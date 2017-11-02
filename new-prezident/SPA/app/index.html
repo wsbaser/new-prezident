@@ -17,27 +17,26 @@
   <body >
     {{content-for "body"}}
 
-    <div id="top_side" style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:45%; transition: all 1000ms linear;">
+    <div id="top_side" style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:45%;">
         <div style="position:absolute; bottom: 0; width:100%; font-family:  Calibri;">
           <div id="newword" style="color: red;font-size: 72px;text-align:center;">NEW</div>
           <div style="color: white; font-size:35px;margin-top:-15px;text-align: center;">prezident</div>
           <div id="divider" style="height:1px; width:150px; background-color: grey; margin:10px auto 0; transition: all 1000ms linear;"></div>
-          <!-- <div class="clearfix"> <span style="color: grey;font-size:33px; padding: 0 2px; transform: rotate(180deg);float:right;">.ru</span></div> -->
         </div>
     </div>
-    <div id="bottom_side" style="position:absolute; left:0; z-index:100000;background-color: #000; top:45%; width: 100%; height:55%; transition: all 1000ms linear;">
-      <div style="width:300px; margin: 70px auto 20px;">
+    <div id="bottom_side" style="position:absolute; left:0; z-index:100000;background-color: #000; top:45%; width: 100%; height:55%;">
+      <div style="width:300px; margin: 60px auto 20px;">
         <div style="color:grey;text-align:center; width: 300px;">
           <div style="margin-bottom:10px; font-size:20px">
             WE MUST TAKE SIDES.
           </div>
-          <div style="padding:3px">
+          <div style="padding:3px;font-size:15px;">
             NEUTRALITY HELPS THE OPRESSOR,
           </div>
-          <div style="padding:3px">
+          <div style="padding:3px;font-size:15px;">
             NEVER THE VICTIM.
           </div>
-          <div style="padding:3px">
+          <div style="padding:3px;font-size:15px;">
             - Elie Wiesel
           </div>
         </div>
@@ -47,7 +46,6 @@
       </div>
     </div>
 
-
     <script >
       setTimeout(function addLetter(){
         var dividerElement = document.getElementById("divider");
@@ -55,23 +53,33 @@
         setTimeout(function(){
           var topElement = document.getElementById("top_side");
           var bottomElement = document.getElementById("bottom_side");
-          topElement.style.top = "-45%"
-          bottomElement.style.top = "100%"
+          var contentElement = document.getElementById("content");
+          topElement.style.display="none";
+          bottomElement.style.display="none";
+          contentElement.style.display="block";
         }, 1000);
-      }, 3000);
-      // var letters=["N","E","W"];
-      // var newwordElement = document.getElementById("newword");
-      // var addLetterFunction = 
-      // setTimeout(function addLetter(){
-      //   newwordElement.textContent = newwordElement.textContent.trim() + letters.shift();
-      //   if(letters.length){
-      //      setTimeout(addLetter, 700);
-      //   }
-      // },1300);
+      }, 4000);
     </script>
 
     <script src="{{rootURL}}assets/vendor.js"></script>
     <script src="{{rootURL}}assets/new-prezident.js"></script>
+
+    <div id="header" class="clearfix" style="max-width: 732px; margin: 0 auto;">
+        <img src='{{rootURL}}assets/anna-politkovskaya.jpg'/ width="300px" style="float:left;" />
+        <div style="padding: 10px 10px 0 0;">"При президенте Путине мы не сможем построить демократию в России: мы будем двигаться лишь назад, в прошлое."</div>
+        <div>А. Политковская, 2004 г.</div>
+    </div>
+    
+    <div id="content" style="max-width: 732px; margin: 0 auto; font-size:18px; font-family:CustomSerif,Georgia,Cambria,'Times New Roman',serif; padding: 10px; box-sizing: border-box;">
+      В марте 2018-го года России предстоит сделать выбор между сохранением авторитарно-клептократического режима и возвращением на непростой путь построения демократического государства. Первый путь ведет страну назад в советское прошлое, с вытекающим из этого упадком экономики, международной изоляцией, бесправием граждан и репрессиями. Второй путь даст возможность развития уничтоженных в данный момент демократических институтов и возобновит процесс формирования гражданского общества.
+      <br/>
+      Только сильное гражданское общество в сочетании с политической конкуренцией способно привести к тому, что управление страной будет осуществляться качественно, разумно и в интересах ее граждан, а не в интересах крупного бизнеса и узкого круга приближенных к власти лиц. Только демократические институты, такие как независимая судебная система, свободные СМИ и честные выборы смогут обеспечить стабильность политической системы и сдержать рост коррупции.
+      <br/>
+      Высокий уровень коррупции (131-е место в мире), отсутствие гарантий права собственности (111-е место в мире), чрезмерная монополизация и многие другие факторы, препятствующие привлечению инвестиций привели к тому, что в 2013-м году при благоприятных внешнеэкономических условиях и стабильно высоких ценах на энергоносители рост ВВП составил всего 1.3% и оказался ниже, чем в развитых Европейских странах. Еще 4 года спустя, ВВП в долларовом выражении упал почти в 2 раза до уровня 2007-го года. Подходят к концу накопления, сделанные при высоких ценах на нефть - в этом году планируется израсходовать последние 17 млрд. $ из Резервного фонда.
+      Согласно прогнозам Минэкономразвития до 2035-го года российская экономика, выйдя из рецессии в 2017-м, в предстоящие 20 лет будет расти крайне медленно — в среднем на 2% в год (от 1,7% до максимум 2,6%). В авторитарном государстве где процветает коррупция, а частная собственность слабо защищена,  нет и не может быть стимулов, которые дали бы толчок для роста экономики. Рост на 2% в год - это максимум на который способна экономика России без решения структурных проблем даже при сохранении стабильных цен на нефть. При таком росте в 2035-м году размер ВВП России все еще будет меньше чем в 2013-м. Однако даже такой прогноз можно считать оптимистичным. Единственным 
+      <br/>
+      Падение цен на нефть является неизбежным следствием технического прогресса. До 2014-го года позитивным сценарием считалось сохранение цен на уровне 100$. Однако произошедшая в 2014-м году “сланцевая революция” позволила существенно повысить добычу за счет ранее недоступных месторождений, что привело к избытку предложения над спросом. Помимо факторов, влияющих на увеличение предложения, также усиливаются факторы влияющие на падение спроса, в числе которых переход на возобновляемые источники энергии и электротранспорт. Стабильный рост “зеленой” энергетики обусловлен тем, что она является 1. неисчерпаемой 2. более дешевой. Поэтому страны, делающие инвестиции в энергию ветра и солнца сегодня, в будущем получат конкурентное преимущество перед странами, которые вырабатывает дорогую энергию из углеводородов.
+    </div>
 
     {{content-for "body-footer"}}
   </body>

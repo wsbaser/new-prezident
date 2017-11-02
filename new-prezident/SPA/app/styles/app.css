@@ -3,3 +3,21 @@
     display: table;
     clear: both;
 }
+
+body{
+	margin:0;
+}
+
+#header{
+	background-color: #000;
+	color:#fff;
+	font-size:20px;
+}
+
+#header>img{
+	float: left;
+}
+
+#content{
+	display: none;
+}
