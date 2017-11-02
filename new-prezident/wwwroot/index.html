@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     
-<meta name="new-prezident/config/environment" content="%7B%22modulePrefix%22%3A%22new-prezident%22%2C%22environment%22%3A%22production%22%2C%22rootURL%22%3A%22/%22%2C%22locationType%22%3A%22auto%22%2C%22EmberENV%22%3A%7B%22FEATURES%22%3A%7B%7D%2C%22EXTEND_PROTOTYPES%22%3A%7B%22Date%22%3Afalse%7D%7D%2C%22APP%22%3A%7B%22name%22%3A%22new-prezident%22%2C%22version%22%3A%220.0.0+507828a5%22%7D%2C%22exportApplicationGlobal%22%3Afalse%7D" />
+<meta name="new-prezident/config/environment" content="%7B%22modulePrefix%22%3A%22new-prezident%22%2C%22environment%22%3A%22production%22%2C%22rootURL%22%3A%22/%22%2C%22locationType%22%3A%22auto%22%2C%22EmberENV%22%3A%7B%22FEATURES%22%3A%7B%7D%2C%22EXTEND_PROTOTYPES%22%3A%7B%22Date%22%3Afalse%7D%7D%2C%22APP%22%3A%7B%22name%22%3A%22new-prezident%22%2C%22version%22%3A%220.0.0+abe831f0%22%7D%2C%22exportApplicationGlobal%22%3Afalse%7D" />
 
     <link integrity="" rel="stylesheet" href="/assets/vendor-d41d8cd98f00b204e9800998ecf8427e.css">
     <link integrity="" rel="stylesheet" href="/assets/new-prezident-8c11b29bf037a421b877c6f5446c8b8e.css">
@@ -18,17 +18,16 @@
   <body >
     
 
-
-    <div style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:50%">
-        <div style="position:absolute; bottom: 0; margin-bottom:35px; width:100%; font-family:  Calibri;">
+    <div id="top_side" style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:45%; transition: all 1000ms linear;">
+        <div style="position:absolute; bottom: 0; width:100%; font-family:  Calibri;">
           <div id="newword" style="color: red;font-size: 72px;text-align:center;">NEW</div>
           <div style="color: white; font-size:35px;margin-top:-15px;text-align: center;">prezident</div>
-          <div style="height:1px; width:150px;background-color: grey;margin:10px auto;"></div>
+          <div id="divider" style="height:1px; width:150px; background-color: grey; margin:10px auto 0; transition: all 1000ms linear;"></div>
           <!-- <div class="clearfix"> <span style="color: grey;font-size:33px; padding: 0 2px; transform: rotate(180deg);float:right;">.ru</span></div> -->
         </div>
     </div>
-    <div style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; top:50%; width: 100%; height:50%">
-      <div style="width:300px; margin: 30px auto 20px;">
+    <div id="bottom_side" style="position:absolute; left:0; z-index:100000;background-color: #000; top:45%; width: 100%; height:55%; transition: all 1000ms linear;">
+      <div style="width:300px; margin: 70px auto 20px;">
         <div style="color:grey;text-align:center; width: 300px;">
           <div style="margin-bottom:10px; font-size:20px">
             WE MUST TAKE SIDES.
@@ -49,7 +48,18 @@
       </div>
     </div>
 
+
     <script >
+      setTimeout(function addLetter(){
+        var dividerElement = document.getElementById("divider");
+        divider.style.width="100%";
+        setTimeout(function(){
+          var topElement = document.getElementById("top_side");
+          var bottomElement = document.getElementById("bottom_side");
+          topElement.style.top = "-45%"
+          bottomElement.style.top = "100%"
+        }, 1000);
+      }, 3000);
       // var letters=["N","E","W"];
       // var newwordElement = document.getElementById("newword");
       // var addLetterFunction = 
@@ -62,7 +72,7 @@
     </script>
 
     <script src="/assets/vendor-d8e139fe902cd02c914be57ac938ae0a.js" integrity="sha256-83MSd462j4EFgnAhaRRuPicxOOk69NfwTNhRLM4O0A4= sha512-lW9o/96yTn86yoI+ZVRM1yGnBUqJa4g5JgLjQzV52KfMFusWVNfte27Jhx5p4XX3E55TfHMBcEsCwZEuQz/gIA==" ></script>
-    <script src="/assets/new-prezident-9967b75d1bf9e1469d2065323e57ce2d.js" integrity="sha256-CcE5g1qIPWyXIWlVye2FoPFwolhhYwc63GdG55+hxQ0= sha512-jLtySNH1Byv2UAs2nriH0Wekd4/5Cx796Ql+UWz2ro7gXk6Qa4N9hRdkRKNoJAW4vvoFE5rn7OBqyrz6Gkn9bg==" ></script>
+    <script src="/assets/new-prezident-16fcaca26420dcb3c1c8539b3d698126.js" integrity="sha256-c7pjtqg3qh/I53qCBV4iFmDA1UbvDwX4gmzPQBU8PYc= sha512-2RsSkSTdgIGDiBGqMXXxkr6FpXLnhjA95J4FrwMIDUNFKFa4lRQ0+IZkRtPOe7Ojb9OtAXA0TlhiqERHbA88KA==" ></script>
 
     
   </body>

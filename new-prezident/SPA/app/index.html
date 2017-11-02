@@ -17,17 +17,16 @@
   <body >
     {{content-for "body"}}
 
-
-    <div style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:50%">
-        <div style="position:absolute; bottom: 0; margin-bottom:35px; width:100%; font-family:  Calibri;">
+    <div id="top_side" style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:45%; transition: all 1000ms linear;">
+        <div style="position:absolute; bottom: 0; width:100%; font-family:  Calibri;">
           <div id="newword" style="color: red;font-size: 72px;text-align:center;">NEW</div>
           <div style="color: white; font-size:35px;margin-top:-15px;text-align: center;">prezident</div>
-          <div style="height:1px; width:150px;background-color: grey;margin:10px auto;"></div>
+          <div id="divider" style="height:1px; width:150px; background-color: grey; margin:10px auto 0; transition: all 1000ms linear;"></div>
           <!-- <div class="clearfix"> <span style="color: grey;font-size:33px; padding: 0 2px; transform: rotate(180deg);float:right;">.ru</span></div> -->
         </div>
     </div>
-    <div style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; top:50%; width: 100%; height:50%">
-      <div style="width:300px; margin: 30px auto 20px;">
+    <div id="bottom_side" style="position:absolute; left:0; z-index:100000;background-color: #000; top:45%; width: 100%; height:55%; transition: all 1000ms linear;">
+      <div style="width:300px; margin: 70px auto 20px;">
         <div style="color:grey;text-align:center; width: 300px;">
           <div style="margin-bottom:10px; font-size:20px">
             WE MUST TAKE SIDES.
@@ -48,7 +47,18 @@
       </div>
     </div>
 
+
     <script >
+      setTimeout(function addLetter(){
+        var dividerElement = document.getElementById("divider");
+        divider.style.width="100%";
+        setTimeout(function(){
+          var topElement = document.getElementById("top_side");
+          var bottomElement = document.getElementById("bottom_side");
+          topElement.style.top = "-45%"
+          bottomElement.style.top = "100%"
+        }, 1000);
+      }, 3000);
       // var letters=["N","E","W"];
       // var newwordElement = document.getElementById("newword");
       // var addLetterFunction = 
