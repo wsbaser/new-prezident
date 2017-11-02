@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="height:100%;">
+<html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,19 +14,23 @@
 
     {{content-for "head-footer"}}
   </head>
-  <body style="background-color: #000;height:100%;">
+  <body >
     {{content-for "body"}}
 
-    <div style="height: 30%;"></div>
-        <div style="width: 150px; margin: 0 auto; font-family: Calibri;">
-          <div id="newword" style="color: red;font-size: 72px;padding-left:3px;">&nbsp;</div>
+
+    <div style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:50%">
+        <div style="position:absolute; bottom: 0; margin-bottom:35px; width:100%; font-family:  Calibri;">
+          <div id="newword" style="color: red;font-size: 72px;text-align:center;">NEW</div>
           <div style="color: white; font-size:35px;margin-top:-15px;text-align: center;">prezident</div>
-          <div style="height:1px; background-color: grey;margin-top:10px;"></div>
+          <div style="height:1px; width:150px;background-color: grey;margin:10px auto;"></div>
           <!-- <div class="clearfix"> <span style="color: grey;font-size:33px; padding: 0 2px; transform: rotate(180deg);float:right;">.ru</span></div> -->
         </div>
-        <div  style="color:grey;text-align:center; margin-top:70px;">
-          <div style="margin-bottom:10px;font-size:20px">
-          WE MUST TAKE SIDES.
+    </div>
+    <div style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; top:50%; width: 100%; height:100%">
+      <div style="width:300px; margin: 30px auto 20px; ">
+        <div style="color:grey;text-align:center; width: 300px;">
+          <div style="margin-bottom:10px; font-size:20px">
+            WE MUST TAKE SIDES.
           </div>
           <div style="padding:3px">
             NEUTRALITY HELPS THE OPRESSOR,
@@ -38,19 +42,22 @@
             - Elie Wiesel
           </div>
         </div>
+      </div>
+      <div style="width: 50px; margin: 0 auto;">
+        <img src='{{rootURL}}assets/elie-wiesel.jpg'/ width="50px" />
+      </div>
     </div>
-    <div style="height: 30%;"></div>
 
     <script >
-      var letters=["N","E","W"];
-      var newwordElement = document.getElementById("newword");
-      var addLetterFunction = 
-      setTimeout(function addLetter(){
-        newwordElement.textContent = newwordElement.textContent.trim() + letters.shift();
-        if(letters.length){
-           setTimeout(addLetter, 700);
-        }
-      },1300);
+      // var letters=["N","E","W"];
+      // var newwordElement = document.getElementById("newword");
+      // var addLetterFunction = 
+      // setTimeout(function addLetter(){
+      //   newwordElement.textContent = newwordElement.textContent.trim() + letters.shift();
+      //   if(letters.length){
+      //      setTimeout(addLetter, 700);
+      //   }
+      // },1300);
     </script>
 
     <script src="{{rootURL}}assets/vendor.js"></script>
