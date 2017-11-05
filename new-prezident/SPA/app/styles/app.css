@@ -8,16 +8,80 @@ body{
 	margin:0;
 }
 
+#headerContainer{
+	position: fixed;
+	top: 0;
+	left:0;
+	right: 0;
+	height: 168px;
+	z-index: 10;
+}
+
+#landmark{
+	position: relative;
+}
+
 #header{
 	background-color: #000;
-	color:#fff;
-	font-size:20px;
+	color:#bbb;
+	font-size:17px;
+	font-style: italic;
+	font-family: Cambria,'Times New Roman',serif
 }
 
 #header>img{
 	float: left;
 }
 
+#contentContainer{
+	max-width: 732px; 
+	margin: 0 auto;
+	box-sizing: border-box;
+	position: relative;
+	padding: 168px 10px 0;
+}
+
 #content{
-	display: none;
+	font-size:18px;
+	font-family: CustomSerif,Georgia,Cambria,'Times New Roman',serif;
+	line-height: 1.58;
+	color: rgba(0,0,0,.8);
+}
+
+
+#drawer{
+	position: absolute;
+	left:-300px;
+	width:250px;
+	top:200px;
+}
+
+#drawer>ul{
+	margin: 0;
+	padding: 0;
+	font-family: Cambria,'Times New Roman',serif;
+}
+
+#drawer>ul>li{
+	padding: 5px;
+	margin: 10px 0;
+	background: #EEE;
+	border-radius: 4px;
+	color: rgba(0,0,0,.8);
+}
+
+.circle{
+	 /*display: inline-block;*/
+    font-style: normal;
+    width: 24px;
+    min-width: 24px;
+    /*background: #fff;*/
+    border-radius: 50%;
+    text-align: center;
+    height: 24px;
+    vertical-align: middle;
+    line-height: 24px;
+    border: 2px solid #bdbdbd;
+    margin-right: 8px;
+    font-weight: 400;
 }

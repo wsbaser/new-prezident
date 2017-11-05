@@ -8,17 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     
-<meta name="new-prezident/config/environment" content="%7B%22modulePrefix%22%3A%22new-prezident%22%2C%22environment%22%3A%22production%22%2C%22rootURL%22%3A%22/%22%2C%22locationType%22%3A%22auto%22%2C%22EmberENV%22%3A%7B%22FEATURES%22%3A%7B%7D%2C%22EXTEND_PROTOTYPES%22%3A%7B%22Date%22%3Afalse%7D%7D%2C%22APP%22%3A%7B%22name%22%3A%22new-prezident%22%2C%22version%22%3A%220.0.0+0c69ca1e%22%7D%2C%22exportApplicationGlobal%22%3Afalse%7D" />
+<meta name="new-prezident/config/environment" content="%7B%22modulePrefix%22%3A%22new-prezident%22%2C%22environment%22%3A%22production%22%2C%22rootURL%22%3A%22/%22%2C%22locationType%22%3A%22auto%22%2C%22EmberENV%22%3A%7B%22FEATURES%22%3A%7B%7D%2C%22EXTEND_PROTOTYPES%22%3A%7B%22Date%22%3Afalse%7D%7D%2C%22APP%22%3A%7B%22name%22%3A%22new-prezident%22%2C%22version%22%3A%220.0.0+4564d9e3%22%7D%2C%22exportApplicationGlobal%22%3Afalse%7D" />
 
     <link integrity="" rel="stylesheet" href="/assets/vendor-d41d8cd98f00b204e9800998ecf8427e.css">
-    <link integrity="" rel="stylesheet" href="/assets/new-prezident-c4da311371ef6d5b8b44b821434dc8a8.css">
+    <link integrity="" rel="stylesheet" href="/assets/new-prezident-c21c977725e467215dc576813c5a2ebc.css">
 
     
   </head>
   <body >
     
 
-    <div id="top_side" style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:45%;">
+<!--     <div id="top_side" style="position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:45%;">
         <div style="position:absolute; bottom: 0; width:100%; font-family:  Calibri;">
           <div id="newword" style="color: red;font-size: 72px;text-align:center;">NEW</div>
           <div style="color: white; font-size:35px;margin-top:-15px;text-align: center;">prezident</div>
@@ -46,40 +46,84 @@
         <img src='/assets/elie-wiesel-042d95a6f02bce61f8dbea399711afa6.jpg'/ width="45px" />
       </div>
     </div>
-
+ -->
     <script >
-      setTimeout(function addLetter(){
-        var dividerElement = document.getElementById("divider");
-        divider.style.width="100%";
-        setTimeout(function(){
-          var topElement = document.getElementById("top_side");
-          var bottomElement = document.getElementById("bottom_side");
-          var contentElement = document.getElementById("content");
-          topElement.style.display="none";
-          bottomElement.style.display="none";
-          contentElement.style.display="block";
-        }, 1000);
-      }, 4000);
+      // setTimeout(function addLetter(){
+      //   var dividerElement = document.getElementById("divider");
+      //   divider.style.width="100%";
+      //   setTimeout(function(){
+      //     var topElement = document.getElementById("top_side");
+      //     var bottomElement = document.getElementById("bottom_side");
+      //     var contentElement = document.getElementById("content");
+      //     topElement.style.display="none";
+      //     bottomElement.style.display="none";
+      //     contentElement.style.display="block";
+      //   }, 1000);
+      // }, 4000);
     </script>
 
     <script src="/assets/vendor-d8e139fe902cd02c914be57ac938ae0a.js" integrity="sha256-83MSd462j4EFgnAhaRRuPicxOOk69NfwTNhRLM4O0A4= sha512-lW9o/96yTn86yoI+ZVRM1yGnBUqJa4g5JgLjQzV52KfMFusWVNfte27Jhx5p4XX3E55TfHMBcEsCwZEuQz/gIA==" ></script>
-    <script src="/assets/new-prezident-70b6d27fc598eeeaefd46329feafb9e5.js" integrity="sha256-qRGHlbgHbmjXM2+5XNpCyx4tYfQJ41g/VDYUpeClvOo= sha512-37xWfalZCLVjWY2LDiQRg01wNH0cQWratkJEfKLRiqsth2Hh2I66rgRNwu1n5D3wx26Sj8eAhZvgqHZoQLLoPg==" ></script>
+    <script src="/assets/new-prezident-e5e259afa17ba5f3ce9365bb529e72c7.js" integrity="sha256-MIgBZS9gPL0MrbFakIa9HdWtbB8qMzg+nBxJzBvRSqQ= sha512-IIhBY+a5hJds6IPgw9mhMseCYyie1yX5RC9jap04BdHtZeAnQDr6j2hs4r2X/DLiyPk3W1gqjX0IOe58SnHsNw==" ></script>
 
-    <div id="header" class="clearfix" style="max-width: 732px; margin: 0 auto;">
-        <img src='/assets/anna-politkovskaya-1cf0ad4dba18a500eb3b0124e19b5be8.jpg'/ width="300px" style="float:left;" />
-        <div style="padding: 10px 10px 0 0;">"При президенте Путине мы не сможем построить демократию в России: мы будем двигаться лишь назад, в прошлое."</div>
-        <div>А. Политковская, 2004 г.</div>
+    <div id="headerContainer">
+      <div id="landmark" style="max-width: 732px; margin: 0 auto;">
+        <div id="header" class="clearfix" style="max-width: 732px; margin: 0 auto;">
+          <img src='/assets/anna-politkovskaya-1cf0ad4dba18a500eb3b0124e19b5be8.jpg'/ width="300px" style="float:left;" />
+          <div style="padding: 30px 30px 20px 0;">"При президенте Путине мы не сможем построить демократию в России: мы будем двигаться лишь назад, в прошлое."</div>
+          <div style="text-align:right;padding-right: 30px;font-size:16px">журналист Анна Политковская, 2004 г.</div>
+          <div style="text-align:right;padding-right: 30px;font-size:14px">( убита 7 ноября 2006 г. )</div>
+        </div>
+        <div id="drawer">
+            <ul>
+              <li class="list-item" style="display: flex;flex-direction:row;align-items:center;">
+                <i class="circle" style="border-color:orange;">1</i>
+                <span class="name">Дорога в никуда</span>
+              </li>
+              <li class="list-item" style="display: flex;flex-direction:row;align-items:center;opacity:0.5;">
+                <i class="circle" >2</i>
+                <span class="name">Пока не закончилась нефть</span>
+              </li>
+              <li class="list-item" style="display: flex;flex-direction:row;align-items:center;opacity:0.5;">
+                <i class="circle" >3</i>
+                <span class="name">Авторитарная клептократия</span>
+              </li>
+              <li class="list-item" style="display: flex;flex-direction:row;align-items:center;opacity:0.5;">
+                <i class="circle" >4</i>
+                <span class="name">"Машин стало больше"</span>
+              </li>
+              <li class="list-item" style="display: flex;flex-direction:row;align-items:center;opacity:0.5;">
+                <i class="circle" >5</i>
+                <span class="name">Почему Россия не Норвегия</span>
+              </li>
+              <li class="list-item" style="display: flex;flex-direction:row;align-items:center;opacity:0.5;">
+                <i class="circle" >6</i>
+                <span class="name">Статья 29: Право на ответственность</span>
+              </li>
+              <li class="list-item" style="display: flex;flex-direction:row;align-items:center;opacity:0.5;">
+                <i class="circle">7</i>
+                <span class="name">ПЛАН ПЕРЕМЕН</span>
+              </li>
+            </ul>
+        </div>
+      </div>
     </div>
     
-    <div id="content" style="max-width: 732px; margin: 0 auto; font-size:18px; font-family:CustomSerif,Georgia,Cambria,'Times New Roman',serif; padding: 10px; box-sizing: border-box;">
-      В марте 2018-го года России предстоит сделать выбор между сохранением авторитарно-клептократического режима и возвращением на непростой путь построения демократического государства. Первый путь ведет страну назад в советское прошлое, с вытекающим из этого упадком экономики, международной изоляцией, бесправием граждан и репрессиями. Второй путь даст возможность развития уничтоженных в данный момент демократических институтов и возобновит процесс формирования гражданского общества.
-      <br/>
-      Только сильное гражданское общество в сочетании с политической конкуренцией способно привести к тому, что управление страной будет осуществляться качественно, разумно и в интересах ее граждан, а не в интересах крупного бизнеса и узкого круга приближенных к власти лиц. Только демократические институты, такие как независимая судебная система, свободные СМИ и честные выборы смогут обеспечить стабильность политической системы и сдержать рост коррупции.
-      <br/>
-      Высокий уровень коррупции (131-е место в мире), отсутствие гарантий права собственности (111-е место в мире), чрезмерная монополизация и многие другие факторы, препятствующие привлечению инвестиций привели к тому, что в 2013-м году при благоприятных внешнеэкономических условиях и стабильно высоких ценах на энергоносители рост ВВП составил всего 1.3% и оказался ниже, чем в развитых Европейских странах. Еще 4 года спустя, ВВП в долларовом выражении упал почти в 2 раза до уровня 2007-го года. Подходят к концу накопления, сделанные при высоких ценах на нефть - в этом году планируется израсходовать последние 17 млрд. $ из Резервного фонда.
-      Согласно прогнозам Минэкономразвития до 2035-го года российская экономика, выйдя из рецессии в 2017-м, в предстоящие 20 лет будет расти крайне медленно — в среднем на 2% в год (от 1,7% до максимум 2,6%). В авторитарном государстве где процветает коррупция, а частная собственность слабо защищена,  нет и не может быть стимулов, которые дали бы толчок для роста экономики. Рост на 2% в год - это максимум на который способна экономика России без решения структурных проблем даже при сохранении стабильных цен на нефть. При таком росте в 2035-м году размер ВВП России все еще будет меньше чем в 2013-м. Однако даже такой прогноз можно считать оптимистичным. Единственным 
-      <br/>
-      Падение цен на нефть является неизбежным следствием технического прогресса. До 2014-го года позитивным сценарием считалось сохранение цен на уровне 100$. Однако произошедшая в 2014-м году “сланцевая революция” позволила существенно повысить добычу за счет ранее недоступных месторождений, что привело к избытку предложения над спросом. Помимо факторов, влияющих на увеличение предложения, также усиливаются факторы влияющие на падение спроса, в числе которых переход на возобновляемые источники энергии и электротранспорт. Стабильный рост “зеленой” энергетики обусловлен тем, что она является 1. неисчерпаемой 2. более дешевой. Поэтому страны, делающие инвестиции в энергию ветра и солнца сегодня, в будущем получат конкурентное преимущество перед странами, которые вырабатывает дорогую энергию из углеводородов.
+    <div id="contentContainer">
+      <div id="content">
+        <p>
+          В марте 2018-го года России предстоит сделать выбор между сохранением авторитарно-клептократического режима и возвращением на непростой путь построения демократического государства. Первый путь ведет страну назад в советское прошлое, с вытекающим из этого упадком экономики, международной изоляцией, бесправием граждан и репрессиями. Второй путь даст возможность развития уничтоженных в данный момент демократических институтов и возобновит процесс формирования гражданского общества.
+        </p>
+        <p>
+          Только сильное гражданское общество в сочетании с политической конкуренцией способно привести к тому, что управление страной будет осуществляться качественно, разумно и в интересах ее граждан, а не в интересах крупного бизнеса и узкого круга приближенных к власти лиц. Только демократические институты, такие как независимая судебная система, свободные СМИ и честные выборы смогут обеспечить стабильность политической системы и сдержать рост коррупции.
+        </p>      
+        <p>
+          Высокий уровень коррупции (131-е место в мире), отсутствие гарантий права собственности (111-е место в мире), чрезмерная монополизация и многие другие факторы, препятствующие привлечению инвестиций привели к тому, что в 2013-м году при благоприятных внешнеэкономических условиях и стабильно высоких ценах на энергоносители рост ВВП составил всего 1.3% и оказался ниже, чем в развитых Европейских странах. Еще 4 года спустя, ВВП в долларовом выражении упал почти в 2 раза до уровня 2007-го года. Подходят к концу накопления, сделанные при высоких ценах на нефть - в этом году планируется израсходовать последние 17 млрд. $ из Резервного фонда.
+          Согласно прогнозам Минэкономразвития до 2035-го года российская экономика, выйдя из рецессии в 2017-м, в предстоящие 20 лет будет расти крайне медленно — в среднем на 2% в год (от 1,7% до максимум 2,6%). В авторитарном государстве где процветает коррупция, а частная собственность слабо защищена,  нет и не может быть стимулов, которые дали бы толчок для роста экономики. Рост на 2% в год - это максимум на который способна экономика России без решения структурных проблем даже при сохранении стабильных цен на нефть. При таком росте в 2035-м году размер ВВП России все еще будет меньше чем в 2013-м. Однако даже такой прогноз можно считать оптимистичным. Единственным 
+        </p>
+        <p>
+          Падение цен на нефть является неизбежным следствием технического прогресса. До 2014-го года позитивным сценарием считалось сохранение цен на уровне 100$. Однако произошедшая в 2014-м году “сланцевая революция” позволила существенно повысить добычу за счет ранее недоступных месторождений, что привело к избытку предложения над спросом. Помимо факторов, влияющих на увеличение предложения, также усиливаются факторы влияющие на падение спроса, в числе которых переход на возобновляемые источники энергии и электротранспорт. Стабильный рост “зеленой” энергетики обусловлен тем, что она является 1. неисчерпаемой 2. более дешевой. Поэтому страны, делающие инвестиции в энергию ветра и солнца сегодня, в будущем получат конкурентное преимущество перед странами, которые вырабатывает дорогую энергию из углеводородов.
+        </p>
+      </div>
     </div>
 
     
