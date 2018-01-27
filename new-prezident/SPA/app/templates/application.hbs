@@ -1,4 +1,29 @@
-{{!-- The following component displays Ember's default welcome message. --}}
-{{!-- Feel free to remove this! --}}
+<div id="headerContainer">
+  <div id="landmark" style="max-width: 732px; margin: 0 auto;">
+    {{#bs-navbar as |navbar|}}
+      <div class="navbar-header">
+        {{navbar.toggle}}
+        {{#link-to "index" class="navbar-brand"}}
+         <span style="color:red;">NP</span>  
+        {{/link-to}}
+      </div>
+      {{#navbar.content}}
+        {{#navbar.nav as |nav|}}
+          {{#nav.item}}{{#nav.link-to "index"}}ВЧЕРА{{/nav.link-to}}{{/nav.item}}
+          {{#nav.item}}{{#nav.link-to "index"}}20!8{{/nav.link-to}}{{/nav.item}}
+          {{#nav.item}}{{#nav.link-to "index"}}ЗАВТРА{{/nav.link-to}}{{/nav.item}}
+        {{/navbar.nav}}
+      {{/navbar.content}}
+    {{/bs-navbar}}
+  </div>
+</div>
+<div id="contentContainer">
+  <div id="videoDescription">
+    Some video description.
+  </div>
+  <div class="videoWrapper">
+    <div id="player"></div>
+  </div>
+</div>
 
 {{outlet}}
