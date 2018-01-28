@@ -1,6 +1,7 @@
 <div id="headerContainer">
   <div id="landmark" style="max-width: 732px; margin: 0 auto;">
     {{#bs-navbar as |navbar|}}
+      <div id="arrow-left"></div>
       <div class="navbar-header">
         {{navbar.toggle}}
         {{#link-to "index" class="navbar-brand"}}
@@ -14,6 +15,7 @@
           {{#nav.item}}{{#nav.link-to "index"}}ЗАВТРА{{/nav.link-to}}{{/nav.item}}
         {{/navbar.nav}}
       {{/navbar.content}}
+      <div id="arrow-right"></div>
     {{/bs-navbar}}
   </div>
 </div>
