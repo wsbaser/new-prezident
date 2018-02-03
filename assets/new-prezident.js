@@ -800,6 +800,38 @@ define('new-prezident/components/ember-popper', ['exports', 'ember-popper/compon
     }
   });
 });
+define('new-prezident/components/video-collection', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Component.extend({
+        video: null,
+        didRender: function didRender() {
+            var youtubeId = this.get('video.youtubeId');
+            var player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: youtubeId,
+                events: {
+                    'onReady': this.onPlayerReady,
+                    'onStateChange': this.onPlayerStateChange
+                }
+            });
+            this.set('player', player);
+        },
+        onPlayerReady: function onPlayerReady(event) {
+            event.target.seekTo(20.5, true);
+        },
+        onPlayerStateChange: function onPlayerStateChange(event) {
+            // if (event.data == YT.PlayerState.PLAYING && !done) {
+            //   //setTimeout(stopVideo, 6000);
+            //   done = true;
+            // }
+        }
+    });
+});
 define('new-prezident/components/welcome-page', ['exports', 'ember-welcome-page/components/welcome-page'], function (exports, _welcomePage) {
   'use strict';
 
@@ -1143,6 +1175,17 @@ define("new-prezident/instance-initializers/ember-data", ["exports", "ember-data
     initialize: _initializeStoreService.default
   };
 });
+define('new-prezident/models/video', ['exports', 'ember-data', 'ember-data/attr'], function (exports, _emberData, _attr) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.default = _emberData.default.Model.extend({
+		youtubeId: (0, _attr.default)('string'),
+		ranges: (0, _attr.default)('string')
+	});
+});
 define('new-prezident/resolver', ['exports', 'ember-resolver'], function (exports, _emberResolver) {
   'use strict';
 
@@ -1164,9 +1207,81 @@ define('new-prezident/router', ['exports', 'new-prezident/config/environment'], 
     rootURL: _environment.default.rootURL
   });
 
-  Router.map(function () {});
+  Router.map(function () {
+    this.route('history', { path: '/history/:video_id' });
+    this.route('future', { path: '/future/:video_id' });
+    this.route('now', { path: '/2018/:video_id' });
+  });
 
   exports.default = Router;
+});
+define('new-prezident/routes/application', ['exports'], function (exports) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.default = Ember.Route.extend({
+		model: function model() {
+			this.store.pushPayload({
+				videos: [{
+					id: 'elections2018',
+					youtubeId: 'KuD0H_W8FDo',
+					ranges: '20.5;'
+				}]
+			});
+			return window.youTubeIframeAPIPromise;
+		}
+	});
+});
+define('new-prezident/routes/future', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Route.extend({});
+});
+define('new-prezident/routes/history', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Route.extend({});
+});
+define('new-prezident/routes/index', ['exports'], function (exports) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.default = Ember.Route.extend({
+		redirect: function redirect(model, transition) {
+			this.transitionTo('now', 'elections2018');
+		}
+	});
+});
+define('new-prezident/routes/now', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Route.extend({
+    model: function model(params) {
+      var model = this.get('store').peekRecord('video', params.video_id);
+      return model;
+    }
+  });
+});
+define('new-prezident/serializers/application', ['exports', 'ember-data'], function (exports, _emberData) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberData.default.RESTSerializer.extend({});
 });
 define('new-prezident/services/ajax', ['exports', 'ember-ajax/services/ajax'], function (exports, _ajax) {
   'use strict';
@@ -1187,7 +1302,7 @@ define("new-prezident/templates/application", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "f1A6PYiQ", "block": "{\"symbols\":[\"navbar\",\"nav\"],\"statements\":[[6,\"div\"],[9,\"id\",\"headerContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"landmark\"],[9,\"style\",\"max-width: 732px; margin: 0 auto;\"],[7],[0,\"\\n\"],[4,\"bs-navbar\",null,null,{\"statements\":[[0,\"      \"],[6,\"div\"],[9,\"id\",\"arrow-left\"],[7],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"navbar-header\"],[7],[0,\"\\n        \"],[1,[19,1,[\"toggle\"]],false],[0,\"\\n\"],[4,\"link-to\",[\"index\"],[[\"class\"],[\"navbar-brand\"]],{\"statements\":[[0,\"         \"],[6,\"span\"],[9,\"style\",\"color:red;\"],[7],[0,\"NP\"],[8],[0,\"  \\n\"]],\"parameters\":[]},null],[0,\"      \"],[8],[0,\"\\n\"],[4,\"component\",[[19,1,[\"content\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"nav\"]]],null,{\"statements\":[[0,\"          \"],[4,\"component\",[[19,2,[\"item\"]]],null,{\"statements\":[[4,\"component\",[[19,2,[\"link-to\"]],\"index\"],null,{\"statements\":[[0,\"ВЧЕРА\"]],\"parameters\":[]},null]],\"parameters\":[]},null],[0,\"\\n          \"],[4,\"component\",[[19,2,[\"item\"]]],null,{\"statements\":[[4,\"component\",[[19,2,[\"link-to\"]],\"index\"],null,{\"statements\":[[0,\"20!8\"]],\"parameters\":[]},null]],\"parameters\":[]},null],[0,\"\\n          \"],[4,\"component\",[[19,2,[\"item\"]]],null,{\"statements\":[[4,\"component\",[[19,2,[\"link-to\"]],\"index\"],null,{\"statements\":[[0,\"ЗАВТРА\"]],\"parameters\":[]},null]],\"parameters\":[]},null],[0,\"\\n\"]],\"parameters\":[2]},null]],\"parameters\":[]},null],[0,\"      \"],[6,\"div\"],[9,\"id\",\"arrow-right\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\"],[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[7],[0,\"\\n    Some video description.\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[1,[18,\"outlet\"],false]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/application.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "dZvw/sK7", "block": "{\"symbols\":[\"navbar\",\"nav\"],\"statements\":[[6,\"div\"],[9,\"id\",\"headerContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"landmark\"],[9,\"style\",\"max-width: 732px; margin: 0 auto;\"],[7],[0,\"\\n\"],[4,\"bs-navbar\",null,null,{\"statements\":[[0,\"      \"],[6,\"div\"],[9,\"id\",\"arrow-left\"],[7],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"navbar-header\"],[7],[0,\"\\n        \"],[1,[19,1,[\"toggle\"]],false],[0,\"\\n\"],[4,\"link-to\",[\"index\"],[[\"class\"],[\"navbar-brand\"]],{\"statements\":[[0,\"         \"],[6,\"span\"],[9,\"style\",\"color:red;\"],[7],[0,\"NP\"],[8],[0,\"  \\n\"]],\"parameters\":[]},null],[0,\"      \"],[8],[0,\"\\n\"],[4,\"component\",[[19,1,[\"content\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"nav\"]]],null,{\"statements\":[[0,\"          \"],[4,\"component\",[[19,2,[\"item\"]]],null,{\"statements\":[[4,\"component\",[[19,2,[\"link-to\"]],\"history\",\"error\"],null,{\"statements\":[[0,\"ИСТОРИЯ\"]],\"parameters\":[]},null]],\"parameters\":[]},null],[0,\"\\n          \"],[4,\"component\",[[19,2,[\"item\"]]],null,{\"statements\":[[4,\"component\",[[19,2,[\"link-to\"]],\"now\",\"elections2018\"],null,{\"statements\":[[0,\"2018\"]],\"parameters\":[]},null]],\"parameters\":[]},null],[0,\"\\n          \"],[4,\"component\",[[19,2,[\"item\"]]],null,{\"statements\":[[4,\"component\",[[19,2,[\"link-to\"]],\"future\",\"error\"],null,{\"statements\":[[0,\"БУДУЩЕЕ\"]],\"parameters\":[]},null]],\"parameters\":[]},null],[0,\"\\n\"]],\"parameters\":[2]},null]],\"parameters\":[]},null],[0,\"      \"],[6,\"div\"],[9,\"id\",\"arrow-right\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[1,[18,\"outlet\"],false]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/application.hbs" } });
 });
 define('new-prezident/templates/components/ember-popper', ['exports', 'ember-popper/templates/components/ember-popper'], function (exports, _emberPopper) {
   'use strict';
@@ -1201,6 +1316,46 @@ define('new-prezident/templates/components/ember-popper', ['exports', 'ember-pop
       return _emberPopper.default;
     }
   });
+});
+define("new-prezident/templates/components/video-collection", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "SSyBQI6U", "block": "{\"symbols\":[],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[7],[0,\"\\n    Some video description.\\n    \"],[6,\"br\"],[7],[8],[0,\"\\n    Some video description.\\n    \"],[6,\"br\"],[7],[8],[0,\"\\n    Some video description.\\n    \"],[6,\"br\"],[7],[8],[0,\"\\n    Some video description.\\n    \"],[6,\"br\"],[7],[8],[0,\"\\n    Some video description.\\n    \"],[6,\"br\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"pager\"],[7],[0,\"\\n    \"],[6,\"span\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
+});
+define("new-prezident/templates/future", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "J/wrRgiX", "block": "{\"symbols\":[],\"statements\":[[1,[25,\"video-collection\",null,[[\"video\"],[[20,[\"model\"]]]]],false]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/future.hbs" } });
+});
+define("new-prezident/templates/history", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "DP1m/AWt", "block": "{\"symbols\":[],\"statements\":[[1,[25,\"video-collection\",null,[[\"video\"],[[20,[\"model\"]]]]],false]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/history.hbs" } });
+});
+define("new-prezident/templates/index", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "bzX+1Bzv", "block": "{\"symbols\":[],\"statements\":[[0,\"    \"],[6,\"div\"],[9,\"id\",\"top_side\"],[9,\"style\",\"display:none;position:absolute; top:0; left:0; z-index:100000;background-color: #000; width: 100%; height:45%; transition: all 300ms linear;\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"style\",\"position:absolute; bottom: 0; width:100%; font-family:  Calibri;\"],[7],[0,\"\\n\"],[2,\"           <div id=\\\"newword\\\" style=\\\"color: red;font-size: 72px;text-align:center;\\\">NEW</div>\\n          <div style=\\\"color: white; font-size:35px;margin-top:-15px;text-align: center;\\\">prezident</div>\\n \"],[0,\"\\n          \"],[6,\"div\"],[9,\"style\",\"text-align:center;\"],[7],[0,\"\\n            \"],[6,\"img\"],[10,\"src\",[26,[[18,\"rootURL\"],\"assets/nplogo.png\"]]],[7],[8],[0,\"  \\n          \"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"id\",\"divider\"],[9,\"style\",\"height:1px; width:150px; background-color: grey; margin:10px auto 0; transition: all 800ms cubic-bezier(0.6, -0.5, 0.735, 0.045);\"],[7],[8],[0,\"\\n        \"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"script\"],[7],[0,\"\\n    //   function showContent(){\\n    //       var dividerElement = document.getElementById(\\\"divider\\\");\\n    //       divider.style.width=\\\"0%\\\";\\n    //       setTimeout(function(){\\n    //         var topElement = document.getElementById(\\\"top_side\\\");\\n    //         var bottomElement = document.getElementById(\\\"bottom_side\\\");\\n    //         var contentElement = document.getElementById(\\\"contentContainer\\\");\\n    //         topElement.style.opacity=0;\\n    //         bottomElement.style.opacity=0;\\n    //         //contentElement.style.display=\\\"block\\\";\\n    //         setTimeout(function(){\\n    //           topElement.remove();\\n    //           bottomElement.remove();\\n    //         },600);\\n    //       }, 900);\\n    //   }\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"bottom_side\"],[9,\"style\",\"display:none;position:absolute; left:0; z-index:100000;background-color: #000; top:45%; width: 100%; height:55%; transition: all 300ms linear;\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"style\",\"width:600px; margin: 40px auto 40px; background-color: #eee; padding: 10px\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"style\",\"text-align:center; width: 600px;\"],[7],[0,\"\\n          \"],[6,\"div\"],[9,\"style\",\"margin-bottom:10px; font-size:15px; line-height: 1.5;font-family:Cambria\"],[7],[0,\"\\n            ПЕРВЕЙШАЯ ЗАДАЧА ТИРАНА - ПОСТОЯННО ВОВЛЕКАТЬ СТРАНУ В ВОЙНЫ, ЧТОБЫ НАРОД НУЖДАЛСЯ В ПРЕДВОДИТЕЛЕ.\\n            ЕСЛИ ТИРАН ЗАПОДОЗРИТ ЛЮДЕЙ В ВОЛЬНЫХ МЫСЛЯХ, ИЛИ МЫСЛЯХ О НЕНУЖНОСТИ ЕГО ПРАВЛЕНИЯ - ОН УНИЧТОЖИТ ИХ ПОД ПРЕДЛОГОМ, ЧТО ОНИ ПРОДАЛИСЬ ВРАГУ.\\n          \"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"style\",\"display:none;margin-bottom:10px; font-size:15px; line-height: 1.5;font-family:Cambria\"],[7],[0,\"\\nМАССЫ НИКОГДА НЕ ЖАЖДАЛИ ЗНАТЬ ПРАВДУ. ИМ НУЖНЫ ИЛЛЮЗИИ, БЕЗ КОТОРЫХ ОНИ ЖИТЬ НЕ МОГУТ. НЕРЕАЛЬНОЕ ДЛЯ НИХ ВСЕГДА ПРЕВАЛИРУЕТ НАД РЕАЛЬНЫМ, И ФАЛЬШЬ ВОЗДЕЙСТВУЕТ НА НИХ С НЕ МЕНЬШЕЙ СИЛОЙ, ЧЕМ ПРАВДА. ОНИ ПОПРОСТУ НЕ ОТЛИЧАЮТ ОДНО ОТ ДРУГОГО\\n          \"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"style\",\"padding:3px;font-size:15px;\"],[7],[0,\"\\n            - Платон, IV в до н.э.\\n          \"],[8],[0,\"\\n        \"],[8],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"style\",\"width: 100px; margin: 0 auto;\"],[7],[0,\"\\n        \"],[6,\"button\"],[9,\"style\",\"width:100px;background-color:red;border-color:red; color:#fff;padding:5px;cursor:pointer;\"],[9,\"onclick\",\"showContent()\"],[7],[0,\"\\n          ДАЛЕЕ\\n        \"],[8],[0,\"  \\n      \"],[8],[0,\"\\n     \"],[2,\"  <div style=\\\"width: 45px; margin: 0 auto;\\\">\\n        <img src='{{rootURL}}assets/elie-wiesel.jpg' width=\\\"45px\\\" />\\n      </div> \"],[0,\"\\n    \"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/index.hbs" } });
+});
+define("new-prezident/templates/now", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "FF5SesDJ", "block": "{\"symbols\":[],\"statements\":[[1,[25,\"video-collection\",null,[[\"video\"],[[20,[\"model\"]]]]],false]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/now.hbs" } });
 });
 
 
@@ -1224,6 +1379,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+6a2fe163"});
+  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+d53e43a6"});
 }
 //# sourceMappingURL=new-prezident.map
