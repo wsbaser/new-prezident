@@ -10,21 +10,13 @@
       </div>
       {{#navbar.content}}
         {{#navbar.nav as |nav|}}
-          {{#nav.item}}{{#nav.link-to "index"}}ВЧЕРА{{/nav.link-to}}{{/nav.item}}
-          {{#nav.item}}{{#nav.link-to "index"}}20!8{{/nav.link-to}}{{/nav.item}}
-          {{#nav.item}}{{#nav.link-to "index"}}ЗАВТРА{{/nav.link-to}}{{/nav.item}}
+          {{#nav.item}}{{#nav.link-to "history" "error"}}ИСТОРИЯ{{/nav.link-to}}{{/nav.item}}
+          {{#nav.item}}{{#nav.link-to "now" "elections2018"}}2018{{/nav.link-to}}{{/nav.item}}
+          {{#nav.item}}{{#nav.link-to "future" "error"}}БУДУЩЕЕ{{/nav.link-to}}{{/nav.item}}
         {{/navbar.nav}}
       {{/navbar.content}}
       <div id="arrow-right"></div>
     {{/bs-navbar}}
-  </div>
-</div>
-<div id="contentContainer">
-  <div id="videoDescription">
-    Some video description.
-  </div>
-  <div class="videoWrapper">
-    <div id="player"></div>
   </div>
 </div>
 
