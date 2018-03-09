@@ -3,5 +3,5 @@ import attr from 'ember-data/attr';
 
 export default DS.Model.extend({
 	youtubeId: attr('string'),
-	ranges: attr('string')
+	channel: attr('string')
 });

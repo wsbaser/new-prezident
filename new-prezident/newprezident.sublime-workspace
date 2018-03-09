@@ -1,0 +1,243 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"vide",
+				"videoId"
+			],
+			[
+				"video",
+				"video"
+			],
+			[
+				"set",
+				"setVideo"
+			],
+			[
+				"get",
+				"getNextVideo"
+			],
+			[
+				"nex",
+				"nextVideo"
+			],
+			[
+				"vi",
+				"videosWatched"
+			],
+			[
+				"ma",
+				"max-width"
+			],
+			[
+				"font",
+				"font-weight"
+			],
+			[
+				"in",
+				"inline-block"
+			],
+			[
+				"ba",
+				"background-color"
+			],
+			[
+				"co",
+				"color"
+			],
+			[
+				"padd",
+				"padding"
+			],
+			[
+				"l",
+				"list-style-type"
+			],
+			[
+				"mar",
+				"margin"
+			],
+			[
+				"fon",
+				"font-size"
+			],
+			[
+				"visi",
+				"visitor_phone"
+			],
+			[
+				"vis",
+				"visitor_name"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"packa",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/application.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/components/video-collection.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/index.hbs",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/router.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/application.hbs",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/index.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/now.hbs",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/services/video-history.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/services/video-navigator.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/components/video-collection.hbs",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.css",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/ember-cli-build.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/index.html",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/now.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/initializers/component-router-injector.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/serializers/application.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/history.hbs",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/future.hbs",
+		"/Users/Mac/dev/nightwatch-data-driven/package.json",
+		"/Users/Mac/dev/nightwatch-data-driven/index.js",
+		"/Users/Mac/dev/Omni-Tests/package.json",
+		"/index.js",
+		"/Users/Mac/dev/order.php"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"description",
+			"videoNavigator",
+			"store",
+			"summary",
+			"family",
+			"Container",
+			"content",
+			";\n",
+			"videoDesctiption",
+			">\n",
+			"source",
+			"buffer",
+			"sendAdminEmail",
+			"\n        ",
+			"form"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 232.0,
+	"status_bar_visible": true
+}
