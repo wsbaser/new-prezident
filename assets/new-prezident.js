@@ -8,9 +8,10 @@ define('new-prezident/app', ['exports', 'new-prezident/resolver', 'ember-load-in
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var Application = Ember.Application;
 
 
-  var App = Ember.Application.extend({
+  var App = Application.extend({
     modulePrefix: _environment.default.modulePrefix,
     podModulePrefix: _environment.default.podModulePrefix,
     Resolver: _resolver.default
@@ -806,7 +807,8 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    exports.default = Ember.Component.extend({
+    var Component = Ember.Component;
+    exports.default = Component.extend({
         videoNavigator: Ember.inject.service(),
         videoHistory: Ember.inject.service(),
         playlist: null,
@@ -940,40 +942,43 @@ define('new-prezident/helpers/bs-eq', ['exports', 'ember-bootstrap/helpers/bs-eq
     }
   });
 });
-define('new-prezident/helpers/cancel-all', ['exports', 'ember-concurrency/-helpers'], function (exports, _helpers) {
+define('new-prezident/helpers/cancel-all', ['exports', 'ember-concurrency/helpers/cancel-all'], function (exports, _cancelAll) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.cancelHelper = cancelHelper;
-
-
-  var CANCEL_REASON = "the 'cancel-all' template helper was invoked";
-
-  function cancelHelper(args) {
-    var cancelable = args[0];
-    if (!cancelable || typeof cancelable.cancelAll !== 'function') {
-      Ember.assert('The first argument passed to the `cancel-all` helper should be a Task or TaskGroup (without quotes); you passed ' + cancelable, false);
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _cancelAll.default;
     }
-
-    return (0, _helpers.taskHelperClosure)('cancel-all', 'cancelAll', [cancelable, CANCEL_REASON]);
-  }
-
-  exports.default = Ember.Helper.helper(cancelHelper);
+  });
+  Object.defineProperty(exports, 'cancelAll', {
+    enumerable: true,
+    get: function () {
+      return _cancelAll.cancelAll;
+    }
+  });
 });
-define('new-prezident/helpers/perform', ['exports', 'ember-concurrency/-helpers'], function (exports, _helpers) {
+define('new-prezident/helpers/perform', ['exports', 'ember-concurrency/helpers/perform'], function (exports, _perform) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.performHelper = performHelper;
-  function performHelper(args, hash) {
-    return (0, _helpers.taskHelperClosure)('perform', 'perform', args, hash);
-  }
-
-  exports.default = Ember.Helper.helper(performHelper);
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _perform.default;
+    }
+  });
+  Object.defineProperty(exports, 'perform', {
+    enumerable: true,
+    get: function () {
+      return _perform.perform;
+    }
+  });
 });
 define('new-prezident/helpers/pluralize', ['exports', 'ember-inflector/lib/helpers/pluralize'], function (exports, _pluralize) {
   'use strict';
@@ -991,38 +996,24 @@ define('new-prezident/helpers/singularize', ['exports', 'ember-inflector/lib/hel
   });
   exports.default = _singularize.default;
 });
-define('new-prezident/helpers/task', ['exports'], function (exports) {
+define('new-prezident/helpers/task', ['exports', 'ember-concurrency/helpers/task'], function (exports, _task) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-
-  function _toConsumableArray(arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
-        arr2[i] = arr[i];
-      }
-
-      return arr2;
-    } else {
-      return Array.from(arr);
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _task.default;
     }
-  }
-
-  function _toArray(arr) {
-    return Array.isArray(arr) ? arr : Array.from(arr);
-  }
-
-  function taskHelper(_ref) {
-    var _ref2 = _toArray(_ref),
-        task = _ref2[0],
-        args = _ref2.slice(1);
-
-    return task._curry.apply(task, _toConsumableArray(args));
-  }
-
-  exports.default = Ember.Helper.helper(taskHelper);
+  });
+  Object.defineProperty(exports, 'task', {
+    enumerable: true,
+    get: function () {
+      return _task.task;
+    }
+  });
 });
 define('new-prezident/initializers/app-version', ['exports', 'ember-cli-app-version/initializer-factory', 'new-prezident/config/environment'], function (exports, _initializerFactory, _environment) {
   'use strict';
@@ -1030,15 +1021,9 @@ define('new-prezident/initializers/app-version', ['exports', 'ember-cli-app-vers
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-
-
-  var name = void 0,
-      version = void 0;
-  if (_environment.default.APP) {
-    name = _environment.default.APP.name;
-    version = _environment.default.APP.version;
-  }
-
+  var _config$APP = _environment.default.APP,
+      name = _config$APP.name,
+      version = _config$APP.version;
   exports.default = {
     name: 'App Version',
     initialize: (0, _initializerFactory.default)(name, version)
@@ -1090,16 +1075,24 @@ define('new-prezident/initializers/data-adapter', ['exports'], function (exports
     initialize: function initialize() {}
   };
 });
-define('new-prezident/initializers/ember-concurrency', ['exports', 'ember-concurrency'], function (exports) {
+define('new-prezident/initializers/ember-concurrency', ['exports', 'ember-concurrency/initializers/ember-concurrency'], function (exports, _emberConcurrency) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = {
-    name: 'ember-concurrency',
-    initialize: function initialize() {}
-  };
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _emberConcurrency.default;
+    }
+  });
+  Object.defineProperty(exports, 'initialize', {
+    enumerable: true,
+    get: function () {
+      return _emberConcurrency.initialize;
+    }
+  });
 });
 define('new-prezident/initializers/ember-data', ['exports', 'ember-data/setup-container', 'ember-data'], function (exports, _setupContainer) {
   'use strict';
@@ -1276,9 +1269,10 @@ define('new-prezident/router', ['exports', 'new-prezident/config/environment'], 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var EmberRouter = Ember.Router;
 
 
-  var Router = Ember.Router.extend({
+  var Router = EmberRouter.extend({
     location: _environment.default.locationType,
     rootURL: _environment.default.rootURL
   });
@@ -1295,7 +1289,8 @@ define('new-prezident/routes/application', ['exports'], function (exports) {
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.default = Ember.Route.extend({
+	var Route = Ember.Route;
+	exports.default = Route.extend({
 		model: function model() {
 			localStorage.clear();
 			this.store.pushPayload({
@@ -1343,7 +1338,8 @@ define('new-prezident/routes/index', ['exports'], function (exports) {
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.default = Ember.Route.extend({
+	var Route = Ember.Route;
+	exports.default = Route.extend({
 		model: function model(params) {
 			// var model = this.get('store').peekRecord('video', params.video_id);
 			// return model;
@@ -1382,7 +1378,8 @@ define('new-prezident/services/video-history', ['exports'], function (exports) {
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
-    exports.default = Ember.Service.extend({
+    var Service = Ember.Service;
+    exports.default = Service.extend({
         save: function save(playlistId) {
             this.init();
             var hystory = JSON.parse(window.localStorage.getItem('videoHistory'));
@@ -1408,7 +1405,8 @@ define('new-prezident/services/video-navigator', ['exports'], function (exports)
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.default = Ember.Service.extend({
+	var Service = Ember.Service;
+	exports.default = Service.extend({
 		router: Ember.inject.service(),
 		store: Ember.inject.service(),
 		videoHistory: Ember.inject.service(),
@@ -1451,7 +1449,7 @@ define("new-prezident/templates/components/video-collection", ["exports"], funct
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "tODk0rqb", "block": "{\"symbols\":[\"car\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[0,\"Нужны ли выборы 2018 года?\"],[8],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[0,\"Время просмотра: 18 минут\"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[7],[0,\"\\n        \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"col-4\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\"],[\"glyphicon glyphicon-chevron-right\",\"glyphicon glyphicon-chevron-left\"]],{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"          video range 1\\n\"]],\"parameters\":[]},null],[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"          video range 2\\n\"]],\"parameters\":[]},null]],\"parameters\":[1]},null],[0,\"      \\n\"],[2,\"        <div class=\\\"links-list\\\">\\n          См. также:\\n          {{#link-to \\\"index\\\"}}диктаторские режимы СНГ{{/link-to}},\\n          {{#link-to \\\"index\\\"}}фальсификация выборов{{/link-to}},\\n          {{#link-to \\\"index\\\"}}создание \\\"Единой России\\\"{{/link-to}},\\n          {{#link-to \\\"index\\\"}}контроль над СМИ{{/link-to}},\\n          {{#link-to \\\"index\\\"}}квасной патриотизм{{/link-to}}\\n        </div>\\n        \"],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextVideo\"],null],\"primary\"]],{\"statements\":[[0,\"      ПРОПУСТИТЬ\\n      \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "qucbWL8/", "block": "{\"symbols\":[\"car\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[0,\"Нужны ли выборы 2018 года?\"],[8],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[0,\"Время просмотра: 18 минут\"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[7],[0,\"\\n        \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"col-4\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\"],[\"glyphicon glyphicon-chevron-right\",\"glyphicon glyphicon-chevron-left\"]],{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"          video range 1\\n\"]],\"parameters\":[]},null],[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"          video range 2\\n\"]],\"parameters\":[]},null]],\"parameters\":[1]},null],[0,\"\\n\"],[2,\"        <div class=\\\"links-list\\\">\\n          См. также:\\n          {{#link-to \\\"index\\\"}}диктаторские режимы СНГ{{/link-to}},\\n          {{#link-to \\\"index\\\"}}фальсификация выборов{{/link-to}},\\n          {{#link-to \\\"index\\\"}}создание \\\"Единой России\\\"{{/link-to}},\\n          {{#link-to \\\"index\\\"}}контроль над СМИ{{/link-to}},\\n          {{#link-to \\\"index\\\"}}квасной патриотизм{{/link-to}}\\n        </div>\\n        \"],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextVideo\"],null],\"primary\"]],{\"statements\":[[0,\"      ПРОПУСТИТЬ ТЕМУ \\\"ВЫБОРЫ\\\"\\n      \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
 });
 define("new-prezident/templates/index", ["exports"], function (exports) {
   "use strict";
@@ -1483,6 +1481,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+42ccb825"});
+  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+42a9b0f0"});
 }
 //# sourceMappingURL=new-prezident.map
