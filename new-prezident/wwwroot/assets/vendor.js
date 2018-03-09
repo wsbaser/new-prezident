@@ -11271,7 +11271,7 @@ return jQuery;
  *            Portions Copyright 2008-2011 Apple Inc. All rights reserved.
  * @license   Licensed under MIT license
  *            See https://raw.github.com/emberjs/ember.js/master/LICENSE
- * @version   2.16.2
+ * @version   2.16.1
  */
 
 var enifed, requireModule, Ember;
@@ -16374,28 +16374,26 @@ enifed('@glimmer/runtime', ['exports', '@glimmer/util', '@glimmer/reference', '@
             var partial = _partial;
             var partialSymbols = partial.symbolTable.symbols;
             var outerScope = vm.scope();
-            var evalScope = outerScope.getEvalScope();
             var partialScope = vm.pushRootScope(partialSymbols.length, false);
             partialScope.bindCallerScope(outerScope.getCallerScope());
-            partialScope.bindEvalScope(evalScope);
+            partialScope.bindEvalScope(outerScope.getEvalScope());
             partialScope.bindSelf(outerScope.getSelf());
             var evalInfo = this.evalInfo,
                 outerSymbols = this.outerSymbols;
 
-            var locals = Object.create(outerScope.getPartialMap());
+            var locals = (0, _util.dict)();
             for (var i = 0; i < evalInfo.length; i++) {
                 var slot = evalInfo[i];
                 var name = outerSymbols[slot - 1];
                 var ref = outerScope.getSymbol(slot);
                 locals[name] = ref;
             }
-            if (evalScope) {
-                for (var _i2 = 0; _i2 < partialSymbols.length; _i2++) {
-                    var _name = partialSymbols[_i2];
-                    var symbol = _i2 + 1;
-                    var value = evalScope[_name];
-                    if (value !== undefined) partialScope.bind(symbol, value);
-                }
+            var evalScope = outerScope.getEvalScope();
+            for (var _i2 = 0; _i2 < partialSymbols.length; _i2++) {
+                var _name = partialSymbols[_i2];
+                var symbol = _i2 + 1;
+                var value = evalScope[_name];
+                if (value !== undefined) partialScope.bind(symbol, value);
             }
             partialScope.bindPartialMap(locals);
             vm.pushFrame();
@@ -59704,7 +59702,7 @@ enifed('ember/index', ['exports', 'require', 'ember-environment', 'node-module',
 enifed("ember/version", ["exports"], function (exports) {
   "use strict";
 
-  exports.default = "2.16.2";
+  exports.default = "2.16.1";
 });
 enifed("handlebars", ["exports"], function (exports) {
   "use strict";
@@ -64019,6 +64017,16 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
 
   var _rsvp;
 
+  function indexOf(callbacks, callback) {
+    for (var i = 0, l = callbacks.length; i < l; i++) {
+      if (callbacks[i] === callback) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
   function callbacksFor(object) {
     var callbacks = object._promiseCallbacks;
 
@@ -64054,7 +64062,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
         callbacks = allCallbacks[eventName] = [];
       }
 
-      if (callbacks.indexOf(callback)) {
+      if (indexOf(callbacks, callback) === -1) {
         callbacks.push(callback);
       }
     },
@@ -64070,7 +64078,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
 
       callbacks = allCallbacks[eventName];
 
-      index = callbacks.indexOf(callback);
+      index = indexOf(callbacks, callback);
 
       if (index !== -1) {
         callbacks.splice(index, 1);
@@ -64106,6 +64114,40 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     }
   }
 
+  function objectOrFunction(x) {
+    var type = typeof x;
+    return x !== null && (type === 'object' || type === 'function');
+  }
+
+  function isFunction(x) {
+    return typeof x === 'function';
+  }
+
+  function isObject(x) {
+    return x !== null && typeof x === 'object';
+  }
+
+  function isMaybeThenable(x) {
+    return x !== null && typeof x === 'object';
+  }
+
+  var _isArray = void 0;
+  if (Array.isArray) {
+    _isArray = Array.isArray;
+  } else {
+    _isArray = function (x) {
+      return Object.prototype.toString.call(x) === '[object Array]';
+    };
+  }
+
+  var isArray = _isArray;
+
+  // Date.now is not available in browsers < IE9
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now#Compatibility
+  var now = Date.now || function () {
+    return new Date().getTime();
+  };
+
   var queue = [];
 
   function scheduleFlush() {
@@ -64137,7 +64179,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
         detail: promise._result,
         childId: child && child._id,
         label: promise._label,
-        timeStamp: Date.now(),
+        timeStamp: now(),
         error: config["instrument-with-stack"] ? new Error(promise._label) : null
       } })) {
       scheduleFlush();
@@ -64193,20 +64235,11 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     return new TypeError('A promises callback cannot return that same promise.');
   }
 
-  function objectOrFunction(x) {
-    var type = typeof x;
-    return x !== null && (type === 'object' || type === 'function');
-  }
-
   function noop() {}
 
   var PENDING = void 0;
   var FULFILLED = 1;
   var REJECTED = 2;
-
-  function ErrorObject() {
-    this.error = null;
-  }
 
   var GET_THEN_ERROR = new ErrorObject();
 
@@ -64217,25 +64250,6 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
       GET_THEN_ERROR.error = error;
       return GET_THEN_ERROR;
     }
-  }
-
-  var TRY_CATCH_ERROR = new ErrorObject();
-
-  var tryCatchCallback = void 0;
-  function tryCatcher() {
-    try {
-      var target = tryCatchCallback;
-      tryCatchCallback = null;
-      return target.apply(this, arguments);
-    } catch (e) {
-      TRY_CATCH_ERROR.error = e;
-      return TRY_CATCH_ERROR;
-    }
-  }
-
-  function tryCatch(fn) {
-    tryCatchCallback = fn;
-    return tryCatcher;
   }
 
   function tryThen(then$$1, value, fulfillmentHandler, rejectionHandler) {
@@ -64283,10 +64297,10 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
       reject(promise, thenable._result);
     } else {
       subscribe(thenable, undefined, function (value) {
-        if (thenable === value) {
-          fulfill(promise, value);
+        if (thenable !== value) {
+          resolve(promise, value, undefined);
         } else {
-          resolve(promise, value);
+          fulfill(promise, value);
         }
       }, function (reason) {
         return reject(promise, reason);
@@ -64300,10 +64314,9 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     if (isOwnThenable) {
       handleOwnThenable(promise, maybeThenable);
     } else if (then$$1 === GET_THEN_ERROR) {
-      var error = GET_THEN_ERROR.error;
+      reject(promise, GET_THEN_ERROR.error);
       GET_THEN_ERROR.error = null;
-      reject(promise, error);
-    } else if (typeof then$$1 === 'function') {
+    } else if (isFunction(then$$1)) {
       handleForeignThenable(promise, maybeThenable, then$$1);
     } else {
       fulfill(promise, maybeThenable);
@@ -64399,26 +64412,46 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     promise._subscribers.length = 0;
   }
 
+  function ErrorObject() {
+    this.error = null;
+  }
+
+  var TRY_CATCH_ERROR = new ErrorObject();
+
+  function tryCatch(callback, result) {
+    try {
+      return callback(result);
+    } catch (e) {
+      TRY_CATCH_ERROR.error = e;
+      return TRY_CATCH_ERROR;
+    }
+  }
+
   function invokeCallback(state, promise, callback, result) {
-    var hasCallback = typeof callback === 'function';
-    var value = void 0;
+    var hasCallback = isFunction(callback);
+    var value = void 0,
+        error = void 0;
 
     if (hasCallback) {
-      value = tryCatch(callback)(result);
+      value = tryCatch(callback, result);
+
+      if (value === TRY_CATCH_ERROR) {
+        error = value.error;
+        value.error = null; // release
+      } else if (value === promise) {
+        reject(promise, withOwnPromise());
+        return;
+      }
     } else {
       value = result;
     }
 
     if (promise._state !== PENDING) {
       // noop
-    } else if (value === promise) {
-      reject(promise, withOwnPromise());
-    } else if (value === TRY_CATCH_ERROR) {
-      var error = value.error;
-      value.error = null; // release
-      reject(promise, error);
-    } else if (hasCallback) {
+    } else if (hasCallback && error === undefined) {
       resolve(promise, value);
+    } else if (error !== undefined) {
+      reject(promise, error);
     } else if (state === FULFILLED) {
       fulfill(promise, value);
     } else if (state === REJECTED) {
@@ -64475,118 +64508,109 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     return child;
   }
 
-  var Enumerator = function () {
-    function Enumerator(Constructor, input, abortOnReject, label) {
-      (0, _emberBabel.classCallCheck)(this, Enumerator);
+  function Enumerator(Constructor, input, abortOnReject, label) {
+    this._instanceConstructor = Constructor;
+    this.promise = new Constructor(noop, label);
+    this._abortOnReject = abortOnReject;
 
-      this._instanceConstructor = Constructor;
-      this.promise = new Constructor(noop, label);
-      this._abortOnReject = abortOnReject;
-      this.isUsingOwnPromise = Constructor === Promise;
+    this._init.apply(this, arguments);
+  }
 
-      this._init.apply(this, arguments);
+  Enumerator.prototype._init = function (Constructor, input) {
+    var len = input.length || 0;
+    this.length = len;
+    this._remaining = len;
+    this._result = new Array(len);
+
+    this._enumerate(input);
+    if (this._remaining === 0) {
+      fulfill(this.promise, this._result);
     }
+  };
 
-    Enumerator.prototype._init = function _init(Constructor, input) {
-      var len = input.length || 0;
-      this.length = len;
-      this._remaining = len;
-      this._result = new Array(len);
+  Enumerator.prototype._enumerate = function (input) {
+    var length = this.length;
+    var promise = this.promise;
 
-      this._enumerate(input);
-    };
+    for (var i = 0; promise._state === PENDING && i < length; i++) {
+      this._eachEntry(input[i], i);
+    }
+  };
 
-    Enumerator.prototype._enumerate = function _enumerate(input) {
-      var length = this.length;
-      var promise = this.promise;
+  Enumerator.prototype._settleMaybeThenable = function (entry, i) {
+    var c = this._instanceConstructor;
+    var resolve$$1 = c.resolve;
 
-      for (var i = 0; promise._state === PENDING && i < length; i++) {
-        this._eachEntry(input[i], i, true);
-      }
+    if (resolve$$1 === resolve$1) {
+      var then$$1 = getThen(entry);
 
-      this._checkFullfillment();
-    };
-
-    Enumerator.prototype._checkFullfillment = function _checkFullfillment() {
-      if (this._remaining === 0) {
-        fulfill(this.promise, this._result);
-      }
-    };
-
-    Enumerator.prototype._settleMaybeThenable = function _settleMaybeThenable(entry, i, firstPass) {
-      var c = this._instanceConstructor;
-      var resolve$$1 = c.resolve;
-
-      if (resolve$$1 === resolve$1) {
-        var then$$1 = getThen(entry);
-
-        if (then$$1 === then && entry._state !== PENDING) {
-          entry._onError = null;
-          this._settledAt(entry._state, i, entry._result, firstPass);
-        } else if (typeof then$$1 !== 'function') {
-          this._settledAt(FULFILLED, i, entry, firstPass);
-        } else if (this.isUsingOwnPromise) {
-          var promise = new c(noop);
-          handleMaybeThenable(promise, entry, then$$1);
-          this._willSettleAt(promise, i, firstPass);
-        } else {
-          this._willSettleAt(new c(function (resolve$$1) {
-            return resolve$$1(entry);
-          }), i, firstPass);
-        }
+      if (then$$1 === then && entry._state !== PENDING) {
+        entry._onError = null;
+        this._settledAt(entry._state, i, entry._result);
+      } else if (typeof then$$1 !== 'function') {
+        this._remaining--;
+        this._result[i] = this._makeResult(FULFILLED, i, entry);
+      } else if (c === Promise) {
+        var promise = new c(noop);
+        handleMaybeThenable(promise, entry, then$$1);
+        this._willSettleAt(promise, i);
       } else {
-        this._willSettleAt(resolve$$1(entry), i, firstPass);
+        this._willSettleAt(new c(function (resolve$$1) {
+          return resolve$$1(entry);
+        }), i);
       }
-    };
+    } else {
+      this._willSettleAt(resolve$$1(entry), i);
+    }
+  };
 
-    Enumerator.prototype._eachEntry = function _eachEntry(entry, i, firstPass) {
-      if (entry !== null && typeof entry === 'object') {
-        this._settleMaybeThenable(entry, i, firstPass);
-      } else {
-        this._setResultAt(FULFILLED, i, entry, firstPass);
-      }
-    };
-
-    Enumerator.prototype._settledAt = function _settledAt(state, i, value, firstPass) {
-      var promise = this.promise;
-
-      if (promise._state === PENDING) {
-        if (this._abortOnReject && state === REJECTED) {
-          reject(promise, value);
-        } else {
-          this._setResultAt(state, i, value, firstPass);
-          this._checkFullfillment();
-        }
-      }
-    };
-
-    Enumerator.prototype._setResultAt = function _setResultAt(state, i, value, firstPass) {
+  Enumerator.prototype._eachEntry = function (entry, i) {
+    if (isMaybeThenable(entry)) {
+      this._settleMaybeThenable(entry, i);
+    } else {
       this._remaining--;
-      this._result[i] = value;
-    };
+      this._result[i] = this._makeResult(FULFILLED, i, entry);
+    }
+  };
 
-    Enumerator.prototype._willSettleAt = function _willSettleAt(promise, i, firstPass) {
-      var _this = this;
+  Enumerator.prototype._settledAt = function (state, i, value) {
+    var promise = this.promise;
 
-      subscribe(promise, undefined, function (value) {
-        return _this._settledAt(FULFILLED, i, value, firstPass);
-      }, function (reason) {
-        return _this._settledAt(REJECTED, i, reason, firstPass);
-      });
-    };
+    if (promise._state === PENDING) {
+      if (this._abortOnReject && state === REJECTED) {
+        reject(promise, value);
+      } else {
+        this._remaining--;
+        this._result[i] = this._makeResult(state, i, value);
+        if (this._remaining === 0) {
+          fulfill(promise, this._result);
+        }
+      }
+    }
+  };
 
-    return Enumerator;
-  }();
+  Enumerator.prototype._makeResult = function (state, i, value) {
+    return value;
+  };
 
-  function setSettledResult(state, i, value) {
-    this._remaining--;
+  Enumerator.prototype._willSettleAt = function (promise, i) {
+    var enumerator = this;
+
+    subscribe(promise, undefined, function (value) {
+      return enumerator._settledAt(FULFILLED, i, value);
+    }, function (reason) {
+      return enumerator._settledAt(REJECTED, i, reason);
+    });
+  };
+
+  function makeSettledResult(state, position, value) {
     if (state === FULFILLED) {
-      this._result[i] = {
+      return {
         state: 'fulfilled',
         value: value
       };
     } else {
-      this._result[i] = {
+      return {
         state: 'rejected',
         reason: value
       };
@@ -64641,7 +64665,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     @static
   */
   function all(entries, label) {
-    if (!Array.isArray(entries)) {
+    if (!isArray(entries)) {
       return this.reject(new TypeError("Promise.all must be called with an array"), label);
     }
     return new Enumerator(this, entries, true /* abort on reject */, label).promise;
@@ -64719,7 +64743,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
 
     var promise = new Constructor(noop, label);
 
-    if (!Array.isArray(entries)) {
+    if (!isArray(entries)) {
       reject(promise, new TypeError('Promise.race must be called with an array'));
       return promise;
     }
@@ -64778,7 +64802,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     return promise;
   }
 
-  var guidKey = 'rsvp_' + Date.now() + '-';
+  var guidKey = 'rsvp_' + now() + '-';
   var counter = 0;
 
   function needsResolver() {
@@ -64893,56 +64917,117 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     Useful for tooling.
     @constructor
   */
+  function Promise(resolver, label) {
+    this._id = counter++;
+    this._label = label;
+    this._state = undefined;
+    this._result = undefined;
+    this._subscribers = [];
 
-  var Promise = function () {
-    function Promise(resolver, label) {
-      (0, _emberBabel.classCallCheck)(this, Promise);
+    config.instrument && instrument('created', this);
 
-      this._id = counter++;
-      this._label = label;
-      this._state = undefined;
-      this._result = undefined;
-      this._subscribers = [];
-
-      config.instrument && instrument('created', this);
-
-      if (noop !== resolver) {
-        typeof resolver !== 'function' && needsResolver();
-        this instanceof Promise ? initializePromise(this, resolver) : needsNew();
-      }
+    if (noop !== resolver) {
+      typeof resolver !== 'function' && needsResolver();
+      this instanceof Promise ? initializePromise(this, resolver) : needsNew();
     }
+  }
 
-    Promise.prototype._onError = function _onError(reason) {
-      var _this2 = this;
+  Promise.prototype._onError = function (reason) {
+    var _this = this;
 
-      config.after(function () {
-        if (_this2._onError) {
-          config.trigger('error', reason, _this2._label);
-        }
+    config.after(function () {
+      if (_this._onError) {
+        config.trigger('error', reason, _this._label);
+      }
+    });
+  };
+
+  /**
+    `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
+    as the catch block of a try/catch statement.
+  
+    ```js
+    function findAuthor(){
+      throw new Error('couldn\'t find that author');
+    }
+  
+    // synchronous
+    try {
+      findAuthor();
+    } catch(reason) {
+      // something went wrong
+    }
+  
+    // async with promises
+    findAuthor().catch(function(reason){
+      // something went wrong
+    });
+    ```
+  
+    @method catch
+    @param {Function} onRejection
+    @param {String} label optional string for labeling the promise.
+    Useful for tooling.
+    @return {Promise}
+  */
+  Promise.prototype.catch = function (onRejection, label) {
+    return this.then(undefined, onRejection, label);
+  };
+
+  /**
+    `finally` will be invoked regardless of the promise's fate just as native
+    try/catch/finally behaves
+  
+    Synchronous example:
+  
+    ```js
+    findAuthor() {
+      if (Math.random() > 0.5) {
+        throw new Error();
+      }
+      return new Author();
+    }
+  
+    try {
+      return findAuthor(); // succeed or fail
+    } catch(error) {
+      return findOtherAuthor();
+    } finally {
+      // always runs
+      // doesn't affect the return value
+    }
+    ```
+  
+    Asynchronous example:
+  
+    ```js
+    findAuthor().catch(function(reason){
+      return findOtherAuthor();
+    }).finally(function(){
+      // author was either found, or not
+    });
+    ```
+  
+    @method finally
+    @param {Function} callback
+    @param {String} label optional string for labeling the promise.
+    Useful for tooling.
+    @return {Promise}
+  */
+  Promise.prototype.finally = function (callback, label) {
+    var promise = this;
+    var constructor = promise.constructor;
+
+    return promise.then(function (value) {
+      return constructor.resolve(callback()).then(function () {
+        return value;
       });
-    };
-
-    Promise.prototype.catch = function _catch(onRejection, label) {
-      return this.then(undefined, onRejection, label);
-    };
-
-    Promise.prototype.finally = function _finally(callback, label) {
-      var promise = this;
-      var constructor = promise.constructor;
-
-      return promise.then(function (value) {
-        return constructor.resolve(callback()).then(function () {
-          return value;
-        });
-      }, function (reason) {
-        return constructor.resolve(callback()).then(function () {
-          throw reason;
-        });
-      }, label);
-    };
-
-    return Promise;
-  }();
+    }, function (reason) {
+      return constructor.resolve(callback()).then(function () {
+        throw reason;
+      });
+    }, label);
+  };
 
   Promise.cast = resolve$1; // deprecated
   Promise.all = all;
@@ -65364,7 +65449,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
       var promise = new Promise(noop);
 
       args[l] = function (err, val) {
-        if (err) reject(promise, err);else if (options === undefined) resolve(promise, val);else if (options === true) resolve(promise, arrayResult(arguments));else if (Array.isArray(options)) resolve(promise, makeObject(arguments, options));else resolve(promise, val);
+        if (err) reject(promise, err);else if (options === undefined) resolve(promise, val);else if (options === true) resolve(promise, arrayResult(arguments));else if (isArray(options)) resolve(promise, makeObject(arguments, options));else resolve(promise, val);
       };
 
       if (promiseInput) {
@@ -65435,7 +65520,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     return AllSettled;
   }(Enumerator);
 
-  AllSettled.prototype._setResultAt = setSettledResult;
+  AllSettled.prototype._makeResult = makeSettledResult;
 
   /**
   `RSVP.allSettled` is similar to `RSVP.all`, but instead of implementing
@@ -65483,7 +65568,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
   */
 
   function allSettled(entries, label) {
-    if (!Array.isArray(entries)) {
+    if (!isArray(entries)) {
       return Promise.reject(new TypeError("Promise.allSettled must be called with an array"), label);
     }
 
@@ -65640,7 +65725,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     have been fulfilled, or rejected if any of them become rejected.
   */
   function hash(object, label) {
-    if (object === null || typeof object !== 'object') {
+    if (!isObject(object)) {
       return Promise.reject(new TypeError("Promise.hash must be called with an object"), label);
     }
 
@@ -65658,7 +65743,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     return HashSettled;
   }(PromiseHash);
 
-  HashSettled.prototype._setResultAt = setSettledResult;
+  HashSettled.prototype._makeResult = makeSettledResult;
 
   /**
     `RSVP.hashSettled` is similar to `RSVP.allSettled`, but takes an object
@@ -65763,7 +65848,7 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
   */
 
   function hashSettled(object, label) {
-    if (object === null || typeof object !== 'object') {
+    if (!isObject(object)) {
       return Promise.reject(new TypeError("RSVP.hashSettled must be called with an object"), label);
     }
 
@@ -65861,46 +65946,12 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     return deferred;
   }
 
-  var MapEnumerator = function (_Enumerator3) {
-    (0, _emberBabel.inherits)(MapEnumerator, _Enumerator3);
-
-    function MapEnumerator(Constructor, entries, mapFn, label) {
-      (0, _emberBabel.classCallCheck)(this, MapEnumerator);
-      return (0, _emberBabel.possibleConstructorReturn)(this, _Enumerator3.call(this, Constructor, entries, true, label, mapFn));
-    }
-
-    MapEnumerator.prototype._init = function _init(Constructor, input, bool, label, mapFn) {
-      var len = input.length || 0;
-      this.length = len;
-      this._remaining = len;
-      this._result = new Array(len);
-      this._mapFn = mapFn;
-
-      this._enumerate(input);
-    };
-
-    MapEnumerator.prototype._setResultAt = function _setResultAt(state, i, value, firstPass) {
-      if (firstPass) {
-        var val = tryCatch(this._mapFn)(value, i);
-        if (val === TRY_CATCH_ERROR) {
-          this._settledAt(REJECTED, i, val.error, false);
-        } else {
-          this._eachEntry(val, i, false);
-        }
-      } else {
-        this._remaining--;
-        this._result[i] = value;
-      }
-    };
-
-    return MapEnumerator;
-  }(Enumerator);
-
   /**
-   `RSVP.map` is similar to JavaScript's native `map` method. `mapFn` is eagerly called
-    meaning that as soon as any promise resolves its value will be passed to `mapFn`.
-    `RSVP.map` returns a promise that will become fulfilled with the result of running
-    `mapFn` on the values the promises become fulfilled with.
+   `RSVP.map` is similar to JavaScript's native `map` method, except that it
+    waits for all promises to become fulfilled before running the `mapFn` on
+    each item in given to `promises`. `RSVP.map` returns a promise that will
+    become fulfilled with the result of running `mapFn` on the values the promises
+    become fulfilled with.
   
     For example:
   
@@ -65974,15 +66025,24 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     @static
   */
   function map(promises, mapFn, label) {
-    if (!Array.isArray(promises)) {
+    if (!isArray(promises)) {
       return Promise.reject(new TypeError("RSVP.map must be called with an array"), label);
     }
 
-    if (typeof mapFn !== 'function') {
+    if (!isFunction(mapFn)) {
       return Promise.reject(new TypeError("RSVP.map expects a function as a second argument"), label);
     }
 
-    return new MapEnumerator(Promise, promises, mapFn, label).promise;
+    return Promise.all(promises, label).then(function (values) {
+      var length = values.length;
+      var results = new Array(length);
+
+      for (var i = 0; i < length; i++) {
+        results[i] = mapFn(values[i]);
+      }
+
+      return Promise.all(results, label);
+    });
   }
 
   /**
@@ -66016,62 +66076,12 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     return Promise.reject(reason, label);
   }
 
-  var EMPTY_OBJECT = {};
-
-  var FilterEnumerator = function (_Enumerator4) {
-    (0, _emberBabel.inherits)(FilterEnumerator, _Enumerator4);
-
-    function FilterEnumerator(Constructor, entries, filterFn, label) {
-      (0, _emberBabel.classCallCheck)(this, FilterEnumerator);
-      return (0, _emberBabel.possibleConstructorReturn)(this, _Enumerator4.call(this, Constructor, entries, true, label, filterFn));
-    }
-
-    FilterEnumerator.prototype._init = function _init(Constructor, input, bool, label, filterFn) {
-      var len = input.length || 0;
-      this.length = len;
-      this._remaining = len;
-
-      this._result = new Array(len);
-      this._filterFn = filterFn;
-
-      this._enumerate(input);
-    };
-
-    FilterEnumerator.prototype._checkFullfillment = function _checkFullfillment() {
-      if (this._remaining === 0) {
-        this._result = this._result.filter(function (val) {
-          return val !== EMPTY_OBJECT;
-        });
-        fulfill(this.promise, this._result);
-      }
-    };
-
-    FilterEnumerator.prototype._setResultAt = function _setResultAt(state, i, value, firstPass) {
-      if (firstPass) {
-        this._result[i] = value;
-        var val = tryCatch(this._filterFn)(value, i);
-        if (val === TRY_CATCH_ERROR) {
-          this._settledAt(REJECTED, i, val.error, false);
-        } else {
-          this._eachEntry(val, i, false);
-        }
-      } else {
-        this._remaining--;
-        if (!value) {
-          this._result[i] = EMPTY_OBJECT;
-        }
-      }
-    };
-
-    return FilterEnumerator;
-  }(Enumerator);
-
   /**
-   `RSVP.filter` is similar to JavaScript's native `filter` method.
-   `filterFn` is eagerly called meaning that as soon as any promise
-    resolves its value will be passed to `filterFn`. `RSVP.filter` returns
-    a promise that will become fulfilled with the result of running
-    `filterFn` on the values the promises become fulfilled with.
+   `RSVP.filter` is similar to JavaScript's native `filter` method, except that it
+    waits for all promises to become fulfilled before running the `filterFn` on
+    each item in given to `promises`. `RSVP.filter` returns a promise that will
+    become fulfilled with the result of running `filterFn` on the values the
+    promises become fulfilled with.
   
     For example:
   
@@ -66152,17 +66162,49 @@ enifed('rsvp', ['exports', 'ember-babel', 'node-module'], function (exports, _em
     @return {Promise}
   */
 
+  function resolveAll(promises, label) {
+    return Promise.all(promises, label);
+  }
+
+  function resolveSingle(promise, label) {
+    return Promise.resolve(promise, label).then(function (promises) {
+      return resolveAll(promises, label);
+    });
+  }
+
   function filter(promises, filterFn, label) {
-    if (!Array.isArray(promises) && !(promises !== null && typeof promises === 'object' && promises.then !== undefined)) {
+    if (!isArray(promises) && !(isObject(promises) && promises.then !== undefined)) {
       return Promise.reject(new TypeError("RSVP.filter must be called with an array or promise"), label);
     }
 
-    if (typeof filterFn !== 'function') {
+    if (!isFunction(filterFn)) {
       return Promise.reject(new TypeError("RSVP.filter expects function as a second argument"), label);
     }
 
-    return Promise.resolve(promises, label).then(function (promises) {
-      return new FilterEnumerator(Promise, promises, filterFn, label).promise;
+    var promise = isArray(promises) ? resolveAll(promises, label) : resolveSingle(promises, label);
+    return promise.then(function (values) {
+      var length = values.length;
+      var filtered = new Array(length);
+
+      for (var i = 0; i < length; i++) {
+        filtered[i] = filterFn(values[i]);
+      }
+
+      return resolveAll(filtered, label).then(function (filtered) {
+        var results = new Array(length);
+        var newLength = 0;
+
+        for (var _i = 0; _i < length; _i++) {
+          if (filtered[_i]) {
+            results[newLength] = values[_i];
+            newLength++;
+          }
+        }
+
+        results.length = newLength;
+
+        return results;
+      });
     });
   }
 
@@ -68816,7 +68858,7 @@ Popper.Defaults = Defaults;
 return Popper;
 
 })));
-//# sourceMappingURL=popper.js.map
+
 
 }
 ;/* globals Ember, require */
@@ -68938,23 +68980,15 @@ return Popper;
   }
 })();
 
-;Ember.libraries.register('Ember Bootstrap', '1.2.0');
-;(function() {
-  define('ember-cli-shims/deprecations', [], function() {
-    var values = {"ember-application":{"default":["@ember/application"]},"ember-array":{"default":["@ember/array"]},"ember-array/mutable":{"default":["@ember/array/mutable"]},"ember-array/utils":{"A":["@ember/array","A"],"isEmberArray":["@ember/array","isArray"],"wrap":["@ember/array","makeArray"]},"ember-component":{"default":["@ember/component"]},"ember-components/checkbox":{"default":["@ember/component/checkbox"]},"ember-components/text-area":{"default":["@ember/component/text-area"]},"ember-components/text-field":{"default":["@ember/component/text-field"]},"ember-controller":{"default":["@ember/controller"]},"ember-controller/inject":{"default":["@ember/controller","inject"]},"ember-controller/proxy":{"default":["@ember/array/proxy"]},"ember-debug":{"log":["@ember/debug","debug"],"inspect":["@ember/debug","inspect"],"run":["@ember/debug","runInDebug"],"warn":["@ember/debug","warn"]},"ember-debug/container-debug-adapter":{"default":["@ember/debug/container-debug-adapter"]},"ember-debug/data-adapter":{"default":["@ember/debug/data-adapter"]},"ember-deprecations":{"deprecate":["@ember/application/deprecations","deprecate"],"deprecateFunc":["@ember/application/deprecations","deprecateFunc"]},"ember-enumerable":{"default":["@ember/enumerable"]},"ember-evented":{"default":["@ember/object/evented"]},"ember-evented/on":{"default":["@ember/object/evented","on"]},"ember-globals-resolver":{"default":["@ember/application/globals-resolver"]},"ember-helper":{"default":["@ember/component/helper"],"helper":["@ember/component/helper","helper"]},"ember-instrumentation":{"instrument":["@ember/instrumentation","instrument"],"reset":["@ember/instrumentation","reset"],"subscribe":["@ember/instrumentation","subscribe"],"unsubscribe":["@ember/instrumentation","unsubscribe"]},"ember-locations/hash":{"default":["@ember/routing/hash-location"]},"ember-locations/history":{"default":["@ember/routing/history-location"]},"ember-locations/none":{"default":["@ember/routing/none-location"]},"ember-map":{"default":["@ember/map"],"withDefault":["@ember/map/with-default"]},"ember-metal/events":{"addListener":["@ember/object/events","addListener"],"removeListener":["@ember/object/events","removeListener"],"send":["@ember/object/events","sendEvent"]},"ember-metal/get":{"default":["@ember/object","get"],"getProperties":["@ember/object","getProperties"]},"ember-metal/mixin":{"default":["@ember/object/mixin"]},"ember-metal/observer":{"default":["@ember/object","observer"],"addObserver":["@ember/object/observers","addObserver"],"removeObserver":["@ember/object/observers","removeObserver"]},"ember-metal/on-load":{"default":["@ember/application","onLoad"],"run":["@ember/application","runLoadHooks"]},"ember-metal/set":{"default":["@ember/object","set"],"setProperties":["@ember/object","setProperties"],"trySet":["@ember/object","trySet"]},"ember-metal/utils":{"aliasMethod":["@ember/object","aliasMethod"],"assert":["@ember/debug","assert"],"cacheFor":["@ember/object/internals","cacheFor"],"copy":["@ember/object/internals","copy"],"guidFor":["@ember/object/internals","guidFor"]},"ember-object":{"default":["@ember/object"]},"ember-owner/get":{"default":["@ember/application","getOwner"]},"ember-owner/set":{"default":["@ember/application","setOwner"]},"ember-platform":{"assign":["@ember/polyfills","assign"],"create":["@ember/polyfills","create"],"hasAccessors":["@ember/polyfills","hasPropertyAccessors"],"keys":["@ember/polyfills","keys"]},"ember-route":{"default":["@ember/routing/route"]},"ember-router":{"default":["@ember/routing/router"]},"ember-runloop":{"default":["@ember/runloop","run"],"begin":["@ember/runloop","begin"],"bind":["@ember/runloop","bind"],"cancel":["@ember/runloop","cancel"],"debounce":["@ember/runloop","debounce"],"end":["@ember/runloop","end"],"join":["@ember/runloop","join"],"later":["@ember/runloop","later"],"next":["@ember/runloop","next"],"once":["@ember/runloop","once"],"schedule":["@ember/runloop","schedule"],"scheduleOnce":["@ember/runloop","scheduleOnce"],"throttle":["@ember/runloop","throttle"]},"ember-service":{"default":["@ember/service"]},"ember-service/inject":{"default":["@ember/service","inject"]},"ember-string":{"camelize":["@ember/string","camelize"],"capitalize":["@ember/string","capitalize"],"classify":["@ember/string","classify"],"dasherize":["@ember/string","dasherize"],"decamelize":["@ember/string","decamelize"],"fmt":["@ember/string","fmt"],"htmlSafe":["@ember/string","htmlSafe"],"loc":["@ember/string","loc"],"underscore":["@ember/string","underscore"],"w":["@ember/string","w"]},"ember-utils":{"isBlank":["@ember/utils","isBlank"],"isEmpty":["@ember/utils","isEmpty"],"isNone":["@ember/utils","isNone"],"isPresent":["@ember/utils","isPresent"],"tryInvoke":["@ember/utils","tryInvoke"],"typeOf":["@ember/utils","typeOf"]},"ember-computed":{"default":["@ember/object","computed"],"empty":["@ember/object/computed","empty"],"notEmpty":["@ember/object/computed","notEmpty"],"none":["@ember/object/computed","none"],"not":["@ember/object/computed","not"],"bool":["@ember/object/computed","bool"],"match":["@ember/object/computed","match"],"equal":["@ember/object/computed","equal"],"gt":["@ember/object/computed","gt"],"gte":["@ember/object/computed","gte"],"lt":["@ember/object/computed","lt"],"lte":["@ember/object/computed","lte"],"alias":["@ember/object/computed","alias"],"oneWay":["@ember/object/computed","oneWay"],"reads":["@ember/object/computed","reads"],"readOnly":["@ember/object/computed","readOnly"],"deprecatingAlias":["@ember/object/computed","deprecatingAlias"],"and":["@ember/object/computed","and"],"or":["@ember/object/computed","or"],"collect":["@ember/object/computed","collect"],"sum":["@ember/object/computed","sum"],"min":["@ember/object/computed","min"],"max":["@ember/object/computed","max"],"map":["@ember/object/computed","map"],"sort":["@ember/object/computed","sort"],"setDiff":["@ember/object/computed","setDiff"],"mapBy":["@ember/object/computed","mapBy"],"mapProperty":["@ember/object/computed","mapProperty"],"filter":["@ember/object/computed","filter"],"filterBy":["@ember/object/computed","filterBy"],"filterProperty":["@ember/object/computed","filterProperty"],"uniq":["@ember/object/computed","uniq"],"union":["@ember/object/computed","union"],"intersect":["@ember/object/computed","intersect"]},"ember-test/adapter":{"default":["@ember/test/adapter"]}};
-    
-    Object.defineProperty(values, '__esModule', {
-      value: true
-    });
-
-    return values;
-  });
-})();
+;Ember.libraries.register('Ember Bootstrap', '1.2.1');
 ;(function() {
 /* globals define, Ember, jQuery */
 
   function processEmberShims() {
     var shims = {
+      'ember': {
+        'default': Ember
+      },
       'ember-application': {
         'default': Ember.Application
       },
@@ -69167,7 +69201,7 @@ return Popper;
     }
 
     for (var moduleName in shims) {
-      generateModule(moduleName, shims[moduleName], true);
+      generateModule(moduleName, shims[moduleName]);
     }
   }
 
@@ -69191,37 +69225,9 @@ return Popper;
     }
   }
 
-  function generateModule(name, values, deprecated) {
-    define(name, ['ember-cli-shims/deprecations'], function(deprecations) {
+  function generateModule(name, values) {
+    define(name, [], function() {
       'use strict';
-
-      if (deprecated) {
-        var moduleDeprecations = deprecations[name];
-
-        var message = 'Importing from the `' + name + '` module has been deprecated. ';
-        if (moduleDeprecations) {
-          message += 'Please use the new module imports:\n\n';
-          Object.keys(moduleDeprecations).forEach(function(key) {
-            var newImport = moduleDeprecations[key];
-            if (newImport[1]) {
-              message += 'import { ' + newImport[1] + ' } from \'' + newImport[0] + '\'\n';
-            } else {
-              var importName = Ember.String.classify(newImport[0].split('/').pop());
-              message += 'import ' + importName + ' from \'' + newImport[0] + '\'\n';
-            }
-          });
-          message += '\n';
-
-        } else {
-          message += 'Please use globals instead.';
-        }
-
-        Ember.deprecate(message, false, {
-          id: 'ember-cli-shims.deprecated-shims',
-          until: '3.0.0',
-          url: 'https://github.com/emberjs/rfcs/blob/master/text/0176-javascript-module-api.md'
-        });
-      }
 
       Object.defineProperty(values, '__esModule', {
         value: true
@@ -69231,7 +69237,6 @@ return Popper;
     });
   }
 
-  generateModule('ember', { default: Ember });
   processEmberShims();
   processTestShims();
   generateModule('jquery', { 'default': self.jQuery });
@@ -69434,6 +69439,7 @@ createDeprecatedModule('resolver');
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
+  var get = Ember.get;
   function shapeOf(shape) {
     (true && !(arguments.length === 1) && Ember.assert('The \'shapeOf\' helper must receive exactly one shape', arguments.length === 1));
     (true && !((typeof shape === 'undefined' ? 'undefined' : _typeof(shape)) === 'object') && Ember.assert('The \'shapeOf\' helper must receive an object to match the shape to, received: ' + shape, (typeof shape === 'undefined' ? 'undefined' : _typeof(shape)) === 'object'));
@@ -69450,7 +69456,7 @@ createDeprecatedModule('resolver');
 
     return (0, _validators.makeValidator)('shapeOf({' + typeDesc.join() + '})', function (value) {
       for (var _key in shape) {
-        if (shape[_key](Ember.get(value, _key)) !== true) {
+        if (shape[_key](get(value, _key)) !== true) {
           return false;
         }
       }
@@ -69483,7 +69489,7 @@ createDeprecatedModule('resolver');
     });
   }
 });
-;define('@ember-decorators/argument/-debug/index', ['exports', '@ember-decorators/argument/-debug/decorators/immutable', '@ember-decorators/argument/-debug/decorators/required', '@ember-decorators/argument/-debug/decorators/type', '@ember-decorators/argument/-debug/helpers/array-of', '@ember-decorators/argument/-debug/helpers/shape-of', '@ember-decorators/argument/-debug/helpers/union-of', '@ember-decorators/argument/-debug/helpers/optional', '@ember-decorators/argument/-debug/errors', '@ember-decorators/argument/-debug/utils/validation-decorator'], function (exports, _immutable, _required, _type, _arrayOf, _shapeOf, _unionOf, _optional, _errors, _validationDecorator) {
+;define('@ember-decorators/argument/-debug/index', ['exports', '@ember-decorators/argument/-debug/decorators/immutable', '@ember-decorators/argument/-debug/decorators/required', '@ember-decorators/argument/-debug/decorators/type', '@ember-decorators/argument/-debug/helpers/array-of', '@ember-decorators/argument/-debug/helpers/shape-of', '@ember-decorators/argument/-debug/helpers/union-of', '@ember-decorators/argument/-debug/helpers/optional', '@ember-decorators/argument/-debug/errors', '@ember-decorators/argument/-debug/utils/validations-for'], function (exports, _immutable, _required, _type, _arrayOf, _shapeOf, _unionOf, _optional, _errors, _validationsFor) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -69549,10 +69555,10 @@ createDeprecatedModule('resolver');
       return _errors.TypeError;
     }
   });
-  Object.defineProperty(exports, 'validationDecorator', {
+  Object.defineProperty(exports, 'getValidationsForKey', {
     enumerable: true,
     get: function () {
-      return _validationDecorator.default;
+      return _validationsFor.getValidationsForKey;
     }
   });
 });
@@ -69605,6 +69611,12 @@ createDeprecatedModule('resolver');
   });
   exports.default = validationDecorator;
 
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  };
+
   function _possibleConstructorReturn(self, call) {
     if (!self) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -69635,6 +69647,13 @@ createDeprecatedModule('resolver');
     }
   }
 
+  var EmberObject = Ember.Object;
+  var Mixin = Ember.Mixin;
+  var Component = Ember.Component;
+  var Controller = Ember.Controller;
+  var Service = Ember.Service;
+
+
   function guardBind(fn) {
     if (typeof fn === 'function') {
       for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -69662,7 +69681,7 @@ createDeprecatedModule('resolver');
       this.isImmutable = isImmutable;
       this.typeValidators = typeValidators;
 
-      runValidators(typeValidators, constructor, keyName, originalValue, 'init');
+      runValidators(typeValidators, klass, keyName, originalValue, 'init');
     }
 
     ValidatedProperty.prototype.get = function get(obj, keyName) {
@@ -69675,7 +69694,7 @@ createDeprecatedModule('resolver');
       var newValue = this._get(obj, keyName);
 
       if (isImmutable && newValue !== originalValue) {
-        throw new _errors.MutabilityError('Immutable value ' + klass + '#' + keyName + ' changed by underlying computed, original value: ' + originalValue + ', new value: ' + newValue);
+        throw new _errors.MutabilityError('Immutable value ' + klass.name + '#' + keyName + ' changed by underlying computed, original value: ' + originalValue + ', new value: ' + newValue);
       }
 
       if (typeValidators.length > 0) {
@@ -69692,18 +69711,16 @@ createDeprecatedModule('resolver');
 
 
       if (isImmutable) {
-        throw new _errors.MutabilityError('Attempted to set ' + klass + '#' + keyName + ' to the value ' + value + ' but the field is immutable');
+        throw new _errors.MutabilityError('Attempted to set ' + klass.name + '#' + keyName + ' to the value ' + value + ' but the field is immutable');
       }
+
+      var newValue = this._set(obj, keyName, value);
 
       if (typeValidators.length > 0) {
-        runValidators(typeValidators, klass, keyName, value, 'set');
+        runValidators(typeValidators, klass, keyName, newValue, 'set');
       }
 
-      // Legacy Ember does not return the value from ComputedProperty.set calls,
-      // so we have to side-effect and return the value directly
-      this._set(obj, keyName, value);
-
-      return value;
+      return newValue;
     };
 
     return ValidatedProperty;
@@ -69728,11 +69745,13 @@ createDeprecatedModule('resolver');
     };
 
     StandardValidatedProperty.prototype._set = function _set(obj, keyName, value) {
-      if (value === this.cachedValue) return;
+      if (value === this.cachedValue) return value;
 
       this.cachedValue = value;
 
       Ember.propertyDidChange(obj, keyName);
+
+      return this.cachedValue;
     };
 
     return StandardValidatedProperty;
@@ -69757,13 +69776,17 @@ createDeprecatedModule('resolver');
     };
 
     NativeComputedValidatedProperty.prototype._set = function _set(obj, keyName, value) {
-      var currentValue = this._get(obj, keyName);
+      // By default Ember.get will check to see if the value has changed before setting
+      // and calling propertyDidChange. In order to not change behavior, we must do the same
+      var currentValue = this._get(obj);
 
-      if (value === currentValue) return;
+      if (value === currentValue) return value;
 
       this.desc.set.call(obj, value);
 
       Ember.propertyDidChange(obj, keyName);
+
+      return this._get(obj);
     };
 
     return NativeComputedValidatedProperty;
@@ -69795,7 +69818,16 @@ createDeprecatedModule('resolver');
     };
 
     ComputedValidatedProperty.prototype._set = function _set(obj, keyName, value) {
+      if (true) {
+        return this.desc.set(obj, keyName, value);
+      }
+
       this.desc.set(obj, keyName, value);
+
+      var _Ember$meta = Ember.meta(obj),
+          cache = _Ember$meta.cache;
+
+      return (typeof cache === 'undefined' ? 'undefined' : _typeof(cache)) === 'object' ? cache[keyName] : value;
     };
 
     return ComputedValidatedProperty;
@@ -69804,7 +69836,8 @@ createDeprecatedModule('resolver');
   function runValidators(validators, klass, key, value, phase) {
     validators.forEach(function (validator) {
       if (validator(value) === false) {
-        throw new _errors.TypeError(klass + '#' + key + ' expected value of type ' + validator + ' during \'' + phase + '\', but received: ' + value);
+        var formattedValue = typeof value === 'string' ? '\'' + value + '\'' : value;
+        throw new _errors.TypeError(klass.name + '#' + key + ' expected value of type ' + validator + ' during \'' + phase + '\', but received: ' + formattedValue);
       }
     });
   }
@@ -69818,13 +69851,13 @@ createDeprecatedModule('resolver');
 
 
     if (isRequired && instance[keyName] === undefined && !instance.hasOwnProperty(keyName)) {
-      throw new _errors.RequiredFieldError(klass + ' requires a \'' + keyName + '\' argument to be passed in when using the component');
+      throw new _errors.RequiredFieldError(klass.name + '#' + keyName + ' is a required value, but was not provided. You can provide it as an argument, as a class field, or in the constructor');
     }
 
     // opt out early if no further validations
     if (!isImmutable && typeValidators.length === 0) {
       if (typeValidators.length === 0 && typeRequired) {
-        throw new _errors.TypeError(klass + '#' + keyName + ' requires a type, add one using the @type decorator');
+        throw new _errors.TypeError(klass.name + '#' + keyName + ' requires a type, add one using the @type decorator');
       }
 
       return;
@@ -69880,11 +69913,11 @@ createDeprecatedModule('resolver');
     });
   }
 
-  var validatingCreateMixin = {
+  var ValidatingCreateMixin = Mixin.create({
     create: function create() {
       var instance = this._super.apply(this, arguments);
 
-      var constructor = this;
+      var klass = this;
       var prototype = Object.getPrototypeOf(instance);
       var validations = (0, _validationsFor.getValidationsFor)(prototype);
 
@@ -69893,26 +69926,40 @@ createDeprecatedModule('resolver');
       }
 
       for (var key in validations) {
-        wrapField(constructor, instance, validations, key);
+        wrapField(klass, instance, validations, key);
       }
 
       return instance;
     }
-  };
+  });
 
-  Ember.Object.reopenClass(validatingCreateMixin);
+  EmberObject.reopenClass(ValidatingCreateMixin);
+
+  // Reopening a parent class does not apply the mixin to existing child classes,
+  // so we need to apply it directly
+  ValidatingCreateMixin.apply(Component);
+  ValidatingCreateMixin.apply(Service);
+  ValidatingCreateMixin.apply(Controller);
+
+  if (window.DS !== undefined && window.DS.Model !== undefined) {
+    ValidatingCreateMixin.apply(window.DS.Model);
+  }
 
   function validationDecorator(fn) {
     return function (target, key, desc, options) {
       var validations = (0, _validationsFor.getValidationsForKey)(target, key);
 
-      // always ensure the property is writeable, doesn't make sense otherwise (babel bug?)
-      desc.writable = true;
-      desc.configurable = true;
-
       fn(target, key, desc, options, validations);
 
-      if (desc.initializer === null) desc.initializer = undefined;
+      if (!desc.get && !desc.set) {
+        // always ensure the property is writeable, doesn't make sense otherwise (babel bug?)
+        desc.writable = true;
+        desc.configurable = true;
+      }
+
+      if (desc.initializer === null) {
+        desc.initializer = undefined;
+      }
     };
   }
 });
@@ -70072,6 +70119,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var Component = Ember.Component;
+  var getWithDefault = Ember.getWithDefault;
 
 
   var validatedComponent = void 0;
@@ -70086,7 +70135,7 @@ createDeprecatedModule('resolver');
   };
 
   if (true) {
-    validatedComponent = Ember.Component.extend();
+    validatedComponent = Component.extend();
 
     validatedComponent.reopenClass({
       create: function create(props) {
@@ -70095,7 +70144,7 @@ createDeprecatedModule('resolver');
 
         var prototype = Object.getPrototypeOf(instance);
         var validations = (0, _validationsFor.getValidationsFor)(prototype) || {};
-        if (Ember.getWithDefault(_emberGetConfig.default, '@ember-decorators/argument.ignoreComponentsWithoutValidations', false) && Object.keys(validations).length === 0) {
+        if (getWithDefault(_emberGetConfig.default, '@ember-decorators/argument.ignoreComponentsWithoutValidations', false) && Object.keys(validations).length === 0) {
           return instance;
         }
 
@@ -70107,43 +70156,17 @@ createDeprecatedModule('resolver');
         for (var key in props.attrs) {
           var isValidArgOrAttr = key in validations && validations[key].isArgument || key in whitelist || attributes.indexOf(key) !== -1 || classNames.indexOf(key) !== -1;
 
-          (true && !(isValidArgOrAttr) && Ember.assert('Attempted to assign \'' + key + '\' value on a ' + this + ' component, but no argument was defined for that key. Use the @argument helper on the class field to define an argument which can be passed into the component', isValidArgOrAttr));
+          (true && !(isValidArgOrAttr) && Ember.assert('Attempted to assign the argument \'' + key + '\' on an instance of ' + (this.name || this) + ', but no argument was defined for that key. Use the @argument helper on the class field to define an argument for that class.', isValidArgOrAttr));
         }
 
         return instance;
       }
     });
   } else {
-    validatedComponent = Ember.Component;
+    validatedComponent = Component;
   }
 
   exports.default = validatedComponent;
-});
-;define("@ember-decorators/argument/-private/initializers-meta", ["exports"], function (exports) {
-  "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.getOrCreateInitializersFor = getOrCreateInitializersFor;
-  exports.getInitializersFor = getInitializersFor;
-  var initializersMap = new WeakMap();
-
-  function getOrCreateInitializersFor(target) {
-    if (!initializersMap.has(target)) {
-      var parentInitializers = getInitializersFor(Object.getPrototypeOf(target));
-      initializersMap.set(target, Object.create(parentInitializers || null));
-    }
-
-    return initializersMap.get(target);
-  }
-
-  function getInitializersFor(target) {
-    // Reached the root of the prototype chain
-    if (target === null) return target;
-
-    return initializersMap.get(target) || getInitializersFor(Object.getPrototypeOf(target));
-  }
 });
 ;define('@ember-decorators/argument/errors', ['exports', '@ember-decorators/argument/-debug'], function (exports, _debug) {
   'use strict';
@@ -70170,7 +70193,7 @@ createDeprecatedModule('resolver');
     }
   });
 });
-;define('@ember-decorators/argument/index', ['exports', 'ember-get-config', '@ember-decorators/argument/-private/initializers-meta', '@ember-decorators/argument/-debug'], function (exports, _emberGetConfig, _initializersMeta, _debug) {
+;define('@ember-decorators/argument/index', ['exports', 'ember-get-config', '@ember-decorators/argument/utils/make-computed', '@ember-decorators/argument/-debug'], function (exports, _emberGetConfig, _makeComputed, _debug) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -70184,10 +70207,24 @@ createDeprecatedModule('resolver');
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
-  var internalArgumentDecorator = function internalArgumentDecorator(target, key, desc, options, validations) {
+  var getWithDefault = Ember.getWithDefault;
+
+
+  var valueMap = new WeakMap();
+
+  function valuesFor(obj) {
+    if (!valueMap.has(obj)) {
+      valueMap.set(obj, Object.create(null));
+    }
+
+    return valueMap.get(obj);
+  }
+
+  var internalArgumentDecorator = function internalArgumentDecorator(target, key, desc, options) {
     if (true) {
+      var validations = (0, _debug.getValidationsForKey)(target, key);
       validations.isArgument = true;
-      validations.typeRequired = Ember.getWithDefault(_emberGetConfig.default, '@ember-decorators/argument.typeRequired', false);
+      validations.typeRequired = getWithDefault(_emberGetConfig.default, '@ember-decorators/argument.typeRequired', false);
     }
 
     // always ensure the property is writeable, doesn't make sense otherwise (babel bug?)
@@ -70199,28 +70236,58 @@ createDeprecatedModule('resolver');
       return;
     }
 
-    var initializers = (0, _initializersMeta.getOrCreateInitializersFor)(target);
-    initializers[key] = desc.initializer;
+    var initializer = desc.initializer;
 
-    desc.initializer = function () {
-      var initializers = (0, _initializersMeta.getInitializersFor)(Object.getPrototypeOf(this));
-      var initializer = initializers[key];
+    var get = function get() {
+      var values = valuesFor(this);
 
-      var value = this[key];
-
-      var shouldInitialize = options.defaultIfUndefined ? value === undefined : this.hasOwnProperty(key) === false;
-
-      if (shouldInitialize) {
-        value = initializer.call(this);
+      if (!Object.hasOwnProperty.call(values, key)) {
+        values[key] = initializer.call(this);
       }
 
-      return value;
+      return values[key];
     };
-  };
 
-  if (true) {
-    internalArgumentDecorator = (0, _debug.validationDecorator)(internalArgumentDecorator);
-  }
+    if (options.defaultIfNullish === true || options.defaultIfUndefined === true) {
+      var defaultIf = void 0;
+
+      if (options.defaultIfNullish === true) {
+        defaultIf = function defaultIf(v) {
+          return v === undefined || v === null;
+        };
+      } else {
+        defaultIf = function defaultIf(v) {
+          return v === undefined;
+        };
+      }
+
+      var descriptor = (0, _makeComputed.default)({
+        get: get,
+        set: function set(keyName, value) {
+          if (defaultIf(value)) {
+            return valuesFor(this)[key] = initializer.call(this);
+          } else {
+            return valuesFor(this)[key] = value;
+          }
+        }
+      });
+
+      // Decorators spec doesn't allow us to make a computed directly on
+      // the prototype, so we need to wrap the descriptor in a getter
+      return {
+        get: function get() {
+          return descriptor;
+        }
+      };
+    } else {
+      return {
+        get: get,
+        set: function set(value) {
+          valuesFor(this)[key] = value;
+        }
+      };
+    }
+  };
 
   function argument(maybeOptions, maybeKey, maybeDesc) {
     if (typeof maybeKey === 'string' && (typeof maybeDesc === 'undefined' ? 'undefined' : _typeof(maybeDesc)) === 'object') {
@@ -70306,6 +70373,32 @@ createDeprecatedModule('resolver');
   var Node = exports.Node = window ? window.Node : function Node() {
     _classCallCheck(this, Node);
   };
+});
+;define('@ember-decorators/argument/utils/make-computed', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = makeComputed;
+  var computed = Ember.computed;
+  function makeComputed(desc) {
+    if (true) {
+      return computed(desc);
+    } else {
+      var get = desc.get,
+          set = desc.set;
+
+
+      return computed(function (key, value) {
+        if (arguments.length > 1) {
+          return set.call(this, key, value);
+        }
+
+        return get.call(this);
+      });
+    }
+  }
 });
 ;define('@ember-decorators/argument/validation', ['exports', '@ember-decorators/argument/-debug'], function (exports, _debug) {
   'use strict';
@@ -72219,7 +72312,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _bsAccordion.default,
     ariaRole: 'tablist',
 
@@ -72276,7 +72370,11 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_typeClass.default, {
+  var oneWay = Ember.computed.oneWay;
+  var not = Ember.computed.not;
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  exports.default = Component.extend(_typeClass.default, {
     layout: _item.default,
 
     /**
@@ -72294,7 +72392,7 @@ createDeprecatedModule('resolver');
      * @property value
      * @public
      */
-    value: Ember.computed.oneWay('elementId'),
+    value: oneWay('elementId'),
 
     /**
      * @property selected
@@ -72308,7 +72406,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    collapsed: Ember.computed('value', 'selected', function () {
+    collapsed: computed('value', 'selected', function () {
       return this.get('value') !== this.get('selected');
     }).readOnly(),
 
@@ -72318,7 +72416,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    active: Ember.computed.not('collapsed'),
+    active: not('collapsed'),
 
     /**
      * Reference to the parent `Components.Accordion` class.
@@ -72341,7 +72439,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _body.default,
     tagName: '',
 
@@ -72360,7 +72459,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _title.default,
     ariaRole: 'tab',
     classNameBindings: ['collapsed:collapsed:expanded'],
@@ -72389,7 +72489,12 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_typeClass.default, _transitionSupport.default, {
+  var not = Ember.computed.not;
+  var and = Ember.computed.and;
+  var Component = Ember.Component;
+  var observer = Ember.observer;
+  var later = Ember.run.later;
+  exports.default = Component.extend(_typeClass.default, _transitionSupport.default, {
     layout: _bsAlert.default,
     classNameBindings: ['alert', 'fade', 'dismissible:alert-dismissible'],
 
@@ -72439,7 +72544,7 @@ createDeprecatedModule('resolver');
      * @property notVisible
      * @private
      */
-    notVisible: Ember.computed.not('_visible'),
+    notVisible: not('_visible'),
 
     /**
      * Set to false to disable the fade out animation when hiding the alert.
@@ -72459,8 +72564,8 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    alert: Ember.computed.not('hidden'),
-    showAlert: Ember.computed.and('_visible', 'fade'),
+    alert: not('hidden'),
+    showAlert: and('_visible', 'fade'),
 
     /**
      * @property classTypePrefix
@@ -72529,7 +72634,7 @@ createDeprecatedModule('resolver');
      */
     hide: function hide() {
       if (this.get('usesTransition')) {
-        Ember.run.later(this, function () {
+        later(this, function () {
           if (!this.get('isDestroyed')) {
             this.set('hidden', true);
             this.get('onDismissed')();
@@ -72546,7 +72651,7 @@ createDeprecatedModule('resolver');
     },
 
 
-    _observeIsVisible: Ember.observer('_visible', function () {
+    _observeIsVisible: observer('_visible', function () {
       if (this.get('_visible')) {
         this.show();
       } else {
@@ -72561,7 +72666,12 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_sizeClass.default, {
+  var equal = Ember.computed.equal;
+  var Component = Ember.Component;
+  var copy = Ember.copy;
+  var isArray = Ember.isArray;
+  var A = Ember.A;
+  exports.default = Component.extend(_sizeClass.default, {
     layout: _bsButtonGroup.default,
     ariaRole: 'group',
     classNameBindings: ['vertical:btn-group-vertical:btn-group', 'justified:btn-group-justified'],
@@ -72646,7 +72756,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    isRadio: Ember.computed.equal('type', 'radio').readOnly(),
+    isRadio: equal('type', 'radio').readOnly(),
 
     /**
      * This action is called whenever the button group's value should be changed because the user clicked a button.
@@ -72662,17 +72772,17 @@ createDeprecatedModule('resolver');
 
     actions: {
       buttonPressed: function buttonPressed(pressedValue) {
-        var newValue = Ember.copy(this.get('value'));
+        var newValue = copy(this.get('value'));
 
         if (this.get('isRadio')) {
           if (newValue !== pressedValue) {
             newValue = pressedValue;
           }
         } else {
-          if (!Ember.isArray(newValue)) {
-            newValue = Ember.A([pressedValue]);
+          if (!isArray(newValue)) {
+            newValue = A([pressedValue]);
           } else {
-            newValue = Ember.A(newValue);
+            newValue = A(newValue);
             if (newValue.includes(pressedValue)) {
               newValue.removeObject(pressedValue);
             } else {
@@ -72692,6 +72802,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var computed = Ember.computed;
+  var isArray = Ember.isArray;
   exports.default = _bsButton.default.extend({
 
     /**
@@ -72713,7 +72825,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    active: Ember.computed('buttonGroupType', 'groupValue.[]', 'value', function () {
+    active: computed('buttonGroupType', 'groupValue.[]', 'value', function () {
       var _getProperties = this.getProperties('value', 'groupValue'),
           value = _getProperties.value,
           groupValue = _getProperties.groupValue;
@@ -72721,7 +72833,7 @@ createDeprecatedModule('resolver');
       if (this.get('buttonGroupType') === 'radio') {
         return value === groupValue;
       } else {
-        if (Ember.isArray(groupValue)) {
+        if (isArray(groupValue)) {
           return groupValue.indexOf(value) !== -1;
         }
       }
@@ -72736,7 +72848,11 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_typeClass.default, _sizeClass.default, {
+  var scheduleOnce = Ember.run.scheduleOnce;
+  var Component = Ember.Component;
+  var observer = Ember.observer;
+  var computed = Ember.computed;
+  exports.default = Component.extend(_typeClass.default, _sizeClass.default, {
     layout: _bsButton.default,
     tagName: 'button',
     classNames: ['btn'],
@@ -72840,7 +72956,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @protected
      */
-    icon: Ember.computed('active', function () {
+    icon: computed('active', function () {
       if (this.get('active')) {
         return this.get('iconActive');
       } else {
@@ -72911,15 +73027,15 @@ createDeprecatedModule('resolver');
     },
 
 
-    resetObserver: Ember.observer('reset', function () {
+    resetObserver: observer('reset', function () {
       if (this.get('reset')) {
-        Ember.run.scheduleOnce('actions', this, function () {
+        scheduleOnce('actions', this, function () {
           this.set('textState', 'default');
         });
       }
     }),
 
-    text: Ember.computed('textState', 'defaultText', 'pendingText', 'resolvedText', 'rejectedText', function () {
+    text: computed('textState', 'defaultText', 'pendingText', 'resolvedText', 'rejectedText', function () {
       return this.getWithDefault(this.get('textState') + 'Text', this.get('defaultText'));
     }),
 
@@ -72973,7 +73089,17 @@ createDeprecatedModule('resolver');
     }
   }
 
-  exports.default = Ember.Component.extend(_componentParent.default, {
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  var observer = Ember.observer;
+  var filter = Ember.computed.filter;
+  var lte = Ember.computed.lte;
+  var gt = Ember.computed.gt;
+  var readOnly = Ember.computed.readOnly;
+  var schedule = Ember.run.schedule;
+  var scheduleOnce = Ember.run.scheduleOnce;
+  var RSVP = Ember.RSVP;
+  exports.default = Component.extend(_componentParent.default, {
     attributeBindings: ['tabindex'],
     classNames: ['carousel', 'slide'],
     layout: _bsCarousel.default,
@@ -72985,7 +73111,7 @@ createDeprecatedModule('resolver');
      * @private
      * @property canTurnToLeft
      */
-    canTurnToLeft: Ember.computed('wrap', 'currentIndex', function () {
+    canTurnToLeft: computed('wrap', 'currentIndex', function () {
       return this.get('wrap') || this.get('currentIndex') > 0;
     }),
 
@@ -72995,7 +73121,7 @@ createDeprecatedModule('resolver');
      * @private
      * @property canTurnToRight
      */
-    canTurnToRight: Ember.computed('childSlides.length', 'wrap', 'currentIndex', function () {
+    canTurnToRight: computed('childSlides.length', 'wrap', 'currentIndex', function () {
       return this.get('wrap') || this.get('currentIndex') < this.get('childSlides.length') - 1;
     }),
 
@@ -73007,7 +73133,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @type array
      */
-    childSlides: Ember.computed.filter('children', function (view) {
+    childSlides: filter('children', function (view) {
       return view instanceof _slide.default;
     }).readOnly(),
 
@@ -73017,10 +73143,10 @@ createDeprecatedModule('resolver');
      * @private
      * @property childSlidesObserver
      */
-    childSlidesObserver: Ember.observer('childSlides.[]', 'autoPlay', function () {
+    childSlidesObserver: observer('childSlides.[]', 'autoPlay', function () {
       var _this = this;
 
-      Ember.run.scheduleOnce('actions', function () {
+      scheduleOnce('actions', function () {
         var childSlides = _this.get('childSlides');
         if (childSlides.length === 0) {
           return;
@@ -73055,7 +73181,7 @@ createDeprecatedModule('resolver');
      * @private
      *
      */
-    currentSlide: Ember.computed('childSlides', 'currentIndex', function () {
+    currentSlide: computed('childSlides', 'currentIndex', function () {
       return this.get('childSlides').objectAt(this.get('currentIndex'));
     }).readOnly(),
 
@@ -73083,7 +73209,7 @@ createDeprecatedModule('resolver');
      * @property followingIndex
      * @private
      */
-    followingSlide: Ember.computed('childSlides', 'followingIndex', function () {
+    followingSlide: computed('childSlides', 'followingIndex', function () {
       return this.get('childSlides').objectAt(this.get('followingIndex'));
     }).readOnly(),
 
@@ -73092,7 +73218,7 @@ createDeprecatedModule('resolver');
      * @property hasInterval
      * @type boolean
      */
-    hasInterval: Ember.computed.gt('interval', 0).readOnly(),
+    hasInterval: gt('interval', 0).readOnly(),
 
     /**
      * This observer is the entry point for programmatically slide changing.
@@ -73100,7 +73226,7 @@ createDeprecatedModule('resolver');
      * @property indexObserver
      * @private
      */
-    indexObserver: Ember.observer('index', function () {
+    indexObserver: observer('index', function () {
       this.send('toSlide', this.get('index'));
     }),
 
@@ -73108,7 +73234,7 @@ createDeprecatedModule('resolver');
      * @property indicators
      * @private
      */
-    indicators: Ember.computed('childSlides.length', function () {
+    indicators: computed('childSlides.length', function () {
       return [].concat(_toConsumableArray(Array(this.get('childSlides.length'))));
     }),
 
@@ -73164,14 +73290,14 @@ createDeprecatedModule('resolver');
      * @property shouldNotDoPresentation
      * @type boolean
      */
-    shouldNotDoPresentation: Ember.computed.lte('childSlides.length', 1),
+    shouldNotDoPresentation: lte('childSlides.length', 1),
 
     /**
      * @private
      * @property shouldRunAutomatically
      * @type boolean
      */
-    shouldRunAutomatically: Ember.computed.readOnly('hasInterval'),
+    shouldRunAutomatically: readOnly('hasInterval'),
 
     /**
      * Starts automatic sliding on page load.
@@ -73368,8 +73494,8 @@ createDeprecatedModule('resolver');
               // Must change current index after execution of 'presentationStateObserver' method
               // from child components.
               _context2.next = 6;
-              return new Ember.RSVP.Promise(function (resolve) {
-                Ember.run.schedule('afterRender', _this2, function () {
+              return new RSVP.Promise(function (resolve) {
+                schedule('afterRender', _this2, function () {
                   this.set('currentIndex', this.get('followingIndex'));
                   resolve();
                 });
@@ -73558,7 +73684,11 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_componentChild.default, {
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  var observer = Ember.observer;
+  var next = Ember.run.next;
+  exports.default = Component.extend(_componentChild.default, {
     classNameBindings: ['active'],
     layout: _slide.default,
 
@@ -73569,7 +73699,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    active: Ember.computed('isCurrentSlide', 'presentationState', function () {
+    active: computed('isCurrentSlide', 'presentationState', function () {
       return this.get('isCurrentSlide') && this.get('presentationState') === null;
     }),
 
@@ -73578,7 +73708,7 @@ createDeprecatedModule('resolver');
      * @property isCurrentSlide
      * @type boolean
      */
-    isCurrentSlide: Ember.computed('currentSlide', function () {
+    isCurrentSlide: computed('currentSlide', function () {
       return this.get('currentSlide') === this;
     }).readOnly(),
 
@@ -73587,7 +73717,7 @@ createDeprecatedModule('resolver');
      * @property isFollowingSlide
      * @type boolean
      */
-    isFollowingSlide: Ember.computed('followingSlide', function () {
+    isFollowingSlide: computed('followingSlide', function () {
       return this.get('followingSlide') === this;
     }).readOnly(),
 
@@ -73633,7 +73763,7 @@ createDeprecatedModule('resolver');
      * @method presentationStateObserver
      * @private
      */
-    presentationStateObserver: Ember.observer('presentationState', function () {
+    presentationStateObserver: observer('presentationState', function () {
       var presentationState = this.get('presentationState');
       if (this.get('isCurrentSlide')) {
         switch (presentationState) {
@@ -73673,7 +73803,7 @@ createDeprecatedModule('resolver');
      */
     currentSlideWillTransit: function currentSlideWillTransit() {
       this.set('active', true);
-      Ember.run.next(this, function () {
+      next(this, function () {
         this.set(this.get('directionalClassName'), true);
       });
     },
@@ -73696,7 +73826,7 @@ createDeprecatedModule('resolver');
      */
     followingSlideWillTransit: function followingSlideWillTransit() {
       this.set(this.get('orderClassName'), true);
-      Ember.run.next(this, function () {
+      next(this, function () {
         this.reflow();
         this.set(this.get('directionalClassName'), true);
       });
@@ -73717,7 +73847,18 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var not = Ember.computed.not;
+  var alias = Ember.computed.alias;
+  var and = Ember.computed.and;
+  var Component = Ember.Component;
+  var isPresent = Ember.isPresent;
+  var isEmpty = Ember.isEmpty;
+  var observer = Ember.observer;
+  var computed = Ember.computed;
+  var next = Ember.run.next;
+  var htmlSafe = Ember.String.htmlSafe;
+  var camelize = Ember.String.camelize;
+  exports.default = Component.extend({
 
     classNameBindings: ['collapse', 'collapsing'],
     attributeBindings: ['style'],
@@ -73740,9 +73881,9 @@ createDeprecatedModule('resolver');
      */
     active: false,
 
-    collapse: Ember.computed.not('transitioning'),
-    collapsing: Ember.computed.alias('transitioning'),
-    showContent: Ember.computed.and('collapse', 'active'),
+    collapse: not('transitioning'),
+    collapsing: alias('transitioning'),
+    showContent: and('collapse', 'active'),
 
     /**
      * true if the component is currently transitioning
@@ -73812,13 +73953,13 @@ createDeprecatedModule('resolver');
      */
     transitionDuration: 350,
 
-    style: Ember.computed('collapseSize', function () {
+    style: computed('collapseSize', function () {
       var size = this.get('collapseSize');
       var dimension = this.get('collapseDimension');
-      if (Ember.isEmpty(size)) {
-        return Ember.String.htmlSafe('');
+      if (isEmpty(size)) {
+        return htmlSafe('');
       }
-      return Ember.String.htmlSafe(dimension + ': ' + size + 'px');
+      return htmlSafe(dimension + ': ' + size + 'px');
     }),
 
     /**
@@ -73885,7 +74026,7 @@ createDeprecatedModule('resolver');
 
       (0, _transitionEnd.default)(this.get('element'), complete, this, this.get('transitionDuration'));
 
-      Ember.run.next(this, function () {
+      next(this, function () {
         if (!this.get('isDestroyed')) {
           this.set('collapseSize', this.getExpandedSize('show'));
         }
@@ -73903,13 +74044,13 @@ createDeprecatedModule('resolver');
      */
     getExpandedSize: function getExpandedSize(action) {
       var expandedSize = this.get('expandedSize');
-      if (Ember.isPresent(expandedSize)) {
+      if (isPresent(expandedSize)) {
         return expandedSize;
       }
 
       var collapseElement = this.get('element');
       var prefix = action === 'show' ? 'scroll' : 'offset';
-      var measureProperty = Ember.String.camelize(prefix + '-' + this.get('collapseDimension'));
+      var measureProperty = camelize(prefix + '-' + this.get('collapseDimension'));
       return collapseElement[measureProperty];
     },
 
@@ -73943,7 +74084,7 @@ createDeprecatedModule('resolver');
 
       (0, _transitionEnd.default)(this.get('element'), complete, this, this.get('transitionDuration'));
 
-      Ember.run.next(this, function () {
+      next(this, function () {
         if (!this.get('isDestroyed')) {
           this.set('collapseSize', this.get('collapsedSize'));
         }
@@ -73951,7 +74092,7 @@ createDeprecatedModule('resolver');
     },
 
 
-    _onCollapsedChange: Ember.observer('collapsed', function () {
+    _onCollapsedChange: observer('collapsed', function () {
       var collapsed = this.get('collapsed');
       var active = this.get('active');
       if (collapsed !== active) {
@@ -73970,13 +74111,13 @@ createDeprecatedModule('resolver');
     },
 
 
-    _updateCollapsedSize: Ember.observer('collapsedSize', function () {
+    _updateCollapsedSize: observer('collapsedSize', function () {
       if (!this.get('resetSizeWhenNotCollapsing') && this.get('collapsed') && !this.get('collapsing')) {
         this.set('collapseSize', this.get('collapsedSize'));
       }
     }),
 
-    _updateExpandedSize: Ember.observer('expandedSize', function () {
+    _updateExpandedSize: observer('expandedSize', function () {
       if (!this.get('resetSizeWhenNotCollapsing') && !this.get('collapsed') && !this.get('collapsing')) {
         this.set('collapseSize', this.get('expandedSize'));
       }
@@ -74028,11 +74169,28 @@ createDeprecatedModule('resolver');
     };
   }();
 
-  var InState = Ember.Object.extend({
+  var or = Ember.computed.or;
+  var reads = Ember.computed.reads;
+  var gt = Ember.computed.gt;
+  var Component = Ember.Component;
+  var guidFor = Ember.guidFor;
+  var isArray = Ember.isArray;
+  var isBlank = Ember.isBlank;
+  var EmberObject = Ember.Object;
+  var observer = Ember.observer;
+  var computed = Ember.computed;
+  var next = Ember.run.next;
+  var schedule = Ember.run.schedule;
+  var cancel = Ember.run.cancel;
+  var later = Ember.run.later;
+  var run = Ember.run;
+
+
+  var InState = EmberObject.extend({
     hover: false,
     focus: false,
     click: false,
-    showHelp: Ember.computed.or('hover', 'focus', 'click')
+    showHelp: or('hover', 'focus', 'click')
   });
 
   function noop() {}
@@ -74045,7 +74203,7 @@ createDeprecatedModule('resolver');
    @uses Mixins.TransitionSupport
    @private
    */
-  exports.default = Ember.Component.extend(_transitionSupport.default, {
+  exports.default = Component.extend(_transitionSupport.default, {
     tagName: '',
 
     /**
@@ -74091,7 +74249,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    inDom: Ember.computed.reads('visible'),
+    inDom: reads('visible'),
 
     /**
      * Set to false to disable fade animations.
@@ -74111,7 +74269,7 @@ createDeprecatedModule('resolver');
      * @default false
      * @private
      */
-    showHelp: Ember.computed.reads('visible'),
+    showHelp: reads('visible'),
 
     /**
      * Delay showing and hiding the tooltip/popover (ms). Individual delays for showing and hiding can be specified by using the
@@ -74132,7 +74290,7 @@ createDeprecatedModule('resolver');
      * @default 0
      * @public
      */
-    delayShow: Ember.computed.reads('delay'),
+    delayShow: reads('delay'),
 
     /**
      * Delay hiding the tooltip/popover. This property overrides the general delay set with the `delay` property.
@@ -74142,10 +74300,10 @@ createDeprecatedModule('resolver');
      * @default 0
      * @public
      */
-    delayHide: Ember.computed.reads('delay'),
+    delayHide: reads('delay'),
 
-    hasDelayShow: Ember.computed.gt('delayShow', 0),
-    hasDelayHide: Ember.computed.gt('delayHide', 0),
+    hasDelayShow: gt('delayShow', 0),
+    hasDelayHide: gt('delayHide', 0),
 
     /**
      * The duration of the fade transition
@@ -74189,8 +74347,8 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    overlayId: Ember.computed(function () {
-      return 'overlay-' + Ember.guidFor(this);
+    overlayId: computed(function () {
+      return 'overlay-' + guidFor(this);
     }),
 
     /**
@@ -74201,7 +74359,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    overlayElement: Ember.computed('overlayId', function () {
+    overlayElement: computed('overlayId', function () {
       return document.getElementById(this.get('overlayId'));
     }).volatile(),
 
@@ -74223,7 +74381,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    viewportElement: Ember.computed('viewportSelector', function () {
+    viewportElement: computed('viewportSelector', function () {
       return document.querySelector(this.get('viewportSelector'));
     }),
 
@@ -74243,11 +74401,11 @@ createDeprecatedModule('resolver');
      * @type {object}
      * @private
      */
-    triggerTargetElement: Ember.computed('triggerElement', function () {
+    triggerTargetElement: computed('triggerElement', function () {
       var triggerElement = this.get('triggerElement');
       var el = void 0;
 
-      if (Ember.isBlank(triggerElement)) {
+      if (isBlank(triggerElement)) {
         try {
           el = (0, _getParent.default)(this);
         } catch (e) {
@@ -74274,9 +74432,9 @@ createDeprecatedModule('resolver');
      */
     triggerEvents: 'hover focus',
 
-    _triggerEvents: Ember.computed('triggerEvents', function () {
+    _triggerEvents: computed('triggerEvents', function () {
       var events = this.get('triggerEvents');
-      if (!Ember.isArray(events)) {
+      if (!isArray(events)) {
         events = events.split(' ');
       }
 
@@ -74307,7 +74465,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    _renderInPlace: Ember.computed('renderInPlace', function () {
+    _renderInPlace: computed('renderInPlace', function () {
       return this.get('renderInPlace') || typeof document === 'undefined' || !document.getElementById('ember-bootstrap-wormhole');
     }),
 
@@ -74327,7 +74485,7 @@ createDeprecatedModule('resolver');
      * @type {InState}
      * @private
      */
-    inState: Ember.computed(function () {
+    inState: computed(function () {
       return InState.create();
     }),
 
@@ -74393,7 +74551,7 @@ createDeprecatedModule('resolver');
         return;
       }
 
-      Ember.run.cancel(this.timer);
+      cancel(this.timer);
 
       this.set('hoverState', 'in');
 
@@ -74401,7 +74559,7 @@ createDeprecatedModule('resolver');
         return this.show();
       }
 
-      this.timer = Ember.run.later(this, function () {
+      this.timer = later(this, function () {
         if (this.get('hoverState') === 'in') {
           this.show();
         }
@@ -74426,7 +74584,7 @@ createDeprecatedModule('resolver');
         return;
       }
 
-      Ember.run.cancel(this.timer);
+      cancel(this.timer);
 
       this.set('hoverState', 'out');
 
@@ -74434,7 +74592,7 @@ createDeprecatedModule('resolver');
         return this.hide();
       }
 
-      this.timer = Ember.run.later(this, function () {
+      this.timer = later(this, function () {
         if (this.get('hoverState') === 'out') {
           this.hide();
         }
@@ -74484,8 +74642,8 @@ createDeprecatedModule('resolver');
 
       // this waits for the tooltip/popover element to be created. when animating a wormholed tooltip/popover we need to wait until
       // ember-wormhole has moved things in the DOM for the animation to be correct, so use Ember.run.next in this case
-      var delayFn = !this.get('_renderInPlace') && this.get('fade') ? Ember.run.next : function (target, fn) {
-        Ember.run.schedule('afterRender', target, fn);
+      var delayFn = !this.get('_renderInPlace') && this.get('fade') ? next : function (target, fn) {
+        schedule('afterRender', target, fn);
       };
 
       this.set('inDom', true);
@@ -74605,7 +74763,7 @@ createDeprecatedModule('resolver');
       var target = this.get('triggerTargetElement');
 
       this.get('_triggerEvents').forEach(function (event) {
-        if (Ember.isArray(event)) {
+        if (isArray(event)) {
           var _event = _slicedToArray(event, 2),
               inEvent = _event[0],
               outEvent = _event[1];
@@ -74629,7 +74787,7 @@ createDeprecatedModule('resolver');
       try {
         var target = this.get('triggerTargetElement');
         this.get('_triggerEvents').forEach(function (event) {
-          if (Ember.isArray(event)) {
+          if (isArray(event)) {
             var _event2 = _slicedToArray(event, 2),
                 inEvent = _event2[0],
                 outEvent = _event2[1];
@@ -74644,15 +74802,15 @@ createDeprecatedModule('resolver');
     },
     init: function init() {
       this._super.apply(this, arguments);
-      this._handleEnter = Ember.run.bind(this, this.enter);
-      this._handleLeave = Ember.run.bind(this, this.leave);
-      this._handleToggle = Ember.run.bind(this, this.toggle);
+      this._handleEnter = run.bind(this, this.enter);
+      this._handleLeave = run.bind(this, this.leave);
+      this._handleToggle = run.bind(this, this.toggle);
     },
     didInsertElement: function didInsertElement() {
       this._super.apply(this, arguments);
       this.addListeners();
       if (this.get('visible')) {
-        Ember.run.next(this, this._show, true);
+        next(this, this._show, true);
       }
     },
     willDestroyElement: function willDestroyElement() {
@@ -74661,7 +74819,7 @@ createDeprecatedModule('resolver');
     },
 
 
-    _watchVisible: Ember.observer('visible', function () {
+    _watchVisible: observer('visible', function () {
       if (this.get('visible')) {
         this.show();
       } else {
@@ -74677,7 +74835,11 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var reads = Ember.computed.reads;
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  var scheduleOnce = Ember.run.scheduleOnce;
+  exports.default = Component.extend({
     layout: _element.default,
     tagName: '',
     ariaRole: 'tooltip',
@@ -74690,7 +74852,7 @@ createDeprecatedModule('resolver');
      */
     placement: 'top',
 
-    actualPlacement: Ember.computed.reads('placement'),
+    actualPlacement: reads('placement'),
 
     /**
      * @property fade
@@ -74772,7 +74934,7 @@ createDeprecatedModule('resolver');
      * @type {string}
      * @private
      */
-    popperClass: Ember.computed('popperClassNames.[]', 'class', function () {
+    popperClass: computed('popperClassNames.[]', 'class', function () {
       var classes = this.get('popperClassNames');
       var classProperty = this.get('class');
       if (typeof classProperty === 'string') {
@@ -74788,7 +74950,7 @@ createDeprecatedModule('resolver');
      * @type {object}
      * @private
      */
-    popperModifiers: Ember.computed('arrowClass', 'autoPlacement', 'viewportElement', 'viewportPadding', function () {
+    popperModifiers: computed('arrowClass', 'autoPlacement', 'viewportElement', 'viewportPadding', function () {
       var self = this;
       return {
         arrow: {
@@ -74843,7 +75005,7 @@ createDeprecatedModule('resolver');
           return;
         }
         this.set('actualPlacement', popperDataObject.placement);
-        Ember.run.scheduleOnce('afterRender', popperDataObject.instance, popperDataObject.instance.scheduleUpdate);
+        scheduleOnce('afterRender', popperDataObject.instance, popperDataObject.instance.scheduleUpdate);
       }
     }
   });
@@ -74854,7 +75016,10 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  var bind = Ember.run.bind;
+  exports.default = Component.extend({
     layout: _bsDropdown.default,
     classNameBindings: ['containerClass'],
 
@@ -74908,7 +75073,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    containerClass: Ember.computed('toggle.tagName', 'direction', function () {
+    containerClass: computed('toggle.tagName', 'direction', function () {
       if (this.get('toggle.tagName') === 'button' && !this.get('toggle.block')) {
         return this.get('direction') !== 'down' ? 'btn-group drop' + this.get('direction') : 'btn-group';
       } else {
@@ -74920,7 +75085,7 @@ createDeprecatedModule('resolver');
      * @property menuElement
      * @private
      */
-    menuElement: Ember.computed(function () {
+    menuElement: computed(function () {
       return this.get('element').querySelector('.dropdown-menu');
     }).volatile(),
 
@@ -74928,7 +75093,7 @@ createDeprecatedModule('resolver');
      * @property toggleElement
      * @private
      */
-    toggleElement: Ember.computed('toggle', function () {
+    toggleElement: computed('toggle', function () {
       return typeof FastBoot === 'undefined' ? this.get('toggle.element') || null : null;
     }),
 
@@ -74982,7 +75147,7 @@ createDeprecatedModule('resolver');
 
     addClickListener: function addClickListener() {
       if (!this.clickListener) {
-        this.clickListener = Ember.run.bind(this, this.closeOnClickHandler);
+        this.clickListener = bind(this, this.closeOnClickHandler);
         document.addEventListener('click', this.clickListener, true);
       }
     },
@@ -75032,7 +75197,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  exports.default = Component.extend({
     layout: _menu.default,
 
     /**
@@ -75077,7 +75244,7 @@ createDeprecatedModule('resolver');
      */
     inNav: false,
 
-    alignClass: Ember.computed('align', function () {
+    alignClass: computed('align', function () {
       if (this.get('align') !== 'left') {
         return 'dropdown-menu-' + this.get('align');
       }
@@ -75090,7 +75257,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({});
+  var Component = Ember.Component;
+  exports.default = Component.extend({});
 });
 ;define('ember-bootstrap/components/base/bs-dropdown/menu/item', ['exports'], function (exports) {
   'use strict';
@@ -75098,7 +75266,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({});
+  var Component = Ember.Component;
+  exports.default = Component.extend({});
 });
 ;define('ember-bootstrap/components/base/bs-dropdown/menu/link-to', ['exports'], function (exports) {
   'use strict';
@@ -75106,7 +75275,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.LinkComponent.extend({});
+  var LinkComponent = Ember.LinkComponent;
+  exports.default = LinkComponent.extend({});
 });
 ;define('ember-bootstrap/components/base/bs-dropdown/toggle', ['exports', 'ember-bootstrap/mixins/dropdown-toggle'], function (exports, _dropdownToggle) {
   'use strict';
@@ -75114,7 +75284,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_dropdownToggle.default, {
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  exports.default = Component.extend(_dropdownToggle.default, {
     /**
      * Defaults to a `<a>` tag. Change for other types of dropdown toggles.
      *
@@ -75142,7 +75314,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    href: Ember.computed('tagName', function () {
+    href: computed('tagName', function () {
       if (this.get('tagName').toUpperCase() === 'A') {
         return '#';
       }
@@ -75168,7 +75340,12 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  var RSVP = Ember.RSVP;
+  var set = Ember.set;
+  var computed = Ember.computed;
+  var isPresent = Ember.isPresent;
+  exports.default = Component.extend({
     layout: _bsForm.default,
     tagName: 'form',
     classNameBindings: ['layoutClass'],
@@ -75249,7 +75426,7 @@ createDeprecatedModule('resolver');
      */
     novalidate: false,
 
-    _novalidate: Ember.computed('novalidate', function () {
+    _novalidate: computed('novalidate', function () {
       return this.get('novalidate') === true ? '' : undefined;
     }),
 
@@ -75330,7 +75507,7 @@ createDeprecatedModule('resolver');
         return this.get('onSubmit')(model);
       } else {
         var validationPromise = this.validate(this.get('model'));
-        if (validationPromise && validationPromise instanceof Ember.RSVP.Promise) {
+        if (validationPromise && validationPromise instanceof RSVP.Promise) {
           validationPromise.then(function (r) {
             return _this.get('onSubmit')(model, r);
           }).catch(function (err) {
@@ -75355,9 +75532,9 @@ createDeprecatedModule('resolver');
 
     actions: {
       change: function change(value, model, property) {
-        (true && !(Ember.isPresent(model) && Ember.isPresent(property)) && Ember.assert('You cannot use the form element\'s default onChange action for form elements if not using a model or setting the value directly on a form element. You must add your own onChange action to the form element in this case!', Ember.isPresent(model) && Ember.isPresent(property)));
+        (true && !(isPresent(model) && isPresent(property)) && Ember.assert('You cannot use the form element\'s default onChange action for form elements if not using a model or setting the value directly on a form element. You must add your own onChange action to the form element in this case!', isPresent(model) && isPresent(property)));
 
-        Ember.set(model, property, value);
+        set(model, property, value);
       }
     }
   });
@@ -75368,9 +75545,24 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var notEmpty = Ember.computed.notEmpty;
+  var gt = Ember.computed.gt;
+  var or = Ember.computed.or;
+  var and = Ember.computed.and;
+  var equal = Ember.computed.equal;
+  var alias = Ember.computed.alias;
+  var observer = Ember.observer;
+  var defineProperty = Ember.defineProperty;
+  var computed = Ember.computed;
+  var scheduleOnce = Ember.run.scheduleOnce;
+  var typeOf = Ember.typeOf;
+  var isBlank = Ember.isBlank;
+  var A = Ember.A;
+  var isArray = Ember.isArray;
+  var getOwner = Ember.getOwner;
 
 
-  var nonDefaultLayouts = Ember.A(['checkbox']);
+  var nonDefaultLayouts = A(['checkbox']);
 
   /**
    Sub class of `Components.FormGroup` that adds automatic form layout markup and form validation features.
@@ -75711,7 +75903,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    hasLabel: Ember.computed.notEmpty('label'),
+    hasLabel: notEmpty('label'),
 
     /**
      * The type of the control widget.
@@ -75792,7 +75984,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    hasHelpText: Ember.computed.notEmpty('helpText').readOnly(),
+    hasHelpText: notEmpty('helpText').readOnly(),
 
     /**
      * The array of error messages from the `model`'s validation.
@@ -75809,7 +76001,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    hasErrors: Ember.computed.gt('errors.length', 0),
+    hasErrors: gt('errors.length', 0),
 
     /**
      * The array of warning messages from the `model`'s validation.
@@ -75826,7 +76018,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    hasWarnings: Ember.computed.gt('warnings.length', 0),
+    hasWarnings: gt('warnings.length', 0),
 
     /**
      * Show a custom error message that does not come from the model's validation. Will be immediately shown, regardless
@@ -75844,7 +76036,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    hasCustomError: Ember.computed.notEmpty('customError'),
+    hasCustomError: notEmpty('customError'),
 
     /**
      * Show a custom warning message that does not come from the model's validation. Will be immediately shown, regardless
@@ -75863,7 +76055,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    hasCustomWarning: Ember.computed.notEmpty('customWarning'),
+    hasCustomWarning: notEmpty('customWarning'),
 
     /**
      * Property for size styling, set to 'lg', 'sm' or 'xs' (the latter only for BS3)
@@ -75881,18 +76073,18 @@ createDeprecatedModule('resolver');
      * @type array
      * @private
      */
-    validationMessages: Ember.computed('hasCustomError', 'customError', 'hasErrors', 'hasCustomWarning', 'customWarning', 'hasWarnings', 'errors.[]', 'warnings.[]', 'showModelValidation', function () {
+    validationMessages: computed('hasCustomError', 'customError', 'hasErrors', 'hasCustomWarning', 'customWarning', 'hasWarnings', 'errors.[]', 'warnings.[]', 'showModelValidation', function () {
       if (this.get('hasCustomError')) {
-        return Ember.A([this.get('customError')]);
+        return A([this.get('customError')]);
       }
       if (this.get('hasErrors') && this.get('showModelValidation')) {
-        return Ember.A(this.get('errors'));
+        return A(this.get('errors'));
       }
       if (this.get('hasCustomWarning')) {
-        return Ember.A([this.get('customWarning')]);
+        return A([this.get('customWarning')]);
       }
       if (this.get('hasWarnings') && this.get('showModelValidation')) {
-        return Ember.A(this.get('warnings'));
+        return A(this.get('warnings'));
       }
       return null;
     }),
@@ -75903,7 +76095,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    hasValidationMessages: Ember.computed.gt('validationMessages.length', 0),
+    hasValidationMessages: gt('validationMessages.length', 0),
 
     /**
      * @property hasValidator
@@ -75931,7 +76123,7 @@ createDeprecatedModule('resolver');
      * @default false
      * @private
      */
-    showValidation: Ember.computed.or('showOwnValidation', 'showAllValidations', 'hasCustomError', 'hasCustomWarning'),
+    showValidation: or('showOwnValidation', 'showAllValidations', 'hasCustomError', 'hasCustomWarning'),
 
     /**
      * @property showOwnValidation
@@ -75955,7 +76147,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    showModelValidation: Ember.computed.or('showOwnValidation', 'showAllValidations'),
+    showModelValidation: or('showOwnValidation', 'showAllValidations'),
 
     /**
      * @property showValidationMessages
@@ -75963,7 +76155,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    showValidationMessages: Ember.computed.and('showValidation', 'hasValidationMessages'),
+    showValidationMessages: and('showValidation', 'hasValidationMessages'),
 
     /**
      * Event or list of events which enable form validation markup rendering.
@@ -75982,12 +76174,12 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    _showValidationOn: Ember.computed('showValidationOn.[]', function () {
+    _showValidationOn: computed('showValidationOn.[]', function () {
       var showValidationOn = this.get('showValidationOn');
 
-      (true && !(Ember.isArray(showValidationOn) || Ember.typeOf(showValidationOn) === 'string') && Ember.assert('showValidationOn must be a String or an Array', Ember.isArray(showValidationOn) || Ember.typeOf(showValidationOn) === 'string'));
+      (true && !(isArray(showValidationOn) || typeOf(showValidationOn) === 'string') && Ember.assert('showValidationOn must be a String or an Array', isArray(showValidationOn) || typeOf(showValidationOn) === 'string'));
 
-      if (Ember.isArray(showValidationOn)) {
+      if (isArray(showValidationOn)) {
         return showValidationOn;
       }
 
@@ -76017,7 +76209,7 @@ createDeprecatedModule('resolver');
      * @type string
      * @private
      */
-    validation: Ember.computed('hasCustomError', 'hasErrors', 'hasCustomWarning', 'hasWarnings', 'hasValidator', 'showValidation', 'showModelValidation', 'isValidating', 'disabled', function () {
+    validation: computed('hasCustomError', 'hasErrors', 'hasCustomWarning', 'hasWarnings', 'hasValidator', 'showValidation', 'showModelValidation', 'isValidating', 'disabled', function () {
       if (!this.get('showValidation') || !this.get('hasValidator') || this.get('isValidating') || this.get('disabled')) {
         return null;
       } else if (this.get('showModelValidation')) {
@@ -76037,7 +76229,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @public
      */
-    useIcons: Ember.computed.equal('controlComponent', 'bs-form/element/control/input'),
+    useIcons: equal('controlComponent', 'bs-form/element/control/input'),
 
     /**
      * The form layout used for the markup generation (see http://getbootstrap.com/css/#forms):
@@ -76072,7 +76264,7 @@ createDeprecatedModule('resolver');
      * @type string
      * @private
      */
-    formElementId: Ember.computed('elementId', function () {
+    formElementId: computed('elementId', function () {
       return this.get('elementId') + '-field';
     }),
 
@@ -76083,7 +76275,7 @@ createDeprecatedModule('resolver');
      * @type string
      * @private
      */
-    ariaDescribedBy: Ember.computed('elementId', function () {
+    ariaDescribedBy: computed('elementId', function () {
       return this.get('elementId') + '-help';
     }),
 
@@ -76092,7 +76284,7 @@ createDeprecatedModule('resolver');
      * @type {String}
      * @private
      */
-    layoutComponent: Ember.computed('formLayout', 'controlType', function () {
+    layoutComponent: computed('formLayout', 'controlType', function () {
       var formLayout = this.get('formLayout');
       var controlType = this.get('controlType');
 
@@ -76108,11 +76300,11 @@ createDeprecatedModule('resolver');
      * @type {String}
      * @private
      */
-    controlComponent: Ember.computed('controlType', function () {
+    controlComponent: computed('controlType', function () {
       var controlType = this.get('controlType');
       var componentName = 'bs-form/element/control/' + controlType;
 
-      if (Ember.getOwner(this).hasRegistration('component:' + componentName)) {
+      if (getOwner(this).hasRegistration('component:' + componentName)) {
         return componentName;
       }
 
@@ -76208,8 +76400,8 @@ createDeprecatedModule('resolver');
       if (this.get('showValidationOn') === null) {
         this.set('showValidationOn', ['focusOut']);
       }
-      if (!Ember.isBlank(this.get('property'))) {
-        Ember.defineProperty(this, 'value', Ember.computed.alias('model.' + this.get('property')));
+      if (!isBlank(this.get('property'))) {
+        defineProperty(this, 'value', alias('model.' + this.get('property')));
         this.setupValidations();
       }
     },
@@ -76223,10 +76415,10 @@ createDeprecatedModule('resolver');
      *  with an add-on on the right. [...] For input groups, adjust the right
      *  value to an appropriate pixel value depending on the width of your addon.
      */
-    adjustFeedbackIcons: Ember.observer('hasFeedback', 'formLayout', function () {
+    adjustFeedbackIcons: observer('hasFeedback', 'formLayout', function () {
       var _this = this;
 
-      Ember.run.scheduleOnce('afterRender', function () {
+      scheduleOnce('afterRender', function () {
         var el = _this.get('element');
         var feedbackIcon = void 0;
         // validation state icons are only shown if form element has feedback
@@ -76281,7 +76473,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
 
     /**
      * @property value
@@ -76378,7 +76571,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _errors.default,
     tagName: '',
 
@@ -76413,7 +76607,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _feedbackIcon.default,
     tagName: '',
 
@@ -76438,7 +76633,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _helpText.default,
 
     /**
@@ -76455,7 +76651,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var equal = Ember.computed.equal;
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _label.default,
     tagName: '',
 
@@ -76527,7 +76725,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    isCheckbox: Ember.computed.equal('controlType', 'checkbox').readOnly(),
+    isCheckbox: equal('controlType', 'checkbox').readOnly(),
 
     /**
      * Indicates whether the form type equals `horizontal`
@@ -76536,7 +76734,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    isHorizontal: Ember.computed.equal('formLayout', 'horizontal').readOnly()
+    isHorizontal: equal('formLayout', 'horizontal').readOnly()
   });
 });
 ;define('ember-bootstrap/components/base/bs-form/element/layout', ['exports'], function (exports) {
@@ -76545,7 +76743,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     tagName: '',
 
     /**
@@ -76597,6 +76796,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var computed = Ember.computed;
+  var isBlank = Ember.isBlank;
   exports.default = _layout.default.extend({
     layout: _horizontal.default,
 
@@ -76617,8 +76818,8 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    horizontalInputGridClass: Ember.computed('horizontalLabelGridClass', function () {
-      if (Ember.isBlank(this.get('horizontalLabelGridClass'))) {
+    horizontalInputGridClass: computed('horizontalLabelGridClass', function () {
+      if (isBlank(this.get('horizontalLabelGridClass'))) {
         return;
       }
       var parts = this.get('horizontalLabelGridClass').split('-');
@@ -76637,8 +76838,8 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    horizontalInputOffsetGridClass: Ember.computed('horizontalLabelGridClass', function () {
-      if (Ember.isBlank(this.get('horizontalLabelGridClass'))) {
+    horizontalInputOffsetGridClass: computed('horizontalLabelGridClass', function () {
+      if (isBlank(this.get('horizontalLabelGridClass'))) {
         return;
       }
       var parts = this.get('horizontalLabelGridClass').split('-');
@@ -76704,7 +76905,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var notEmpty = Ember.computed.notEmpty;
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _group.default,
 
     /**
@@ -76722,7 +76925,7 @@ createDeprecatedModule('resolver');
      * @private
      * @readonly
      */
-    hasValidation: Ember.computed.notEmpty('validation').readOnly(),
+    hasValidation: notEmpty('validation').readOnly(),
 
     /**
      * Set to a validation state to render the form-group with a validation style (only for BS3).
@@ -76805,7 +77008,16 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_transitionSupport.default, {
+  var not = Ember.computed.not;
+  var Component = Ember.Component;
+  var getOwner = Ember.getOwner;
+  var observer = Ember.observer;
+  var get = Ember.get;
+  var computed = Ember.computed;
+  var schedule = Ember.run.schedule;
+  var next = Ember.run.next;
+  var bind = Ember.run.bind;
+  exports.default = Component.extend(_transitionSupport.default, {
     layout: _bsModal.default,
 
     /**
@@ -76841,14 +77053,14 @@ createDeprecatedModule('resolver');
      * @default true
      * @public
      */
-    fade: Ember.computed.not('isFastBoot'),
+    fade: not('isFastBoot'),
 
     /**
      * @property notFade
      * @type boolean
      * @private
      */
-    notFade: Ember.computed.not('fade'),
+    notFade: not('fade'),
 
     /**
      * Used to apply Bootstrap's visibility classes.
@@ -76933,7 +77145,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    modalId: Ember.computed('elementId', function () {
+    modalId: computed('elementId', function () {
       return this.get('elementId') + '-modal';
     }),
 
@@ -76945,7 +77157,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    modalElement: Ember.computed('modalId', function () {
+    modalElement: computed('modalId', function () {
       return document.getElementById(this.get('modalId'));
     }).volatile(),
 
@@ -76957,7 +77169,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    backdropId: Ember.computed('elementId', function () {
+    backdropId: computed('elementId', function () {
       return this.get('elementId') + '-backdrop';
     }),
 
@@ -76969,7 +77181,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    backdropElement: Ember.computed('backdropId', function () {
+    backdropElement: computed('backdropId', function () {
       return document.getElementById(this.get('backdropId'));
     }).volatile(),
 
@@ -76981,7 +77193,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    destinationElement: Ember.computed(function () {
+    destinationElement: computed(function () {
       var dom = (0, _dom.getDOM)(this);
       return (0, _dom.findElementById)(dom, 'ember-bootstrap-wormhole');
     }).volatile(),
@@ -77022,7 +77234,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    _renderInPlace: Ember.computed('renderInPlace', 'destinationElement', function () {
+    _renderInPlace: computed('renderInPlace', 'destinationElement', function () {
       return this.get('renderInPlace') || !this.get('destinationElement');
     }),
 
@@ -77051,13 +77263,13 @@ createDeprecatedModule('resolver');
      * @type {Boolean}
      * @private
      */
-    isFastBoot: Ember.computed(function () {
-      if (!Ember.getOwner) {
+    isFastBoot: computed(function () {
+      if (!getOwner) {
         // Ember.getOwner is available as of Ember 2.3, while FastBoot requires 2.4. So just return false...
         return false;
       }
 
-      var owner = Ember.getOwner(this);
+      var owner = getOwner(this);
       if (!owner) {
         return false;
       }
@@ -77067,7 +77279,7 @@ createDeprecatedModule('resolver');
         return false;
       }
 
-      return Ember.get(fastboot, 'isFastBoot');
+      return get(fastboot, 'isFastBoot');
     }),
 
     /**
@@ -77202,7 +77414,7 @@ createDeprecatedModule('resolver');
         this.checkScrollbar();
         this.setScrollbar();
 
-        Ember.run.schedule('afterRender', function () {
+        schedule('afterRender', function () {
           var modalEl = _this.get('modalElement');
           if (!modalEl) {
             return;
@@ -77292,7 +77504,7 @@ createDeprecatedModule('resolver');
           return;
         }
 
-        Ember.run.schedule('afterRender', this, function () {
+        schedule('afterRender', this, function () {
           var backdrop = this.get('backdropElement');
           (true && !(backdrop) && Ember.assert('Backdrop element should be in DOM', backdrop));
 
@@ -77322,7 +77534,7 @@ createDeprecatedModule('resolver');
           callbackRemove.call(this);
         }
       } else if (callback) {
-        Ember.run.next(this, callback);
+        next(this, callback);
       }
     },
 
@@ -77335,7 +77547,7 @@ createDeprecatedModule('resolver');
      */
     resize: function resize() {
       if (this.get('isOpen')) {
-        this._handleUpdate = Ember.run.bind(this, this.handleUpdate);
+        this._handleUpdate = bind(this, this.handleUpdate);
         window.addEventListener('resize', this._handleUpdate, false);
       } else {
         window.removeEventListener('resize', this._handleUpdate, false);
@@ -77421,7 +77633,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    scrollbarWidth: Ember.computed(function () {
+    scrollbarWidth: computed(function () {
       var scrollDiv = document.createElement('div');
       scrollDiv.className = 'modal-scrollbar-measure';
       var modalEl = this.get('modalElement');
@@ -77445,7 +77657,7 @@ createDeprecatedModule('resolver');
     },
 
 
-    _observeOpen: Ember.observer('isOpen', function () {
+    _observeOpen: observer('isOpen', function () {
       if (this.get('isOpen')) {
         this.show();
       } else {
@@ -77476,7 +77688,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _body.default,
     classNames: ['modal-body']
   });
@@ -77487,7 +77700,12 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var isBlank = Ember.isBlank;
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  var htmlSafe = Ember.String.htmlSafe;
+  var bind = Ember.run.bind;
+  exports.default = Component.extend({
     layout: _dialog.default,
     classNames: ['modal'],
     classNameBindings: ['fade'],
@@ -77578,7 +77796,7 @@ createDeprecatedModule('resolver');
      * @readOnly
      * @private
      */
-    style: Ember.computed('inDom', 'paddingLeft', 'paddingRight', function () {
+    style: computed('inDom', 'paddingLeft', 'paddingRight', function () {
       var styles = [];
 
       var _getProperties = this.getProperties('inDom', 'paddingLeft', 'paddingRight'),
@@ -77596,7 +77814,7 @@ createDeprecatedModule('resolver');
         styles.push('padding-right: ' + paddingRight + 'px');
       }
 
-      return Ember.String.htmlSafe(styles.join(';'));
+      return htmlSafe(styles.join(';'));
     }),
 
     /**
@@ -77607,9 +77825,9 @@ createDeprecatedModule('resolver');
      * @readOnly
      * @private
      */
-    sizeClass: Ember.computed('size', function () {
+    sizeClass: computed('size', function () {
       var size = this.get('size');
-      return Ember.isBlank(size) ? null : 'modal-' + size;
+      return isBlank(size) ? null : 'modal-' + size;
     }).readOnly(),
 
     /**
@@ -77634,7 +77852,10 @@ createDeprecatedModule('resolver');
       // Ember events use event delegation, but we need to add an `onclick` handler directly on the modal element for
       // iOS to allow clicking the div. So a `click(){}` method here won't work, we need to attach an event listener
       // directly to the element
-      this.element.onclick = Ember.run.bind(this, this._click);
+      this.element.onclick = bind(this, this._click);
+    },
+    willDestroyElement: function willDestroyElement() {
+      this.element.onclick = null;
     }
   });
 });
@@ -77644,7 +77865,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var notEmpty = Ember.computed.notEmpty;
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _footer.default,
     tagName: 'form',
     classNames: ['modal-footer'],
@@ -77671,7 +77894,7 @@ createDeprecatedModule('resolver');
      */
     submitTitle: null,
 
-    hasSubmitButton: Ember.computed.notEmpty('submitTitle'),
+    hasSubmitButton: notEmpty('submitTitle'),
 
     /**
      * Set to true to disable the submit button. If you bind this to some property that indicates if submitting is allowed
@@ -77721,7 +77944,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _header.default,
     classNames: ['modal-header'],
 
@@ -77758,7 +77982,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _close.default,
     tagName: 'button',
     classNames: ['close'],
@@ -77782,7 +78007,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _title.default,
     tagName: 'h4',
     classNames: ['modal-title']
@@ -77794,7 +78020,10 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var computed = Ember.computed;
+  var Component = Ember.Component;
+  var isPresent = Ember.isPresent;
+  exports.default = Component.extend({
     layout: _bsNav.default,
 
     tagName: 'ul',
@@ -77802,9 +78031,9 @@ createDeprecatedModule('resolver');
 
     classNameBindings: ['typeClass', 'justified:nav-justified'],
 
-    typeClass: Ember.computed('type', function () {
+    typeClass: computed('type', function () {
       var type = this.get('type');
-      if (Ember.isPresent(type)) {
+      if (isPresent(type)) {
         return 'nav-' + type;
       }
     }),
@@ -77867,7 +78096,15 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_componentParent.default, {
+  var Component = Ember.Component;
+  var observer = Ember.observer;
+  var reads = Ember.computed.reads;
+  var filter = Ember.computed.filter;
+  var filterBy = Ember.computed.filterBy;
+  var gt = Ember.computed.gt;
+  var scheduleOnce = Ember.run.scheduleOnce;
+  var LinkComponent = Ember.LinkComponent;
+  exports.default = Component.extend(_componentParent.default, {
     layout: _item.default,
     classNameBindings: ['disabled', 'active'],
     tagName: 'li',
@@ -77882,7 +78119,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @public
      */
-    disabled: Ember.computed.reads('_disabled'),
+    disabled: reads('_disabled'),
     _disabled: false,
 
     /**
@@ -77895,7 +78132,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @public
      */
-    active: Ember.computed.reads('_active'),
+    active: reads('_active'),
     _active: false,
 
     /**
@@ -77904,15 +78141,15 @@ createDeprecatedModule('resolver');
      * @property childLinks
      * @private
      */
-    childLinks: Ember.computed.filter('children', function (view) {
-      return view instanceof Ember.LinkComponent;
+    childLinks: filter('children', function (view) {
+      return view instanceof LinkComponent;
     }),
 
-    activeChildLinks: Ember.computed.filterBy('childLinks', 'active'),
-    hasActiveChildLinks: Ember.computed.gt('activeChildLinks.length', 0),
+    activeChildLinks: filterBy('childLinks', 'active'),
+    hasActiveChildLinks: gt('activeChildLinks.length', 0),
 
-    disabledChildLinks: Ember.computed.filterBy('childLinks', 'disabled'),
-    hasDisabledChildLinks: Ember.computed.gt('disabledChildLinks.length', 0),
+    disabledChildLinks: filterBy('childLinks', 'disabled'),
+    hasDisabledChildLinks: gt('disabledChildLinks.length', 0),
 
     /**
      * Called when clicking the nav item
@@ -77931,8 +78168,8 @@ createDeprecatedModule('resolver');
     },
 
 
-    _observeActive: Ember.observer('activeChildLinks.[]', function () {
-      Ember.run.scheduleOnce('afterRender', this, this._updateActive);
+    _observeActive: observer('activeChildLinks.[]', function () {
+      scheduleOnce('afterRender', this, this._updateActive);
     }),
 
     _updateActive: function _updateActive() {
@@ -77940,8 +78177,8 @@ createDeprecatedModule('resolver');
     },
 
 
-    _observeDisabled: Ember.observer('disabledChildLinks.[]', function () {
-      Ember.run.scheduleOnce('afterRender', this, this._updateDisabled);
+    _observeDisabled: observer('disabledChildLinks.[]', function () {
+      scheduleOnce('afterRender', this, this._updateDisabled);
     }),
 
     _updateDisabled: function _updateDisabled() {
@@ -77955,7 +78192,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.LinkComponent.extend(_componentChild.default, {});
+  var LinkComponent = Ember.LinkComponent;
+  exports.default = LinkComponent.extend(_componentChild.default, {});
 });
 ;define('ember-bootstrap/components/base/bs-navbar', ['exports', 'ember-bootstrap/mixins/type-class', 'ember-bootstrap/templates/components/bs-navbar', 'ember-bootstrap/utils/listen-to-cp'], function (exports, _typeClass, _bsNavbar, _listenToCp) {
   'use strict';
@@ -77963,7 +78201,10 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_typeClass.default, {
+  var Component = Ember.Component;
+  var observer = Ember.observer;
+  var computed = Ember.computed;
+  exports.default = Component.extend(_typeClass.default, {
     layout: _bsNavbar.default,
 
     tagName: 'nav',
@@ -78010,7 +78251,7 @@ createDeprecatedModule('resolver');
      */
     position: null,
 
-    positionClass: Ember.computed('position', function () {
+    positionClass: computed('position', function () {
       var position = this.get('position');
       var validPositions = this.get('_validPositions');
       var positionPrefix = this.get('_positionPrefix');
@@ -78064,7 +78305,7 @@ createDeprecatedModule('resolver');
     onExpanded: function onExpanded() {},
 
 
-    _onCollapsedChange: Ember.observer('_collapsed', function () {
+    _onCollapsedChange: observer('_collapsed', function () {
       var collapsed = this.get('_collapsed');
       var active = this.get('active');
       if (collapsed !== active) {
@@ -78199,22 +78440,13 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _toggle.default,
     tagName: 'button',
 
     classNameBindings: ['collapsed'],
     collapsed: true,
-
-    /**
-     * Bootstrap 4 Only: Defines the alignment of the toggler. Valid values are 'left' and 'right'
-     * to set the `navbar-toggler-*` class.
-     *
-     * @property align
-     * @type String
-     * @default null
-     * @public
-     */
 
     /**
      * @event onClick
@@ -78232,6 +78464,7 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var computed = Ember.computed;
   exports.default = _bsContextualHelp.default.extend({
     layout: _bsPopover.default,
 
@@ -78259,7 +78492,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    arrowElement: Ember.computed('overlayElement', function () {
+    arrowElement: computed('overlayElement', function () {
       return this.get('overlayElement').querySelector('.arrow');
     }).volatile()
   });
@@ -78270,6 +78503,7 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var notEmpty = Ember.computed.notEmpty;
   exports.default = _element.default.extend({
     layout: _element2.default,
 
@@ -78285,7 +78519,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    hasTitle: Ember.computed.notEmpty('title')
+    hasTitle: notEmpty('title')
   });
 });
 ;define('ember-bootstrap/components/base/bs-progress', ['exports', 'ember-bootstrap/templates/components/bs-progress'], function (exports, _bsProgress) {
@@ -78294,7 +78528,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend({
+  var Component = Ember.Component;
+  exports.default = Component.extend({
     layout: _bsProgress.default,
     classNames: ['progress']
   });
@@ -78305,7 +78540,11 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_typeClass.default, {
+  var readOnly = Ember.computed.readOnly;
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  var htmlSafe = Ember.String.htmlSafe;
+  exports.default = Component.extend(_typeClass.default, {
     layout: _bar.default,
     classNames: ['progress-bar'],
     classNameBindings: ['progressBarStriped'],
@@ -78389,12 +78628,12 @@ createDeprecatedModule('resolver');
      */
     roundDigits: 0,
 
-    progressBarStriped: Ember.computed.readOnly('striped'),
-    progressBarAnimate: Ember.computed.readOnly('animate'),
+    progressBarStriped: readOnly('striped'),
+    progressBarAnimate: readOnly('animate'),
 
-    ariaValuenow: Ember.computed.readOnly('value'),
-    ariaValuemin: Ember.computed.readOnly('minValue'),
-    ariaValuemax: Ember.computed.readOnly('maxValue'),
+    ariaValuenow: readOnly('value'),
+    ariaValuemin: readOnly('minValue'),
+    ariaValuemax: readOnly('maxValue'),
 
     /**
      * The percentage of `value`
@@ -78404,7 +78643,7 @@ createDeprecatedModule('resolver');
      * @protected
      * @readonly
      */
-    percent: Ember.computed('value', 'minValue', 'maxValue', function () {
+    percent: computed('value', 'minValue', 'maxValue', function () {
       var value = parseFloat(this.get('value'));
       var minValue = parseFloat(this.get('minValue'));
       var maxValue = parseFloat(this.get('maxValue'));
@@ -78420,7 +78659,7 @@ createDeprecatedModule('resolver');
      * @protected
      * @readonly
      */
-    percentRounded: Ember.computed('percent', 'roundDigits', function () {
+    percentRounded: computed('percent', 'roundDigits', function () {
       var roundFactor = Math.pow(10, this.get('roundDigits'));
       return Math.round(this.get('percent') * roundFactor) / roundFactor;
     }).readOnly(),
@@ -78431,9 +78670,9 @@ createDeprecatedModule('resolver');
      * @private
      * @readonly
      */
-    style: Ember.computed('percent', function () {
+    style: computed('percent', function () {
       var percent = this.get('percent');
-      return Ember.String.htmlSafe('width: ' + percent + '%');
+      return htmlSafe('width: ' + percent + '%');
     })
 
   });
@@ -78444,7 +78683,13 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_componentParent.default, {
+  var oneWay = Ember.computed.oneWay;
+  var filter = Ember.computed.filter;
+  var Component = Ember.Component;
+  var computed = Ember.computed;
+  var isPresent = Ember.isPresent;
+  var A = Ember.A;
+  exports.default = Component.extend(_componentParent.default, {
     layout: _bsTab.default,
 
     /**
@@ -78490,7 +78735,7 @@ createDeprecatedModule('resolver');
      * @type string
      * @public
      */
-    activeId: Ember.computed.oneWay('childPanes.firstObject.elementId'),
+    activeId: oneWay('childPanes.firstObject.elementId'),
 
     /**
      * @property isActiveId
@@ -78538,7 +78783,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    childPanes: Ember.computed.filter('children', function (view) {
+    childPanes: filter('children', function (view) {
       return view instanceof _pane.default;
     }),
 
@@ -78550,12 +78795,12 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    navItems: Ember.computed('childPanes.@each.{elementId,title,group}', function () {
-      var items = Ember.A();
+    navItems: computed('childPanes.@each.{elementId,title,group}', function () {
+      var items = A();
       this.get('childPanes').forEach(function (pane) {
         var groupTitle = pane.get('groupTitle');
         var item = pane.getProperties('elementId', 'title');
-        if (Ember.isPresent(groupTitle)) {
+        if (isPresent(groupTitle)) {
           var group = items.findBy('groupTitle', groupTitle);
           if (group) {
             group.children.push(item);
@@ -78564,8 +78809,8 @@ createDeprecatedModule('resolver');
             items.push({
               isGroup: true,
               groupTitle: groupTitle,
-              children: Ember.A([item]),
-              childIds: Ember.A([item.elementId])
+              children: A([item]),
+              childIds: A([item.elementId])
             });
           }
         } else {
@@ -78592,7 +78837,11 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Component.extend(_componentChild.default, _transitionSupport.default, {
+  var Component = Ember.Component;
+  var observer = Ember.observer;
+  var computed = Ember.computed;
+  var scheduleOnce = Ember.run.scheduleOnce;
+  exports.default = Component.extend(_componentChild.default, _transitionSupport.default, {
     layout: _pane.default,
     classNameBindings: ['active', 'usesTransition:fade'],
     classNames: ['tab-pane'],
@@ -78612,7 +78861,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    isActive: Ember.computed('activeId', 'elementId', function () {
+    isActive: computed('activeId', 'elementId', function () {
       return this.get('activeId') === this.get('elementId');
     }).readOnly(),
 
@@ -78721,7 +78970,7 @@ createDeprecatedModule('resolver');
     },
 
 
-    _showHide: Ember.observer('isActive', function () {
+    _showHide: observer('isActive', function () {
       if (this.get('isActive')) {
         this.show();
       } else {
@@ -78731,7 +78980,7 @@ createDeprecatedModule('resolver');
 
     init: function init() {
       this._super.apply(this, arguments);
-      Ember.run.scheduleOnce('afterRender', this, function () {
+      scheduleOnce('afterRender', this, function () {
         // isActive comes from parent component, so only available after render...
         this.set('active', this.get('isActive'));
         this.set('showContent', this.get('isActive') && this.get('fade'));
@@ -78745,6 +78994,7 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var computed = Ember.computed;
   exports.default = _bsContextualHelp.default.extend({
     layout: _bsTooltip.default,
 
@@ -78756,7 +79006,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    arrowElement: Ember.computed('overlayElement', function () {
+    arrowElement: computed('overlayElement', function () {
       return this.get('overlayElement').querySelector('.tooltip-arrow');
     }).volatile()
   });
@@ -78934,10 +79184,11 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var computed = Ember.computed;
   exports.default = _menu.default.extend({
     tagName: '',
 
-    isOpen: Ember.computed({
+    isOpen: computed({
       get: function get() {
         return false;
       },
@@ -78952,7 +79203,7 @@ createDeprecatedModule('resolver');
 
     _popperApi: null,
 
-    popperPlacement: Ember.computed('direction', 'align', function () {
+    popperPlacement: computed('direction', 'align', function () {
       var placement = 'bottom-start';
 
       var _getProperties = this.getProperties('direction', 'align'),
@@ -78974,7 +79225,7 @@ createDeprecatedModule('resolver');
       return placement;
     }),
 
-    popperModifiers: Ember.computed('inNav', 'flip', function () {
+    popperModifiers: computed('inNav', 'flip', function () {
       return {
         // @todo add offset config
         applyStyle: {
@@ -79039,8 +79290,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var computed = Ember.computed;
   exports.default = _bsForm.default.extend({
-    layoutClass: Ember.computed('formLayout', function () {
+    layoutClass: computed('formLayout', function () {
       var layout = this.get('formLayout');
       return layout === 'inline' ? 'form-inline' : null;
     }).readOnly()
@@ -79139,6 +79391,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var isBlank = Ember.isBlank;
+  var computed = Ember.computed;
   exports.default = _label.default.extend({
     tagName: 'label',
 
@@ -79146,12 +79400,12 @@ createDeprecatedModule('resolver');
     classNameBindings: ['invisibleLabel:sr-only', 'isHorizontal:col-form-label', 'isCheckbox:form-check-label', 'labelClass', 'sizeClass'],
     attributeBindings: ['formElementId:for'],
 
-    sizeClass: Ember.computed('size', 'isHorizontal', function () {
+    sizeClass: computed('size', 'isHorizontal', function () {
       if (!this.get('isHorizontal')) {
         return;
       }
       var size = this.get('size');
-      return Ember.isBlank(size) ? null : 'col-form-label-' + size;
+      return isBlank(size) ? null : 'col-form-label-' + size;
     }),
 
     /**
@@ -79261,6 +79515,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var equal = Ember.computed.equal;
+  var and = Ember.computed.and;
   exports.default = _group.default.extend({
     classNameBindings: ['isHorizontal:row', 'isCheckbox:form-check:form-group', 'isInlineCheckbox:form-check-inline'],
 
@@ -79271,7 +79527,7 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    isCheckbox: Ember.computed.equal('controlType', 'checkbox').readOnly(),
+    isCheckbox: equal('controlType', 'checkbox').readOnly(),
 
     /**
      * Indicates whether the form type equals `horizontal`
@@ -79280,11 +79536,11 @@ createDeprecatedModule('resolver');
      * @type boolean
      * @private
      */
-    isHorizontal: Ember.computed.equal('formLayout', 'horizontal').readOnly(),
+    isHorizontal: equal('formLayout', 'horizontal').readOnly(),
 
-    isInline: Ember.computed.equal('formLayout', 'inline').readOnly(),
+    isInline: equal('formLayout', 'inline').readOnly(),
 
-    isInlineCheckbox: Ember.computed.and('isCheckbox', 'isInline').readOnly()
+    isInlineCheckbox: and('isCheckbox', 'isInline').readOnly()
   });
 });
 ;define('ember-bootstrap/components/bs-modal-simple', ['exports', 'ember-bootstrap/components/base/bs-modal-simple'], function (exports, _bsModalSimple) {
@@ -79419,10 +79675,12 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var computed = Ember.computed;
+  var isBlank = Ember.isBlank;
   exports.default = _bsNavbar.default.extend({
     classNameBindings: ['breakpointClass', 'backgroundClass'],
 
-    type: Ember.computed('appliedType', {
+    type: computed('appliedType', {
       get: function get() {
         return this.get('appliedType');
       },
@@ -79458,17 +79716,17 @@ createDeprecatedModule('resolver');
      */
     backgroundColor: 'light',
 
-    breakpointClass: Ember.computed('toggleBreakpoint', function () {
+    breakpointClass: computed('toggleBreakpoint', function () {
       var toggleBreakpoint = this.get('toggleBreakpoint');
 
-      if (Ember.isBlank(toggleBreakpoint)) {
+      if (isBlank(toggleBreakpoint)) {
         return 'navbar-expand';
       } else {
         return 'navbar-expand-' + toggleBreakpoint;
       }
     }),
 
-    backgroundClass: Ember.computed('backgroundColor', function () {
+    backgroundClass: computed('backgroundColor', function () {
       var backgroundColor = this.get('backgroundColor');
 
       return 'bg-' + backgroundColor;
@@ -79530,27 +79788,7 @@ createDeprecatedModule('resolver');
     value: true
   });
   exports.default = _toggle.default.extend({
-    classNames: ['navbar-toggler'],
-    classNameBindings: ['alignmentClass'],
-
-    /**
-     * Defines the alignment of the toggler. Valid values are 'left' and 'right'
-     * to set the `navbar-toggler-*` class.
-     *
-     * @property align
-     * @type String
-     * @default null
-     * @public
-     */
-    align: null,
-
-    alignmentClass: Ember.computed('align', function () {
-      var align = this.get('align');
-
-      if (align) {
-        return 'navbar-toggler-' + align;
-      }
-    }).readOnly()
+    classNames: ['navbar-toggler']
   });
 });
 ;define('ember-bootstrap/components/bs-popover', ['exports', 'ember-bootstrap/components/base/bs-popover'], function (exports, _bsPopover) {
@@ -79572,8 +79810,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var computed = Ember.computed;
   exports.default = _element.default.extend({
-    popperClassNames: Ember.computed('fade', 'actualPlacement', 'showHelp', function () {
+    popperClassNames: computed('fade', 'actualPlacement', 'showHelp', function () {
       var classes = ['popover', 'bs-popover-' + this.get('actualPlacement')];
       if (this.get('fade')) {
         classes.push('fade');
@@ -79670,8 +79909,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var computed = Ember.computed;
   exports.default = _element.default.extend({
-    popperClassNames: Ember.computed('fade', 'actualPlacement', 'showHelp', function () {
+    popperClassNames: computed('fade', 'actualPlacement', 'showHelp', function () {
       var classes = ['tooltip', 'bs-tooltip-' + this.get('actualPlacement')];
       if (this.get('fade')) {
         classes.push('fade');
@@ -79689,9 +79929,10 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var EmberObject = Ember.Object;
 
 
-  var Config = Ember.Object.extend();
+  var Config = EmberObject.extend();
 
   Config.reopenClass({
     formValidationSuccessIcon: 'glyphicon glyphicon-ok',
@@ -79720,11 +79961,14 @@ createDeprecatedModule('resolver');
     value: true
   });
   exports.bsContains = bsContains;
+  var helper = Ember.Helper.helper;
+  var A = Ember.A;
+  var isArray = Ember.isArray;
   function bsContains(params /* , hash*/) {
-    return Ember.isArray(params[0]) ? Ember.A(params[0]).includes(params[1]) : false;
+    return isArray(params[0]) ? A(params[0]).includes(params[1]) : false;
   }
 
-  exports.default = Ember.Helper.helper(bsContains);
+  exports.default = helper(bsContains);
 });
 ;define('ember-bootstrap/helpers/bs-eq', ['exports'], function (exports) {
   'use strict';
@@ -79733,11 +79977,12 @@ createDeprecatedModule('resolver');
     value: true
   });
   exports.eq = eq;
+  var helper = Ember.Helper.helper;
   function eq(params) {
     return params[0] === params[1];
   }
 
-  exports.default = Ember.Helper.helper(eq);
+  exports.default = helper(eq);
 });
 ;define('ember-bootstrap/mixins/component-child', ['exports', 'ember-bootstrap/mixins/component-parent'], function (exports, _componentParent) {
   'use strict';
@@ -79745,7 +79990,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Mixin.create({
+  var Mixin = Ember.Mixin;
+  var computed = Ember.computed;
+  exports.default = Mixin.create({
 
     /**
      * The parent component
@@ -79753,7 +80000,7 @@ createDeprecatedModule('resolver');
      * @property _parent
      * @private
      */
-    _parent: Ember.computed(function () {
+    _parent: computed(function () {
       return this.nearestOfType(_componentParent.default);
     }),
 
@@ -79816,7 +80063,10 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Mixin.create({
+  var schedule = Ember.run.schedule;
+  var A = Ember.A;
+  var Mixin = Ember.Mixin;
+  exports.default = Mixin.create({
 
     /**
      * Array of registered child components
@@ -79829,7 +80079,7 @@ createDeprecatedModule('resolver');
 
     init: function init() {
       this._super.apply(this, arguments);
-      this.set('children', Ember.A());
+      this.set('children', A());
     },
 
 
@@ -79841,7 +80091,7 @@ createDeprecatedModule('resolver');
      * @public
      */
     registerChild: function registerChild(child) {
-      Ember.run.schedule('actions', this, function () {
+      schedule('actions', this, function () {
         this.get('children').addObject(child);
       });
     },
@@ -79855,7 +80105,7 @@ createDeprecatedModule('resolver');
      * @public
      */
     removeChild: function removeChild(child) {
-      Ember.run.schedule('actions', this, function () {
+      schedule('actions', this, function () {
         this.get('children').removeObject(child);
       });
     }
@@ -79867,7 +80117,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Mixin.create({
+  var Mixin = Ember.Mixin;
+  exports.default = Mixin.create({
     attributeBindings: ['name', 'autofocus', 'disabled', 'readonly', 'required', 'tabindex', 'form', 'title', 'ariaDescribedBy:aria-describedby'],
     tagName: 'input'
   });
@@ -79878,12 +80129,14 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Mixin.create({
+  var Mixin = Ember.Mixin;
+  var computed = Ember.computed;
+  exports.default = Mixin.create({
     classNameBindings: ['formFeedbackClass'],
 
     validationType: null,
 
-    formFeedbackClass: Ember.computed('validationType', function () {
+    formFeedbackClass: computed('validationType', function () {
       var validationType = this.get('validationType');
       switch (validationType) {
         case 'error':
@@ -79902,7 +80155,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Mixin.create({
+  var Mixin = Ember.Mixin;
+  var schedule = Ember.run.schedule;
+  exports.default = Mixin.create({
     classNames: ['dropdown-toggle'],
 
     /**
@@ -79926,7 +80181,7 @@ createDeprecatedModule('resolver');
       this._super.apply(this, arguments);
       var dropdown = this.get('dropdown');
       if (dropdown) {
-        Ember.run.schedule('actions', this, function () {
+        schedule('actions', this, function () {
           if (!this.get('isDestroyed')) {
             dropdown.set('toggle', this);
           }
@@ -79941,7 +80196,10 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Mixin.create({
+  var isBlank = Ember.isBlank;
+  var computed = Ember.computed;
+  var Mixin = Ember.Mixin;
+  exports.default = Mixin.create({
     /**
      * Prefix for the size class, e.g. "btn" for button size classes ("btn-lg", "btn-sm" etc.)
      *
@@ -79954,10 +80212,10 @@ createDeprecatedModule('resolver');
 
     classNameBindings: ['sizeClass'],
 
-    sizeClass: Ember.computed('size', function () {
+    sizeClass: computed('size', function () {
       var prefix = this.get('classTypePrefix');
       var size = this.get('size');
-      return Ember.isBlank(size) ? null : prefix + '-' + size;
+      return isBlank(size) ? null : prefix + '-' + size;
     }),
 
     /**
@@ -79978,8 +80236,10 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Mixin.create({
-    targetObject: Ember.computed.alias('parentView')
+  var alias = Ember.computed.alias;
+  var Mixin = Ember.Mixin;
+  exports.default = Mixin.create({
+    targetObject: alias('parentView')
   });
 });
 ;define('ember-bootstrap/mixins/transition-support', ['exports', 'ember-bootstrap/utils/transition-support'], function (exports, _transitionSupport) {
@@ -79988,14 +80248,18 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Mixin.create({
+  var reads = Ember.computed.reads;
+  var getOwner = Ember.getOwner;
+  var Mixin = Ember.Mixin;
+  var computed = Ember.computed;
+  exports.default = Mixin.create({
 
     /**
      * @property transitionsEnabled
      * @type boolean
      * @private
      */
-    transitionsEnabled: Ember.computed.reads('fade'),
+    transitionsEnabled: reads('fade'),
 
     /**
      * Access to the fastboot service if available
@@ -80004,8 +80268,8 @@ createDeprecatedModule('resolver');
      * @type {Ember.Service}
      * @private
      */
-    fastboot: Ember.computed(function () {
-      var owner = Ember.getOwner(this);
+    fastboot: computed(function () {
+      var owner = getOwner(this);
       return owner.lookup('service:fastboot');
     }),
 
@@ -80017,7 +80281,7 @@ createDeprecatedModule('resolver');
      * @readonly
      * @private
      */
-    usesTransition: Ember.computed('fade', 'fastboot.isFastBoot', function () {
+    usesTransition: computed('fade', 'fastboot.isFastBoot', function () {
       return !this.get('fastboot.isFastBoot') && !!_transitionSupport.default && this.get('transitionsEnabled');
     })
   });
@@ -80028,7 +80292,9 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Mixin.create({
+  var computed = Ember.computed;
+  var Mixin = Ember.Mixin;
+  exports.default = Mixin.create({
     /**
      * Prefix for the type class, e.g. "btn" for button type classes ("btn-primary2 etc.)
      *
@@ -80041,7 +80307,7 @@ createDeprecatedModule('resolver');
 
     classNameBindings: ['typeClass'],
 
-    typeClass: Ember.computed('type', function () {
+    typeClass: computed('type', function () {
       var prefix = this.get('classTypePrefix');
       var type = this.get('type') || 'default';
       return prefix + '-' + type;
@@ -80244,7 +80510,7 @@ createDeprecatedModule('resolver');
   "use strict";
 
   exports.__esModule = true;
-  exports.default = Ember.HTMLBars.template({ "id": "n3VGCzB5", "block": "{\"symbols\":[\"&default\"],\"statements\":[[11,1,[[25,\"hash\",null,[[\"item\",\"link-to\",\"dropdown\"],[[25,\"component\",[[20,[\"itemComponent\"]]],null],[25,\"component\",[[20,[\"linkToComponent\"]]],null],[25,\"component\",[[20,[\"dropdownComponent\"]]],[[\"inNav\"],[true]]]]]]]],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "ember-bootstrap/templates/components/bs-nav.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "uV2huhqn", "block": "{\"symbols\":[\"&default\"],\"statements\":[[11,1,[[25,\"hash\",null,[[\"item\",\"link-to\",\"dropdown\"],[[25,\"component\",[[20,[\"itemComponent\"]]],null],[25,\"component\",[[20,[\"linkToComponent\"]]],null],[25,\"component\",[[20,[\"dropdownComponent\"]]],[[\"inNav\",\"tagName\"],[true,\"li\"]]]]]]]],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "ember-bootstrap/templates/components/bs-nav.hbs" } });
 });
 ;define("ember-bootstrap/templates/components/bs-nav/item", ["exports"], function (exports) {
   "use strict";
@@ -80298,7 +80564,7 @@ createDeprecatedModule('resolver');
   "use strict";
 
   exports.__esModule = true;
-  exports.default = Ember.HTMLBars.template({ "id": "xpTCuqDv", "block": "{\"symbols\":[\"nav\",\"item\",\"dd\",\"menu\",\"subItem\",\"&default\"],\"statements\":[[4,\"if\",[[20,[\"customTabs\"]]],null,{\"statements\":[[0,\"  \"],[11,6,[[25,\"hash\",null,[[\"pane\",\"activeId\",\"select\"],[[25,\"component\",[\"bs-tab/pane\"],[[\"parent\",\"activeId\",\"fade\",\"fadeTransition\"],[[19,0,[]],[20,[\"isActiveId\"]],[20,[\"fade\"]],[20,[\"fadeTransition\"]]]]],[20,[\"isActiveId\"]],[25,\"action\",[[19,0,[]],\"select\"],null]]]]]],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"bs-nav\",null,[[\"type\"],[[20,[\"type\"]]]],{\"statements\":[[4,\"each\",[[20,[\"navItems\"]]],null,{\"statements\":[[4,\"if\",[[19,2,[\"isGroup\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"dropdown\"]]],[[\"tagName\",\"class\"],[\"li\",[25,\"if\",[[25,\"bs-contains\",[[19,2,[\"childIds\"]],[20,[\"isActiveId\"]]],null],\"active\"],null]]],{\"statements\":[[0,\"          \"],[4,\"component\",[[19,3,[\"toggle\"]]],null,{\"statements\":[[1,[19,2,[\"groupTitle\"]],false],[0,\" \"],[6,\"span\"],[9,\"class\",\"caret\"],[7],[8]],\"parameters\":[]},null],[0,\"\\n\"],[4,\"component\",[[19,3,[\"menu\"]]],null,{\"statements\":[[4,\"each\",[[19,2,[\"children\"]]],null,{\"statements\":[[4,\"component\",[[19,4,[\"item\"]]],[[\"class\"],[[25,\"if\",[[25,\"bs-eq\",[[20,[\"isActiveId\"]],[19,5,[\"elementId\"]]],null],\"active\"],null]]],{\"statements\":[[0,\"                \"],[6,\"a\"],[10,\"href\",[26,[\"#\",[19,5,[\"elementId\"]]]]],[9,\"role\",\"tab\"],[10,\"class\",[25,\"if\",[[25,\"bs-eq\",[[20,[\"isActiveId\"]],[19,5,[\"elementId\"]]],null],\"nav-link active\",\"nav-link\"],null],null],[3,\"action\",[[19,0,[]],\"select\",[19,5,[\"elementId\"]]]],[7],[0,\"\\n                  \"],[1,[19,5,[\"title\"]],false],[0,\"\\n                \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[5]},null]],\"parameters\":[4]},null]],\"parameters\":[3]},null]],\"parameters\":[]},{\"statements\":[[4,\"component\",[[19,1,[\"item\"]]],[[\"active\"],[[25,\"bs-eq\",[[19,2,[\"elementId\"]],[20,[\"isActiveId\"]]],null]]],{\"statements\":[[0,\"          \"],[6,\"a\"],[10,\"href\",[26,[\"#\",[19,2,[\"elementId\"]]]]],[9,\"role\",\"tab\"],[10,\"class\",[25,\"if\",[[25,\"bs-eq\",[[20,[\"isActiveId\"]],[19,2,[\"elementId\"]]],null],\"nav-link active\",\"nav-link\"],null],null],[3,\"action\",[[19,0,[]],\"select\",[19,2,[\"elementId\"]]]],[7],[0,\"\\n            \"],[1,[19,2,[\"title\"]],false],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]}]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"tab-content\"],[7],[0,\"\\n    \"],[11,6,[[25,\"hash\",null,[[\"pane\",\"activeId\",\"select\"],[[25,\"component\",[\"bs-tab/pane\"],[[\"parent\",\"activeId\",\"fade\",\"fadeTransition\"],[[19,0,[]],[20,[\"isActiveId\"]],[20,[\"fade\"]],[20,[\"fadeTransition\"]]]]],[20,[\"isActiveId\"]],[25,\"action\",[[19,0,[]],\"select\"],null]]]]]],[0,\"\\n  \"],[8],[0,\"\\n\"]],\"parameters\":[]}]],\"hasEval\":false}", "meta": { "moduleName": "ember-bootstrap/templates/components/bs-tab.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "Svc9B2oW", "block": "{\"symbols\":[\"nav\",\"item\",\"dd\",\"menu\",\"subItem\",\"&default\"],\"statements\":[[4,\"if\",[[20,[\"customTabs\"]]],null,{\"statements\":[[0,\"  \"],[11,6,[[25,\"hash\",null,[[\"pane\",\"activeId\",\"select\"],[[25,\"component\",[\"bs-tab/pane\"],[[\"parent\",\"activeId\",\"fade\",\"fadeTransition\"],[[19,0,[]],[20,[\"isActiveId\"]],[20,[\"fade\"]],[20,[\"fadeTransition\"]]]]],[20,[\"isActiveId\"]],[25,\"action\",[[19,0,[]],\"select\"],null]]]]]],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"bs-nav\",null,[[\"type\"],[[20,[\"type\"]]]],{\"statements\":[[4,\"each\",[[20,[\"navItems\"]]],null,{\"statements\":[[4,\"if\",[[19,2,[\"isGroup\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"dropdown\"]]],[[\"class\"],[[25,\"if\",[[25,\"bs-contains\",[[19,2,[\"childIds\"]],[20,[\"isActiveId\"]]],null],\"active\"],null]]],{\"statements\":[[0,\"          \"],[4,\"component\",[[19,3,[\"toggle\"]]],null,{\"statements\":[[1,[19,2,[\"groupTitle\"]],false],[0,\" \"],[6,\"span\"],[9,\"class\",\"caret\"],[7],[8]],\"parameters\":[]},null],[0,\"\\n\"],[4,\"component\",[[19,3,[\"menu\"]]],null,{\"statements\":[[4,\"each\",[[19,2,[\"children\"]]],null,{\"statements\":[[4,\"component\",[[19,4,[\"item\"]]],[[\"class\"],[[25,\"if\",[[25,\"bs-eq\",[[20,[\"isActiveId\"]],[19,5,[\"elementId\"]]],null],\"active\"],null]]],{\"statements\":[[0,\"                \"],[6,\"a\"],[10,\"href\",[26,[\"#\",[19,5,[\"elementId\"]]]]],[9,\"role\",\"tab\"],[10,\"class\",[25,\"if\",[[25,\"bs-eq\",[[20,[\"isActiveId\"]],[19,5,[\"elementId\"]]],null],\"nav-link active\",\"nav-link\"],null],null],[3,\"action\",[[19,0,[]],\"select\",[19,5,[\"elementId\"]]]],[7],[0,\"\\n                  \"],[1,[19,5,[\"title\"]],false],[0,\"\\n                \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[5]},null]],\"parameters\":[4]},null]],\"parameters\":[3]},null]],\"parameters\":[]},{\"statements\":[[4,\"component\",[[19,1,[\"item\"]]],[[\"active\"],[[25,\"bs-eq\",[[19,2,[\"elementId\"]],[20,[\"isActiveId\"]]],null]]],{\"statements\":[[0,\"          \"],[6,\"a\"],[10,\"href\",[26,[\"#\",[19,2,[\"elementId\"]]]]],[9,\"role\",\"tab\"],[10,\"class\",[25,\"if\",[[25,\"bs-eq\",[[20,[\"isActiveId\"]],[19,2,[\"elementId\"]]],null],\"nav-link active\",\"nav-link\"],null],null],[3,\"action\",[[19,0,[]],\"select\",[19,2,[\"elementId\"]]]],[7],[0,\"\\n            \"],[1,[19,2,[\"title\"]],false],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]}]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"tab-content\"],[7],[0,\"\\n    \"],[11,6,[[25,\"hash\",null,[[\"pane\",\"activeId\",\"select\"],[[25,\"component\",[\"bs-tab/pane\"],[[\"parent\",\"activeId\",\"fade\",\"fadeTransition\"],[[19,0,[]],[20,[\"isActiveId\"]],[20,[\"fade\"]],[20,[\"fadeTransition\"]]]]],[20,[\"isActiveId\"]],[25,\"action\",[[19,0,[]],\"select\"],null]]]]]],[0,\"\\n  \"],[8],[0,\"\\n\"]],\"parameters\":[]}]],\"hasEval\":false}", "meta": { "moduleName": "ember-bootstrap/templates/components/bs-tab.hbs" } });
 });
 ;define("ember-bootstrap/templates/components/bs-tab/pane", ["exports"], function (exports) {
   "use strict";
@@ -80326,6 +80592,7 @@ createDeprecatedModule('resolver');
   });
   exports.findElementById = findElementById;
   exports.getDOM = getDOM;
+  var getOwner = Ember.getOwner;
 
 
   function childNodesOfElement(element) {
@@ -80336,12 +80603,7 @@ createDeprecatedModule('resolver');
       child = child.nextSibling;
     }
     return children;
-  } /*
-     * Implement some helpers methods for interacting with the DOM,
-     * be it Fastboot's SimpleDOM or the browser's version.
-     *
-     * Credit to https://github.com/yapplabs/ember-wormhole, from where this has been shamelessly stolen.
-     */
+  }
 
   function findElementById(doc, id) {
     if (doc.getElementById) {
@@ -80368,7 +80630,7 @@ createDeprecatedModule('resolver');
 
     if (!renderer._dom) {
       // pre glimmer2
-      var container = Ember.getOwner ? Ember.getOwner(context) : context.container;
+      var container = getOwner ? getOwner(context) : context.container;
       var documentService = container.lookup('service:-document');
 
       if (documentService) {
@@ -80392,8 +80654,9 @@ createDeprecatedModule('resolver');
     value: true
   });
   exports.default = getParent;
+  var get = Ember.get;
   function getParent(view) {
-    if (Ember.get(view, 'tagName') === '') {
+    if (get(view, 'tagName') === '') {
       // Beware: use of private API! :(
       if (Ember.ViewUtils && Ember.ViewUtils.getViewBounds) {
         return Ember.ViewUtils.getViewBounds(view).parentElement;
@@ -80401,7 +80664,7 @@ createDeprecatedModule('resolver');
         return view._renderNode.contextualElement;
       }
     } else {
-      return Ember.get(view, 'element').parentNode;
+      return get(view, 'element').parentNode;
     }
   }
 });
@@ -80415,9 +80678,9 @@ createDeprecatedModule('resolver');
   exports.default = function (dependentKey) {
     var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-    return Ember.computed(dependentKey, {
+    return computed(dependentKey, {
       get: function get() {
-        return Ember.getWithDefault(this, dependentKey, defaultValue);
+        return getWithDefault(this, dependentKey, defaultValue);
       },
       set: function set(key, value) {
         // eslint-disable-line no-unused-vars
@@ -80425,6 +80688,9 @@ createDeprecatedModule('resolver');
       }
     });
   };
+
+  var getWithDefault = Ember.getWithDefault;
+  var computed = Ember.computed;
 });
 ;define('ember-bootstrap/utils/transition-end', ['exports', 'ember-bootstrap/utils/transition-support'], function (exports, _transitionSupport) {
   'use strict';
@@ -80433,6 +80699,9 @@ createDeprecatedModule('resolver');
     value: true
   });
   exports.default = onTransitionEnd;
+  var later = Ember.run.later;
+  var cancel = Ember.run.cancel;
+  var join = Ember.run.join;
   function onTransitionEnd(node, handler, context) {
     var duration = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
@@ -80448,17 +80717,17 @@ createDeprecatedModule('resolver');
     if (_transitionSupport.default) {
       node.addEventListener(_transitionSupport.default, done, false);
 
-      backup = Ember.run.later(this, done, fakeEvent, duration);
+      backup = later(this, done, fakeEvent, duration);
     } else {
-      Ember.run.later(this, done, fakeEvent, 0);
+      later(this, done, fakeEvent, 0);
     }
 
     function done(event) {
       if (backup) {
-        Ember.run.cancel(backup);
+        cancel(backup);
       }
       node.removeEventListener(_transitionSupport.default, done);
-      Ember.run.join(context, handler, event);
+      join(context, handler, event);
     }
   }
 });
@@ -80615,7 +80884,11 @@ createDeprecatedModule('resolver');
 
   var _marked = regeneratorRuntime.mark(resolver);
 
-  var asyncAll = taskAwareVariantOf(Ember.RSVP.Promise, 'all', identity);
+  var RSVP = Ember.RSVP;
+  var Promise = Ember.RSVP.Promise;
+
+
+  var asyncAll = taskAwareVariantOf(Promise, 'all', identity);
 
   function resolver(value) {
     return regeneratorRuntime.wrap(function resolver$(_context) {
@@ -80690,7 +80963,7 @@ createDeprecatedModule('resolver');
    * - if the task that `yield`ed `allSettled()` is canceled, any of the
    *   {@linkcode TaskInstance}s passed in to `allSettled` will be canceled
    */
-  var allSettled = exports.allSettled = taskAwareVariantOf(Ember.RSVP, 'allSettled', identity);
+  var allSettled = exports.allSettled = taskAwareVariantOf(RSVP, 'allSettled', identity);
 
   /**
    * A cancelation-aware variant of [Promise.race](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race).
@@ -80705,7 +80978,7 @@ createDeprecatedModule('resolver');
    *
    * [Check out the "Awaiting Multiple Child Tasks example"](/#/docs/examples/joining-tasks)
    */
-  var race = exports.race = taskAwareVariantOf(Ember.RSVP.Promise, 'race', identity);
+  var race = exports.race = taskAwareVariantOf(Promise, 'race', identity);
 
   /**
    * A cancelation-aware variant of [RSVP.hash](http://emberjs.com/api/classes/RSVP.html#hash).
@@ -80718,7 +80991,7 @@ createDeprecatedModule('resolver');
    * - if any of the items rejects/cancels, all other cancelable items
    *   (e.g. {@linkcode TaskInstance}s) will be canceled
    */
-  var hash = exports.hash = taskAwareVariantOf(Ember.RSVP, 'hash', getValues);
+  var hash = exports.hash = taskAwareVariantOf(RSVP, 'hash', getValues);
 
   function identity(obj) {
     return obj;
@@ -80733,7 +81006,7 @@ createDeprecatedModule('resolver');
   function taskAwareVariantOf(obj, method, getItems) {
     return function (thing) {
       var items = getItems(thing);
-      var defer = Ember.RSVP.defer();
+      var defer = RSVP.defer();
 
       obj[method](thing).then(defer.resolve, defer.reject);
 
@@ -80784,7 +81057,8 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Object.extend({
+  var EmberObject = Ember.Object;
+  exports.default = EmberObject.extend({
     obj: null,
     eventName: null,
 
@@ -80826,11 +81100,13 @@ createDeprecatedModule('resolver');
     }
   }
 
+  var get = Ember.get;
+  var bind = Ember.run.bind;
   function taskHelperClosure(helperName, taskMethod, _args, hash) {
     var task = _args[0];
     var outerArgs = _args.slice(1);
 
-    return Ember.run.bind(null, function () {
+    return bind(null, function () {
       if (!task || typeof task[taskMethod] !== 'function') {
         (true && !(false) && Ember.assert('The first argument passed to the `' + helperName + '` helper should be a Task object (without quotes); you passed ' + task, false));
 
@@ -80843,7 +81119,7 @@ createDeprecatedModule('resolver');
 
       if (hash && hash.value) {
         var event = innerArgs.pop();
-        innerArgs.push(Ember.get(event, hash.value));
+        innerArgs.push(get(event, hash.value));
       }
 
       return task[taskMethod].apply(task, _toConsumableArray(outerArgs).concat(innerArgs));
@@ -80932,11 +81208,15 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var once = Ember.run.once;
+  var EmberObject = Ember.Object;
+  var set = Ember.set;
+  var get = Ember.get;
 
 
   var SEEN_INDEX = 0;
 
-  var Scheduler = Ember.Object.extend({
+  var Scheduler = EmberObject.extend({
     lastPerformed: null,
     lastStarted: null,
     lastRunning: null,
@@ -80980,7 +81260,7 @@ createDeprecatedModule('resolver');
       taskInstances.splice(index, count);
     },
     schedule: function schedule(taskInstance) {
-      Ember.set(this, 'lastPerformed', taskInstance);
+      set(this, 'lastPerformed', taskInstance);
       this.incrementProperty('performCount');
       taskInstance.task.incrementProperty('numQueued');
       this.queuedTaskInstances.push(taskInstance);
@@ -81008,16 +81288,16 @@ createDeprecatedModule('resolver');
       }
 
       if (lastStarted) {
-        Ember.set(this, 'lastStarted', lastStarted);
+        set(this, 'lastStarted', lastStarted);
       }
-      Ember.set(this, 'lastRunning', lastStarted);
+      set(this, 'lastRunning', lastStarted);
 
       for (var _i2 = 0; _i2 < this.queuedTaskInstances.length; ++_i2) {
         seen.push(this.queuedTaskInstances[_i2].task);
       }
 
       flushTaskCounts(seen);
-      Ember.set(this, 'concurrency', this.activeTaskInstances.length);
+      set(this, 'concurrency', this.activeTaskInstances.length);
     },
     _startTaskInstance: function _startTaskInstance(taskInstance) {
       var _this = this;
@@ -81029,18 +81309,18 @@ createDeprecatedModule('resolver');
       taskInstance._start()._onFinalize(function () {
         task.decrementProperty('numRunning');
         var state = taskInstance._completionState;
-        Ember.set(_this, 'lastComplete', taskInstance);
+        set(_this, 'lastComplete', taskInstance);
         if (state === 1) {
-          Ember.set(_this, 'lastSuccessful', taskInstance);
+          set(_this, 'lastSuccessful', taskInstance);
         } else {
           if (state === 2) {
-            Ember.set(_this, 'lastErrored', taskInstance);
+            set(_this, 'lastErrored', taskInstance);
           } else if (state === 3) {
-            Ember.set(_this, 'lastCanceled', taskInstance);
+            set(_this, 'lastCanceled', taskInstance);
           }
-          Ember.set(_this, 'lastIncomplete', taskInstance);
+          set(_this, 'lastIncomplete', taskInstance);
         }
-        Ember.run.once(_this, _this._flushQueues);
+        once(_this, _this._flushQueues);
       });
     }
   });
@@ -81062,8 +81342,8 @@ createDeprecatedModule('resolver');
     var taskGroup = task.get('group');
 
     while (taskGroup) {
-      Ember.set(taskGroup, 'numRunning', numRunning);
-      Ember.set(taskGroup, 'numQueued', numQueued);
+      set(taskGroup, 'numRunning', numRunning);
+      set(taskGroup, 'numQueued', numQueued);
       taskGroup = taskGroup.get('group');
     }
   }
@@ -81072,7 +81352,7 @@ createDeprecatedModule('resolver');
     var ret = [];
     for (var i = 0, l = taskInstances.length; i < l; ++i) {
       var taskInstance = taskInstances[i];
-      if (Ember.get(taskInstance, 'isFinished') === false) {
+      if (get(taskInstance, 'isFinished') === false) {
         ret.push(taskInstance);
       }
     }
@@ -81089,7 +81369,10 @@ createDeprecatedModule('resolver');
   });
   exports.TaskGroup = undefined;
   exports.TaskGroupProperty = TaskGroupProperty;
-  var TaskGroup = exports.TaskGroup = Ember.Object.extend(_taskStateMixin.default, {
+  var or = Ember.computed.or;
+  var bool = Ember.computed.bool;
+  var EmberObject = Ember.Object;
+  var TaskGroup = exports.TaskGroup = EmberObject.extend(_taskStateMixin.default, {
     isTaskGroup: true,
 
     toString: function toString() {
@@ -81097,8 +81380,8 @@ createDeprecatedModule('resolver');
     },
 
 
-    _numRunningOrNumQueued: Ember.computed.or('numRunning', 'numQueued'),
-    isRunning: Ember.computed.bool('_numRunningOrNumQueued'),
+    _numRunningOrNumQueued: or('numRunning', 'numQueued'),
+    isRunning: bool('_numRunningOrNumQueued'),
     isQueued: false
   });
 
@@ -81137,6 +81420,17 @@ createDeprecatedModule('resolver');
   exports.didCancel = didCancel;
   exports.go = go;
   exports.wrap = wrap;
+  var defer = Ember.RSVP.defer;
+  var reject = Ember.RSVP.reject;
+  var not = Ember.computed.not;
+  var and = Ember.computed.and;
+  var run = Ember.run;
+  var join = Ember.run.join;
+  var schedule = Ember.run.schedule;
+  var EmberObject = Ember.Object;
+  var computed = Ember.computed;
+  var get = Ember.get;
+  var set = Ember.set;
 
 
   var TASK_CANCELATION_NAME = 'TaskCancelation';
@@ -81283,7 +81577,7 @@ createDeprecatedModule('resolver');
      * @instance
      * @readOnly
      */
-    isCanceled: Ember.computed.and('isCanceling', 'isFinished'),
+    isCanceled: and('isCanceling', 'isFinished'),
     isCanceling: false,
 
     /**
@@ -81311,7 +81605,7 @@ createDeprecatedModule('resolver');
      * @instance
      * @readOnly
      */
-    isRunning: Ember.computed.not('isFinished'),
+    isRunning: not('isFinished'),
 
     /**
      * Describes the state that the task instance is in. Can be used for debugging,
@@ -81333,14 +81627,14 @@ createDeprecatedModule('resolver');
      * @instance
      * @readOnly
      */
-    state: Ember.computed('isDropped', 'isCanceling', 'hasStarted', 'isFinished', function () {
-      if (Ember.get(this, 'isDropped')) {
+    state: computed('isDropped', 'isCanceling', 'hasStarted', 'isFinished', function () {
+      if (get(this, 'isDropped')) {
         return 'dropped';
-      } else if (Ember.get(this, 'isCanceling')) {
+      } else if (get(this, 'isCanceling')) {
         return 'canceled';
-      } else if (Ember.get(this, 'isFinished')) {
+      } else if (get(this, 'isFinished')) {
         return 'finished';
-      } else if (Ember.get(this, 'hasStarted')) {
+      } else if (get(this, 'hasStarted')) {
         return 'running';
       } else {
         return 'waiting';
@@ -81358,8 +81652,8 @@ createDeprecatedModule('resolver');
      * @instance
      * @readOnly
      */
-    isDropped: Ember.computed('isCanceling', 'hasStarted', function () {
-      return Ember.get(this, 'isCanceling') && !Ember.get(this, 'hasStarted');
+    isDropped: computed('isCanceling', 'hasStarted', function () {
+      return get(this, 'isCanceling') && !get(this, 'hasStarted');
     }),
 
     _index: 1,
@@ -81368,7 +81662,7 @@ createDeprecatedModule('resolver');
       if (this.hasStarted || this.isCanceling) {
         return this;
       }
-      Ember.set(this, 'hasStarted', true);
+      set(this, 'hasStarted', true);
       this._scheduleProceed(_utils.YIELDABLE_CONTINUE, undefined);
       return this;
     },
@@ -81379,13 +81673,13 @@ createDeprecatedModule('resolver');
     cancel: function cancel() {
       var cancelReason = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ".cancel() was explicitly called";
 
-      if (this.isCanceling || Ember.get(this, 'isFinished')) {
+      if (this.isCanceling || get(this, 'isFinished')) {
         return;
       }
-      Ember.set(this, 'isCanceling', true);
+      set(this, 'isCanceling', true);
 
-      var name = Ember.get(this, 'task._propertyName') || "<unknown>";
-      Ember.set(this, 'cancelReason', 'TaskInstance \'' + name + '\' was canceled because ' + cancelReason + '. For more information, see: http://ember-concurrency.com/#/docs/task-cancelation-help');
+      var name = get(this, 'task._propertyName') || "<unknown>";
+      set(this, 'cancelReason', 'TaskInstance \'' + name + '\' was canceled because ' + cancelReason + '. For more information, see: http://ember-concurrency.com/#/docs/task-cancelation-help');
 
       if (this.hasStarted) {
         this._proceedSoon(_utils.YIELDABLE_CANCEL, null);
@@ -81396,8 +81690,8 @@ createDeprecatedModule('resolver');
 
 
     _defer: null,
-    _promise: Ember.computed(function () {
-      this._defer = Ember.RSVP.defer();
+    _promise: computed(function () {
+      this._defer = defer();
       this._maybeResolveDefer();
       return this._defer.promise;
     }),
@@ -81461,20 +81755,20 @@ createDeprecatedModule('resolver');
         value.taskInstance = this;
       }
 
-      Ember.set(this, '_completionState', completionState);
-      Ember.set(this, '_result', value);
+      set(this, '_completionState', completionState);
+      set(this, '_result', value);
 
       if (completionState === COMPLETION_SUCCESS) {
-        Ember.set(this, 'isSuccessful', true);
-        Ember.set(this, 'value', value);
+        set(this, 'isSuccessful', true);
+        set(this, 'value', value);
       } else if (completionState === COMPLETION_ERROR) {
-        Ember.set(this, 'isError', true);
-        Ember.set(this, 'error', value);
+        set(this, 'isError', true);
+        set(this, 'error', value);
       } else if (completionState === COMPLETION_CANCEL) {
-        Ember.set(this, 'error', value);
+        set(this, 'error', value);
       }
 
-      Ember.set(this, 'isFinished', true);
+      set(this, 'isFinished', true);
 
       this._dispose();
       this._runFinalizeCallbacks();
@@ -81508,9 +81802,9 @@ createDeprecatedModule('resolver');
 
       // this backports the Ember 2.0+ RSVP _onError 'after' microtask behavior to Ember < 2.0
       if (!this._hasSubscribed && this._completionState === COMPLETION_ERROR) {
-        Ember.run.schedule(Ember.run.queues[Ember.run.queues.length - 1], function () {
+        run.schedule(run.queues[run.queues.length - 1], function () {
           if (!_this._hasSubscribed && !didCancel(_this.error)) {
-            Ember.RSVP.reject(_this.error);
+            reject(_this.error);
           }
         });
       }
@@ -81577,8 +81871,8 @@ createDeprecatedModule('resolver');
 
       this._advanceIndex(this._index);
       if (this._runLoop) {
-        Ember.run.join(function () {
-          Ember.run.schedule('actions', _this2, _this2._proceed, yieldResumeType, value);
+        join(function () {
+          schedule('actions', _this2, _this2._proceed, yieldResumeType, value);
         });
       } else {
         setTimeout(function () {
@@ -81602,10 +81896,10 @@ createDeprecatedModule('resolver');
         return;
       }
 
-      if (this._runLoop && !Ember.run.currentRunLoop) {
-        Ember.run(this, this._proceed, yieldResumeType, value);
+      if (this._runLoop && !run.currentRunLoop) {
+        run(this, this._proceed, yieldResumeType, value);
         return;
-      } else if (!this._runLoop && Ember.run.currentRunLoop) {
+      } else if (!this._runLoop && run.currentRunLoop) {
         setTimeout(function () {
           return _this3._proceed(yieldResumeType, value);
         }, 1);
@@ -81639,7 +81933,7 @@ createDeprecatedModule('resolver');
           this._finalize(value, COMPLETION_ERROR);
           break;
         case _utils.YIELDABLE_CANCEL:
-          Ember.set(this, 'isCanceling', true);
+          set(this, 'isCanceling', true);
           this._finalize(null, COMPLETION_CANCEL);
           break;
       }
@@ -81651,7 +81945,7 @@ createDeprecatedModule('resolver');
     _handleResolvedContinueValue: function _handleResolvedContinueValue(_yieldResumeType, resumeValue) {
       var iteratorMethod = _yieldResumeType;
       if (iteratorMethod === _utils.YIELDABLE_CANCEL) {
-        Ember.set(this, 'isCanceling', true);
+        set(this, 'isCanceling', true);
         iteratorMethod = _utils.YIELDABLE_RETURN;
       }
 
@@ -81737,9 +82031,9 @@ createDeprecatedModule('resolver');
     return function disposeYieldedTaskInstance() {
       if (yieldedTaskInstance._performType !== PERFORM_TYPE_UNLINKED) {
         if (yieldedTaskInstance._performType === PERFORM_TYPE_DEFAULT) {
-          var parentObj = Ember.get(parentTaskInstance, 'task.context');
-          var childObj = Ember.get(yieldedTaskInstance, 'task.context');
-          if (parentObj && childObj && parentObj !== childObj && parentObj.isDestroying && Ember.get(yieldedTaskInstance, 'isRunning')) {
+          var parentObj = get(parentTaskInstance, 'task.context');
+          var childObj = get(yieldedTaskInstance, 'task.context');
+          if (parentObj && childObj && parentObj !== childObj && parentObj.isDestroying && get(yieldedTaskInstance, 'isRunning')) {
             var parentName = '`' + parentTaskInstance.task._propertyName + '`';
             var childName = '`' + yieldedTaskInstance.task._propertyName + '`';
             Ember.Logger.warn('ember-concurrency detected a potentially hazardous "self-cancel loop" between parent task ' + parentName + ' and child task ' + childName + '. If you want child task ' + childName + ' to be canceled when parent task ' + parentName + ' is canceled, please change `.perform()` to `.linked().perform()`. If you want child task ' + childName + ' to keep running after parent task ' + parentName + ' is canceled, change it to `.unlinked().perform()`');
@@ -81750,7 +82044,7 @@ createDeprecatedModule('resolver');
     };
   };
 
-  var TaskInstance = Ember.Object.extend(taskInstanceAttrs);
+  var TaskInstance = EmberObject.extend(taskInstanceAttrs);
 
   function go(args, fn) {
     var attrs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -81814,7 +82108,14 @@ createDeprecatedModule('resolver');
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
-  var PerformProxy = Ember.Object.extend({
+  var scheduleOnce = Ember.run.scheduleOnce;
+  var addObserver = Ember.addObserver;
+  var addListener = Ember.addListener;
+  var EmberObject = Ember.Object;
+  var getOwner = Ember.getOwner;
+
+
+  var PerformProxy = EmberObject.extend({
     _task: null,
     _performType: null,
     _linkedObject: null,
@@ -81845,7 +82146,7 @@ createDeprecatedModule('resolver');
   
     @class Task
   */
-  var Task = exports.Task = Ember.Object.extend(_taskStateMixin.default, _defineProperty({
+  var Task = exports.Task = EmberObject.extend(_taskStateMixin.default, _defineProperty({
     /**
      * `true` if any current task instances are running.
      *
@@ -81973,7 +82274,7 @@ createDeprecatedModule('resolver');
       this._super.apply(this, arguments);
 
       if (_typeof(this.fn) === 'object') {
-        var owner = Ember.getOwner(this.context);
+        var owner = getOwner(this.context);
         var ownerInjection = owner ? owner.ownerInjection() : {};
         this._taskInstanceFactory = _encapsulatedTask.default.extend(ownerInjection, this.fn);
       }
@@ -82230,9 +82531,9 @@ createDeprecatedModule('resolver');
         Ember.Logger.warn('The use of maxConcurrency() without a specified task modifier is deprecated and won\'t be supported in future versions of ember-concurrency. Please specify a task modifier instead, e.g. `' + taskName + ': task(...).enqueue().maxConcurrency(' + this._maxConcurrency + ')`');
       }
 
-      registerOnPrototype(Ember.addListener, proto, this.eventNames, taskName, 'perform', false);
-      registerOnPrototype(Ember.addListener, proto, this.cancelEventNames, taskName, 'cancelAll', false);
-      registerOnPrototype(Ember.addObserver, proto, this._observes, taskName, 'perform', true);
+      registerOnPrototype(addListener, proto, this.eventNames, taskName, 'perform', false);
+      registerOnPrototype(addListener, proto, this.cancelEventNames, taskName, 'cancelAll', false);
+      registerOnPrototype(addObserver, proto, this._observes, taskName, 'perform', true);
     },
     on: function on() {
       this.eventNames = this.eventNames || [];
@@ -82271,7 +82572,7 @@ createDeprecatedModule('resolver');
       var task = this.get(taskName);
 
       if (once) {
-        Ember.run.scheduleOnce.apply(undefined, ['actions', task, method].concat(Array.prototype.slice.call(arguments)));
+        scheduleOnce.apply(undefined, ['actions', task, method].concat(Array.prototype.slice.call(arguments)));
       } else {
         task[method].apply(task, arguments);
       }
@@ -82284,15 +82585,18 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  var alias = Ember.computed.alias;
-  exports.default = Ember.Mixin.create({
-    isRunning: Ember.computed.gt('numRunning', 0),
-    isQueued: Ember.computed.gt('numQueued', 0),
-    isIdle: Ember.computed('isRunning', 'isQueued', function () {
+  var gt = Ember.computed.gt;
+  var Mixin = Ember.Mixin;
+  var computed = Ember.computed;
+  var alias = computed.alias;
+  exports.default = Mixin.create({
+    isRunning: gt('numRunning', 0),
+    isQueued: gt('numQueued', 0),
+    isIdle: computed('isRunning', 'isQueued', function () {
       return !this.get('isRunning') && !this.get('isQueued');
     }),
 
-    state: Ember.computed('isRunning', 'isQueued', function () {
+    state: computed('isRunning', 'isQueued', function () {
       if (this.get('isRunning')) {
         return 'running';
       } else if (this.get('isQueued')) {
@@ -82328,7 +82632,7 @@ createDeprecatedModule('resolver');
     },
 
 
-    group: Ember.computed(function () {
+    group: computed(function () {
       return this._taskGroupPath && this.context.get(this._taskGroupPath);
     }),
 
@@ -82344,6 +82648,7 @@ createDeprecatedModule('resolver');
   });
   exports.waitForQueue = waitForQueue;
   exports.waitForEvent = waitForEvent;
+  exports.waitForProperty = waitForProperty;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -82369,6 +82674,9 @@ createDeprecatedModule('resolver');
     };
   }();
 
+  var schedule = Ember.run.schedule;
+  var get = Ember.get;
+
   var WaitForQueueYieldable = function () {
     function WaitForQueueYieldable(queueName) {
       _classCallCheck(this, WaitForQueueYieldable);
@@ -82379,7 +82687,7 @@ createDeprecatedModule('resolver');
     _createClass(WaitForQueueYieldable, [{
       key: _utils.yieldableSymbol,
       value: function value(taskInstance, resumeIndex) {
-        Ember.run.schedule(this.queueName, function () {
+        schedule(this.queueName, function () {
           taskInstance.proceed(resumeIndex, _utils.YIELDABLE_CONTINUE, null);
         });
       }
@@ -82433,11 +82741,55 @@ createDeprecatedModule('resolver');
     return WaitForEventYieldable;
   }();
 
+  var WaitForPropertyYieldable = function () {
+    function WaitForPropertyYieldable(object, key) {
+      var predicateCallback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Boolean;
+
+      _classCallCheck(this, WaitForPropertyYieldable);
+
+      this.object = object;
+      this.key = key;
+
+      if (typeof predicateCallback === 'function') {
+        this.predicateCallback = predicateCallback;
+      } else {
+        this.predicateCallback = function (v) {
+          return v === predicateCallback;
+        };
+      }
+    }
+
+    _createClass(WaitForPropertyYieldable, [{
+      key: _utils.yieldableSymbol,
+      value: function value(taskInstance, resumeIndex) {
+        var _this2 = this;
+
+        var observerFn = function observerFn() {
+          var value = get(_this2.object, _this2.key);
+          var predicateValue = _this2.predicateCallback(value);
+          if (predicateValue) {
+            taskInstance.proceed(resumeIndex, _utils.YIELDABLE_CONTINUE, value);
+            return true;
+          }
+        };
+
+        if (!observerFn()) {
+          this.object.addObserver(this.key, null, observerFn);
+          return function () {
+            _this2.object.removeObserver(_this2.key, null, observerFn);
+          };
+        }
+      }
+    }]);
+
+    return WaitForPropertyYieldable;
+  }();
+
   /**
    * Use `waitForQueue` to pause the task until a certain run loop queue is reached.
    *
    * ```js
-   * import { task, timeout, waitForQueue } from 'ember-concurrency';
+   * import { task, waitForQueue } from 'ember-concurrency';
    * export default Component.extend({
    *   myTask: task(function * () {
    *     yield waitForQueue('afterRender');
@@ -82458,7 +82810,7 @@ createDeprecatedModule('resolver');
    * where the object supports `.on()` `.one()` and `.off()`).
    *
    * ```js
-   * import { task, timeout, waitForEvent } from 'ember-concurrency';
+   * import { task, waitForEvent } from 'ember-concurrency';
    * export default Component.extend({
    *   myTask: task(function * () {
    *     console.log("Please click anywhere..");
@@ -82482,6 +82834,126 @@ createDeprecatedModule('resolver');
 
     return new WaitForEventYieldable(object, eventName);
   }
+
+  /**
+   * Use `waitForProperty` to pause the task until a property on an object
+   * changes to some expected value. This can be used for a variety of use
+   * cases, including synchronizing with another task by waiting for it
+   * to become idle, or change state in some other way. If you omit the
+   * callback, `waitForProperty` will resume execution when the observed
+   * property becomes truthy. If you provide a callback, it'll be called
+   * immediately with the observed property's current value, and multiple
+   * times thereafter whenever the property changes, until you return
+   * a truthy value from the callback, or the current task is canceled.
+   * You can also pass in a non-Function value in place of the callback,
+   * in which case the task will continue executing when the property's
+   * value becomes the value that you passed in.
+   *
+   * ```js
+   * import { task, waitForProperty } from 'ember-concurrency';
+   * export default Component.extend({
+   *   foo: 0,
+   *
+   *   myTask: task(function * () {
+   *     console.log("Waiting for `foo` to become 5");
+   *
+   *     yield waitForProperty(this, 'foo', v => v === 5);
+   *     // alternatively: yield waitForProperty(this, 'foo', 5);
+   *
+   *     // somewhere else: this.set('foo', 5)
+   *
+   *     console.log("`foo` is 5!");
+   *
+   *     // wait for another task to be idle before running:
+   *     yield waitForProperty(this, 'otherTask.isIdle');
+   *     console.log("otherTask is idle!");
+   *   })
+   * });
+   * ```
+   *
+   * @param {object} object an object (most likely an Ember Object)
+   * @param {string} key the property name that is observed for changes
+   * @param {function} callbackOrValue a Function that should return a truthy value
+   *                                   when the task should continue executing, or
+   *                                   a non-Function value that the watched property
+   *                                   needs to equal before the task will continue running
+   */
+  function waitForProperty(object, key, predicateCallback) {
+    return new WaitForPropertyYieldable(object, key, predicateCallback);
+  }
+});
+;define('ember-concurrency/helpers/cancel-all', ['exports', 'ember-concurrency/-helpers'], function (exports, _helpers) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.cancelHelper = cancelHelper;
+  var helper = Ember.Helper.helper;
+
+
+  var CANCEL_REASON = "the 'cancel-all' template helper was invoked";
+
+  function cancelHelper(args) {
+    var cancelable = args[0];
+    if (!cancelable || typeof cancelable.cancelAll !== 'function') {
+      (true && !(false) && Ember.assert('The first argument passed to the `cancel-all` helper should be a Task or TaskGroup (without quotes); you passed ' + cancelable, false));
+    }
+
+    return (0, _helpers.taskHelperClosure)('cancel-all', 'cancelAll', [cancelable, CANCEL_REASON]);
+  }
+
+  exports.default = helper(cancelHelper);
+});
+;define('ember-concurrency/helpers/perform', ['exports', 'ember-concurrency/-helpers'], function (exports, _helpers) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.performHelper = performHelper;
+  var helper = Ember.Helper.helper;
+  function performHelper(args, hash) {
+    return (0, _helpers.taskHelperClosure)('perform', 'perform', args, hash);
+  }
+
+  exports.default = helper(performHelper);
+});
+;define('ember-concurrency/helpers/task', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _toConsumableArray(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  }
+
+  function _toArray(arr) {
+    return Array.isArray(arr) ? arr : Array.from(arr);
+  }
+
+  var helper = Ember.Helper.helper;
+
+
+  function taskHelper(_ref) {
+    var _ref2 = _toArray(_ref),
+        task = _ref2[0],
+        args = _ref2.slice(1);
+
+    return task._curry.apply(task, _toConsumableArray(args));
+  }
+
+  exports.default = helper(taskHelper);
 });
 ;define('ember-concurrency/index', ['exports', 'ember-concurrency/utils', 'ember-concurrency/-task-property', 'ember-concurrency/-task-instance', 'ember-concurrency/-task-group', 'ember-concurrency/-evented-observable', 'ember-concurrency/-cancelable-promise-helpers', 'ember-concurrency/-wait-for'], function (exports, _utils, _taskProperty, _taskInstance, _taskGroup, _eventedObservable, _cancelablePromiseHelpers, _waitFor) {
   'use strict';
@@ -82489,7 +82961,7 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.waitForEvent = exports.waitForQueue = exports.timeout = exports.race = exports.hash = exports.didCancel = exports.allSettled = exports.all = undefined;
+  exports.waitForProperty = exports.waitForEvent = exports.waitForQueue = exports.timeout = exports.race = exports.hash = exports.didCancel = exports.allSettled = exports.all = undefined;
   exports.task = task;
   exports.taskGroup = taskGroup;
   exports.events = events;
@@ -82589,6 +83061,18 @@ createDeprecatedModule('resolver');
   exports.timeout = _utils.timeout;
   exports.waitForQueue = _waitFor.waitForQueue;
   exports.waitForEvent = _waitFor.waitForEvent;
+  exports.waitForProperty = _waitFor.waitForProperty;
+});
+;define('ember-concurrency/initializers/ember-concurrency', ['exports', 'ember-concurrency'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    name: 'ember-concurrency',
+    initialize: function initialize() {}
+  };
 });
 ;define('ember-concurrency/utils', ['exports'], function (exports) {
   'use strict';
@@ -82619,6 +83103,10 @@ createDeprecatedModule('resolver');
     return obj;
   }
 
+  var later = Ember.run.later;
+  var cancel = Ember.run.cancel;
+  var Promise = Ember.RSVP.Promise;
+  var ComputedProperty = Ember.ComputedProperty;
   function isEventedObject(c) {
     return c && (typeof c.one === 'function' && typeof c.off === 'function' || typeof c.addEventListener === 'function' && typeof c.removeEventListener === 'function');
   }
@@ -82703,7 +83191,7 @@ createDeprecatedModule('resolver');
   var YIELDABLE_RETURN = exports.YIELDABLE_RETURN = "return";
   var YIELDABLE_CANCEL = exports.YIELDABLE_CANCEL = "cancel";
 
-  var _ComputedProperty = exports._ComputedProperty = Ember.ComputedProperty;
+  var _ComputedProperty = exports._ComputedProperty = ComputedProperty;
 
   /**
    *
@@ -82729,11 +83217,11 @@ createDeprecatedModule('resolver');
    */
   function timeout(ms) {
     var timerId = void 0;
-    var promise = new Ember.RSVP.Promise(function (r) {
-      timerId = Ember.run.later(r, ms);
+    var promise = new Promise(function (r) {
+      timerId = later(r, ms);
     });
     promise.__ec_cancel__ = function () {
-      Ember.run.cancel(timerId);
+      cancel(timerId);
     };
     return promise;
   }
@@ -84154,8 +84642,8 @@ createDeprecatedModule('resolver');
     }
   });
 });
-;define('ember-inflector/index', ['exports', 'ember-inflector/lib/system', 'ember-inflector/lib/ext/string'], function (exports, _system) {
-  'use strict';
+;define("ember-inflector/index", ["module", "exports", "ember-inflector/lib/system", "ember-inflector/lib/ext/string"], function (module, exports, _system) {
+  "use strict";
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -84164,44 +84652,30 @@ createDeprecatedModule('resolver');
 
 
   _system.Inflector.defaultRules = _system.defaultRules;
+  Ember.Inflector = _system.Inflector;
 
-  Object.defineProperty(Ember, 'Inflector', {
-    get: function get() {
-      Ember.deprecate('Ember.Inflector is deprecated. Please explicitly: import Inflector from \'ember-inflector\';', false, {
-        id: 'ember-inflector.globals',
-        until: '3.0.0'
-      });
-
-      return _system.Inflector;
-    }
-  });
-
-  Object.defineProperty(Ember.String, 'singularize', {
-    get: function get() {
-      Ember.deprecate('Ember.String.singularize() is deprecated. Please explicitly: import { singularize } from \'ember-inflector\';', false, {
-        id: 'ember-inflector.globals',
-        until: '3.0.0'
-      });
-
-      return _system.singularize;
-    }
-  });
-
-  Object.defineProperty(Ember.String, 'pluralize', {
-    get: function get() {
-      Ember.deprecate('Ember.String.pluralize() is deprecated. Please explicitly: import { pluralize } from \'ember-inflector\';', false, {
-        id: 'ember-inflector.globals',
-        until: '3.0.0'
-      });
-
-      return _system.pluralize;
-    }
-  });
+  Ember.String.pluralize = _system.pluralize;
+  Ember.String.singularize = _system.singularize;
 
   exports.default = _system.Inflector;
   exports.pluralize = _system.pluralize;
   exports.singularize = _system.singularize;
   exports.defaultRules = _system.defaultRules;
+
+
+  if (typeof define !== 'undefined' && define.amd) {
+    define('ember-inflector', ['exports'], function (__exports__) {
+      __exports__['default'] = _system.Inflector;
+      __exports__.pluralize = _system.pluralize;
+      __exports__.singularize = _system.singularize;
+
+      return __exports__;
+    });
+  } else if (typeof module !== 'undefined' && module['exports']) {
+    module['exports'] = _system.Inflector;
+    _system.Inflector.singularize = _system.singularize;
+    _system.Inflector.pluralize = _system.pluralize;
+  }
 });
 ;define('ember-inflector/lib/ext/string', ['ember-inflector/lib/system/string'], function (_string) {
   'use strict';
@@ -84212,36 +84686,18 @@ createDeprecatedModule('resolver');
        @method pluralize
       @for String
     */
-    Object.defineProperty(String.prototype, 'pluralize', {
-      get: function get() {
-        Ember.deprecate('String.prototype.pluralize() is deprecated. Please explicitly: import { pluralize } from \'ember-inflector\';', false, {
-          id: 'ember-inflector.globals',
-          until: '3.0.0'
-        });
-
-        return function () {
-          return (0, _string.pluralize)(this);
-        };
-      }
-    });
+    String.prototype.pluralize = function () {
+      return (0, _string.pluralize)(this);
+    };
 
     /**
       See {{#crossLink "Ember.String/singularize"}}{{/crossLink}}
        @method singularize
       @for String
     */
-    Object.defineProperty(String.prototype, 'singularize', {
-      get: function get() {
-        Ember.deprecate('String.prototype.singularize() is deprecated. Please explicitly: import { singularize } from \'ember-inflector\';', false, {
-          id: 'ember-inflector.globals',
-          until: '3.0.0'
-        });
-
-        return function () {
-          return (0, _string.singularize)(this);
-        };
-      }
-    });
+    String.prototype.singularize = function () {
+      return (0, _string.singularize)(this);
+    };
   }
 });
 ;define('ember-inflector/lib/helpers/pluralize', ['exports', 'ember-inflector', 'ember-inflector/lib/utils/make-helper'], function (exports, _emberInflector, _makeHelper) {
@@ -84759,7 +85215,7 @@ createDeprecatedModule('resolver');
 
       var newCallback = buildCallback({ incomingCallback: incomingCallback, createArgs: createArgs });
 
-      return Ember.computed.apply(undefined, _toConsumableArray(flattenKeys(keys)).concat([newCallback]));
+      return computed.apply(undefined, _toConsumableArray(flattenKeys(keys)).concat([newCallback]));
     };
   };
 
@@ -84776,6 +85232,9 @@ createDeprecatedModule('resolver');
       return Array.from(arr);
     }
   }
+
+  var computed = Ember.computed;
+
 
   function parseComputedArgs(args) {
     return {
@@ -84990,19 +85449,19 @@ createDeprecatedModule('resolver');
 
         mappedKeys.push(mappedKey);
         if (shouldObserve) {
-          classProperties['key' + i + 'DidChange'] = Ember.observer(mappedKey, rewriteComputed);
+          classProperties['key' + i + 'DidChange'] = observer(mappedKey, rewriteComputed);
         }
       });
 
       var ObserverClass = BaseClass.extend(classProperties, {
         // can't use rewriteComputed directly, maybe a bug
         // https://github.com/emberjs/ember.js/issues/15246
-        onInit: Ember.on('init', function () {
+        onInit: on('init', function () {
           rewriteComputed.call(this);
         })
       });
 
-      var cp = Ember.computed.apply(undefined, _toConsumableArray((0, _flattenKeys.default)(keys)).concat([function (key) {
+      var cp = computed.apply(undefined, _toConsumableArray((0, _flattenKeys.default)(keys)).concat([function (key) {
         var _this2 = this;
 
         var propertyInstance = findOrCreatePropertyInstance(this, ObserverClass, key, cp);
@@ -85014,9 +85473,9 @@ createDeprecatedModule('resolver');
           return properties;
         }, {});
 
-        Ember.setProperties(propertyInstance.nonStrings, properties);
+        setProperties(propertyInstance.nonStrings, properties);
 
-        return Ember.get(propertyInstance, 'computed');
+        return get(propertyInstance, 'computed');
       }])).readOnly();
 
       return cp;
@@ -85035,6 +85494,13 @@ createDeprecatedModule('resolver');
     }
   }
 
+  var EmberObject = Ember.Object;
+  var computed = Ember.computed;
+  var observer = Ember.observer;
+  var get = Ember.get;
+  var setProperties = Ember.setProperties;
+  var Component = Ember.Component;
+  var on = Ember.on;
   var WeakMap = Ember.WeakMap,
       defineProperty = Ember.defineProperty,
       meta = Ember.meta;
@@ -85058,12 +85524,12 @@ createDeprecatedModule('resolver');
     property = propertyClass.create( /* owner.ownerInjection(), */{
       key: key,
       context: context,
-      nonStrings: Ember.Object.create()
+      nonStrings: EmberObject.create()
     });
 
     propertiesForContext.set(cp, property);
 
-    if (context instanceof Ember.Component) {
+    if (context instanceof Component) {
       context.one('willDestroyElement', function () {
         property.destroy();
       });
@@ -85072,8 +85538,8 @@ createDeprecatedModule('resolver');
     return property;
   }
 
-  var BaseClass = Ember.Object.extend({
-    computedDidChange: Ember.observer('computed', function () {
+  var BaseClass = EmberObject.extend({
+    computedDidChange: observer('computed', function () {
       var context = this.context,
           key = this.key;
 
@@ -85254,14 +85720,17 @@ createDeprecatedModule('resolver');
       return macro;
     }
 
-    if (Ember.isBlank(macro)) {
+    if (isBlank(macro)) {
       // the macro was `[]' or `@each.key', which has been trimmed, leaving a
       // blank string, so return the context (which is likely an ArrayProxy)
       return context;
     }
 
-    return Ember.get(context, macro);
+    return get(context, macro);
   };
+
+  var get = Ember.get;
+  var isBlank = Ember.isBlank;
 });
 ;define('ember-macro-helpers/is-computed', ['exports'], function (exports) {
   'use strict';
@@ -85368,8 +85837,10 @@ createDeprecatedModule('resolver');
       }
     }
 
-    return Ember.isBlank(array) ? suffix : array + '.' + suffix;
+    return isBlank(array) ? suffix : array + '.' + suffix;
   };
+
+  var isBlank = Ember.isBlank;
 });
 ;define('ember-macro-helpers/raw', ['exports'], function (exports) {
   'use strict';
@@ -85379,10 +85850,12 @@ createDeprecatedModule('resolver');
   });
 
   exports.default = function (key) {
-    return Ember.computed(function () {
+    return computed(function () {
       return key;
     }).readOnly();
   };
+
+  var computed = Ember.computed;
 });
 ;define('ember-macro-helpers/reads', ['exports', 'ember-macro-helpers/writable'], function (exports, _writable) {
   'use strict';
@@ -85558,7 +86031,7 @@ createDeprecatedModule('resolver');
 
   var Selector = (0, _type.unionOf)('string', _types.Element);
 
-  var EmberPopperBase = (_dec = (0, _component.tagName)(''), _dec2 = (0, _argument.argument)({ defaultIfUndefined: true }), _dec3 = (0, _type.type)('boolean'), _dec4 = (0, _type.type)((0, _type.optional)('object')), _dec5 = (0, _type.type)((0, _type.optional)(_types.Action)), _dec6 = (0, _type.type)((0, _type.optional)(Function)), _dec7 = (0, _type.type)((0, _type.optional)(Function)), _dec8 = (0, _argument.argument)({ defaultIfUndefined: true }), _dec9 = (0, _type.type)('string'), _dec10 = (0, _argument.argument)({ defaultIfUndefined: true }), _dec11 = (0, _type.type)(Selector), _dec12 = (0, _type.type)((0, _type.optional)(Selector)), _dec13 = (0, _argument.argument)({ defaultIfUndefined: true }), _dec14 = (0, _type.type)('boolean'), _dec15 = (0, _object.computed)('_renderInPlace', 'popperContainer'), _dec16 = (0, _object.computed)('renderInPlace'), _dec(_class = (_class2 = function (_Component) {
+  var EmberPopperBase = (_dec = (0, _component.tagName)(''), _dec2 = (0, _argument.argument)({ defaultIfUndefined: true }), _dec3 = (0, _type.type)('boolean'), _dec4 = (0, _type.type)((0, _type.optional)('object')), _dec5 = (0, _type.type)((0, _type.optional)(Function)), _dec6 = (0, _type.type)((0, _type.optional)(Function)), _dec7 = (0, _argument.argument)({ defaultIfUndefined: true }), _dec8 = (0, _type.type)('string'), _dec9 = (0, _argument.argument)({ defaultIfUndefined: true }), _dec10 = (0, _type.type)(Selector), _dec11 = (0, _type.type)((0, _type.optional)(Selector)), _dec12 = (0, _type.type)((0, _type.optional)(_types.Action)), _dec13 = (0, _argument.argument)({ defaultIfUndefined: true }), _dec14 = (0, _type.type)('boolean'), _dec15 = (0, _object.computed)('_renderInPlace', 'popperContainer'), _dec16 = (0, _object.computed)('renderInPlace'), _dec(_class = (_class2 = function (_Component) {
     _inherits(EmberPopperBase, _Component);
 
     function EmberPopperBase() {
@@ -85572,7 +86045,7 @@ createDeprecatedModule('resolver');
         args[_key] = arguments[_key];
       }
 
-      return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = EmberPopperBase.__proto__ || Object.getPrototypeOf(EmberPopperBase)).call.apply(_ref, [this].concat(args))), _this), _this.layout = _emberPopper.default, _initDefineProp(_this, 'eventsEnabled', _descriptor, _this), _initDefineProp(_this, 'modifiers', _descriptor2, _this), _initDefineProp(_this, 'registerAPI', _descriptor3, _this), _initDefineProp(_this, 'onCreate', _descriptor4, _this), _initDefineProp(_this, 'onUpdate', _descriptor5, _this), _initDefineProp(_this, 'placement', _descriptor6, _this), _initDefineProp(_this, 'popperContainer', _descriptor7, _this), _initDefineProp(_this, 'popperTarget', _descriptor8, _this), _initDefineProp(_this, 'renderInPlace', _descriptor9, _this), _this._popper = null, _this._initialParentNode = null, _this._didRenderInPlace = false, _this._popperTarget = null, _this._eventsEnabled = null, _this._placement = null, _this._modifiers = null, _this._updateRAF = null, _this._onCreate = null, _this._onUpdate = null, _this._publicAPI = null, _temp), _possibleConstructorReturn(_this, _ret);
+      return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = EmberPopperBase.__proto__ || Object.getPrototypeOf(EmberPopperBase)).call.apply(_ref, [this].concat(args))), _this), _this.layout = _emberPopper.default, _initDefineProp(_this, 'eventsEnabled', _descriptor, _this), _initDefineProp(_this, 'modifiers', _descriptor2, _this), _initDefineProp(_this, 'onCreate', _descriptor3, _this), _initDefineProp(_this, 'onUpdate', _descriptor4, _this), _initDefineProp(_this, 'placement', _descriptor5, _this), _initDefineProp(_this, 'popperContainer', _descriptor6, _this), _initDefineProp(_this, 'popperTarget', _descriptor7, _this), _initDefineProp(_this, 'registerAPI', _descriptor8, _this), _initDefineProp(_this, 'renderInPlace', _descriptor9, _this), _this._didRenderInPlace = false, _this._eventsEnabled = null, _this._initialParentNode = null, _this._modifiers = null, _this._onCreate = null, _this._onUpdate = null, _this._placement = null, _this._popper = null, _this._popperTarget = null, _this._publicAPI = null, _this._updateRAF = null, _temp), _possibleConstructorReturn(_this, _ret);
     }
 
     _createClass(EmberPopperBase, [{
@@ -85624,13 +86097,13 @@ createDeprecatedModule('resolver');
           return;
         }
 
-        var popperTarget = this._getPopperTarget();
-        var renderInPlace = this.get('_renderInPlace');
         var eventsEnabled = this.get('eventsEnabled');
         var modifiers = this.get('modifiers');
-        var placement = this.get('placement');
         var onCreate = this.get('onCreate');
         var onUpdate = this.get('onUpdate');
+        var placement = this.get('placement');
+        var popperTarget = this._getPopperTarget();
+        var renderInPlace = this.get('_renderInPlace');
 
         // Compare against previous values to see if anything has changed
         var didChange = renderInPlace !== this._didRenderInPlace || popperTarget !== this._popperTarget || eventsEnabled !== this._eventsEnabled || modifiers !== this._modifiers || placement !== this._placement || onCreate !== this._onCreate || onUpdate !== this._onUpdate;
@@ -85644,12 +86117,12 @@ createDeprecatedModule('resolver');
 
           // Store current values to check against on updates
           this._didRenderInPlace = renderInPlace;
-          this._popperTarget = popperTarget;
           this._eventsEnabled = eventsEnabled;
           this._modifiers = modifiers;
-          this._placement = placement;
           this._onCreate = onCreate;
           this._onUpdate = onUpdate;
+          this._placement = placement;
+          this._popperTarget = popperTarget;
 
           var options = {
             eventsEnabled: eventsEnabled,
@@ -85712,10 +86185,10 @@ createDeprecatedModule('resolver');
           // bootstrap the public API with fields that are guaranteed to be static,
           // such as imperative actions
           this._publicAPI = {
-            update: this.update.bind(this),
-            scheduleUpdate: this.scheduleUpdate.bind(this),
+            disableEventListeners: this.disableEventListeners.bind(this),
             enableEventListeners: this.enableEventListeners.bind(this),
-            disableEventListeners: this.disableEventListeners.bind(this)
+            scheduleUpdate: this.scheduleUpdate.bind(this),
+            update: this.update.bind(this)
           };
         }
 
@@ -85768,32 +86241,32 @@ createDeprecatedModule('resolver');
     initializer: function initializer() {
       return null;
     }
-  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'registerAPI', [_argument.argument, _dec5], {
+  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'onCreate', [_argument.argument, _dec5], {
     enumerable: true,
     initializer: function initializer() {
       return null;
     }
-  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'onCreate', [_argument.argument, _dec6], {
+  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'onUpdate', [_argument.argument, _dec6], {
     enumerable: true,
     initializer: function initializer() {
       return null;
     }
-  }), _descriptor5 = _applyDecoratedDescriptor(_class2.prototype, 'onUpdate', [_argument.argument, _dec7], {
-    enumerable: true,
-    initializer: function initializer() {
-      return null;
-    }
-  }), _descriptor6 = _applyDecoratedDescriptor(_class2.prototype, 'placement', [_dec8, _dec9], {
+  }), _descriptor5 = _applyDecoratedDescriptor(_class2.prototype, 'placement', [_dec7, _dec8], {
     enumerable: true,
     initializer: function initializer() {
       return 'bottom';
     }
-  }), _descriptor7 = _applyDecoratedDescriptor(_class2.prototype, 'popperContainer', [_dec10, _dec11], {
+  }), _descriptor6 = _applyDecoratedDescriptor(_class2.prototype, 'popperContainer', [_dec9, _dec10], {
     enumerable: true,
     initializer: function initializer() {
       return '.ember-application';
     }
-  }), _descriptor8 = _applyDecoratedDescriptor(_class2.prototype, 'popperTarget', [_argument.argument, _dec12], {
+  }), _descriptor7 = _applyDecoratedDescriptor(_class2.prototype, 'popperTarget', [_argument.argument, _dec11], {
+    enumerable: true,
+    initializer: function initializer() {
+      return null;
+    }
+  }), _descriptor8 = _applyDecoratedDescriptor(_class2.prototype, 'registerAPI', [_argument.argument, _dec12], {
     enumerable: true,
     initializer: function initializer() {
       return null;
@@ -85922,7 +86395,7 @@ createDeprecatedModule('resolver');
   "use strict";
 
   exports.__esModule = true;
-  exports.default = Ember.HTMLBars.template({ "id": "q2HT5NdU", "block": "{\"symbols\":[\"&default\"],\"statements\":[[1,[25,\"unbound\",[[20,[\"_parentFinder\"]]],null],false],[0,\"\\n\\n\"],[4,\"if\",[[20,[\"renderInPlace\"]]],null,{\"statements\":[[0,\"  \"],[6,\"div\"],[10,\"id\",[18,\"id\"],null],[10,\"class\",[18,\"class\"],null],[10,\"role\",[18,\"ariaRole\"],null],[7],[0,\"\\n    \"],[11,1,[[25,\"hash\",null,[[\"update\",\"scheduleUpdate\",\"enableEventListeners\",\"disableEventListeners\"],[[25,\"action\",[[19,0,[]],\"update\"],null],[25,\"action\",[[19,0,[]],\"scheduleUpdate\"],null],[25,\"action\",[[19,0,[]],\"enableEventListeners\"],null],[25,\"action\",[[19,0,[]],\"disableEventListeners\"],null]]]]]],[0,\"\\n  \"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"\\n\"],[4,\"-in-element\",[[20,[\"_popperContainer\"]]],null,{\"statements\":[[0,\"    \"],[6,\"div\"],[10,\"id\",[18,\"id\"],null],[10,\"class\",[18,\"class\"],null],[10,\"role\",[18,\"ariaRole\"],null],[7],[0,\"\\n      \"],[11,1,[[25,\"hash\",null,[[\"update\",\"scheduleUpdate\",\"enableEventListeners\",\"disableEventListeners\"],[[25,\"action\",[[19,0,[]],\"update\"],null],[25,\"action\",[[19,0,[]],\"scheduleUpdate\"],null],[25,\"action\",[[19,0,[]],\"enableEventListeners\"],null],[25,\"action\",[[19,0,[]],\"disableEventListeners\"],null]]]]]],[0,\"\\n    \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]}]],\"hasEval\":false}", "meta": { "moduleName": "ember-popper/templates/components/ember-popper.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "+b/JYMmF", "block": "{\"symbols\":[\"&default\"],\"statements\":[[1,[25,\"unbound\",[[20,[\"_parentFinder\"]]],null],false],[0,\"\\n\\n\"],[4,\"if\",[[20,[\"renderInPlace\"]]],null,{\"statements\":[[0,\"  \"],[6,\"div\"],[10,\"id\",[18,\"id\"],null],[10,\"class\",[18,\"class\"],null],[10,\"role\",[18,\"ariaRole\"],null],[7],[0,\"\\n    \"],[11,1,[[25,\"hash\",null,[[\"disableEventListeners\",\"enableEventListeners\",\"scheduleUpdate\",\"update\"],[[25,\"action\",[[19,0,[]],\"disableEventListeners\"],null],[25,\"action\",[[19,0,[]],\"enableEventListeners\"],null],[25,\"action\",[[19,0,[]],\"scheduleUpdate\"],null],[25,\"action\",[[19,0,[]],\"update\"],null]]]]]],[0,\"\\n  \"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"\\n\"],[4,\"-in-element\",[[20,[\"_popperContainer\"]]],null,{\"statements\":[[0,\"    \"],[6,\"div\"],[10,\"id\",[18,\"id\"],null],[10,\"class\",[18,\"class\"],null],[10,\"role\",[18,\"ariaRole\"],null],[7],[0,\"\\n      \"],[11,1,[[25,\"hash\",null,[[\"disableEventListeners\",\"enableEventListeners\",\"scheduleUpdate\",\"update\"],[[25,\"action\",[[19,0,[]],\"disableEventListeners\"],null],[25,\"action\",[[19,0,[]],\"enableEventListeners\"],null],[25,\"action\",[[19,0,[]],\"scheduleUpdate\"],null],[25,\"action\",[[19,0,[]],\"update\"],null]]]]]],[0,\"\\n    \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]}]],\"hasEval\":false}", "meta": { "moduleName": "ember-popper/templates/components/ember-popper.hbs" } });
 });
 ;define('ember-raf-scheduler/index', ['exports'], function (exports) {
   'use strict';
@@ -85954,6 +86427,8 @@ createDeprecatedModule('resolver');
       return Constructor;
     };
   }();
+
+  var run = Ember.run;
 
   var Token = exports.Token = function () {
     function Token(parent) {
@@ -86050,14 +86525,14 @@ createDeprecatedModule('resolver');
         this.jobs = 0;
 
         if (this.sync.length > 0) {
-          Ember.run.begin();
+          run.begin();
           q = this.sync;
           this.sync = [];
 
           for (i = 0; i < q.length; i++) {
             q[i]();
           }
-          Ember.run.end();
+          run.end();
         }
 
         if (this.layout.length > 0) {
@@ -90919,9 +91394,6 @@ function diffArray(oldArray, newArray) {
   };
 }
 
-/**
-  @module ember-data
-*/
 var get$5 = Ember.get;
 
 /**
@@ -91863,9 +92335,6 @@ var get$7 = Ember.get;
   @private
   @constructor
   @param {DS.Model} internalModel The model to create a snapshot from
-*/
-/**
-  @module ember-data
 */
 
 var Snapshot = function () {
@@ -96750,7 +97219,7 @@ function associateWithRecordArray(internalModels, array) {
 
 function _classCallCheck$12(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var set$5 = Ember.set; /* global heimdall */
+var set$5 = Ember.set;
 
 /*
  * The `ContainerInstanceCache` serves as a lazy cache for looking up
@@ -99681,10 +100150,6 @@ function isArrayLike(obj) {
   return false;
 }
 
-/**
-  @module ember-data
-*/
-
 var get$14 = Ember.get;
 
 /**
@@ -101231,11 +101696,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
     @namespace DS
     @extends DS.RESTAdapter
   */
-  /* global heimdall */
-  /**
-    @module ember-data
-  */
-
   var JSONAPIAdapter = _rest.default.extend({
     defaultSerializer: '-json-api',
 
@@ -103402,9 +103862,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  /**
-    @module ember-data
-  */
+
 
   var dasherize = Ember.String.dasherize;
 

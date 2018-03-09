@@ -77,8 +77,9 @@ define('new-prezident/tests/helpers/destroy-app', ['exports'], function (exports
     value: true
   });
   exports.default = destroyApp;
+  var run = Ember.run;
   function destroyApp(application) {
-    Ember.run(application, 'destroy');
+    run(application, 'destroy');
   }
 });
 define('new-prezident/tests/helpers/module-for-acceptance', ['exports', 'qunit', 'new-prezident/tests/helpers/start-app', 'new-prezident/tests/helpers/destroy-app'], function (exports, _qunit, _startApp, _destroyApp) {
@@ -103,12 +104,14 @@ define('new-prezident/tests/helpers/module-for-acceptance', ['exports', 'qunit',
         var _this = this;
 
         var afterEach = options.afterEach && options.afterEach.apply(this, arguments);
-        return Ember.RSVP.resolve(afterEach).then(function () {
+        return resolve(afterEach).then(function () {
           return (0, _destroyApp.default)(_this.application);
         });
       }
     });
   };
+
+  var resolve = Ember.RSVP.resolve;
 });
 define('new-prezident/tests/helpers/resolver', ['exports', 'new-prezident/resolver', 'new-prezident/config/environment'], function (exports, _resolver, _environment) {
   'use strict';
@@ -134,11 +137,13 @@ define('new-prezident/tests/helpers/start-app', ['exports', 'new-prezident/app',
     value: true
   });
   exports.default = startApp;
+  var merge = Ember.merge;
+  var run = Ember.run;
   function startApp(attrs) {
-    var attributes = Ember.merge({}, _environment.default.APP);
-    attributes = Ember.merge(attributes, attrs); // use defaults, but you can override;
+    var attributes = merge({}, _environment.default.APP);
+    attributes = merge(attributes, attrs); // use defaults, but you can override;
 
-    return Ember.run(function () {
+    return run(function () {
       var application = _app.default.create(attributes);
       application.setupForTesting();
       application.injectTestHelpers();
@@ -254,12 +259,16 @@ define('new-prezident/tests/tests.lint-test', [], function () {
 define('new-prezident/tests/unit/initializers/component-router-injector-test', ['new-prezident/initializers/component-router-injector', 'qunit', 'new-prezident/tests/helpers/destroy-app'], function (_componentRouterInjector, _qunit, _destroyApp) {
   'use strict';
 
+  var Application = Ember.Application;
+  var run = Ember.run;
+
+
   (0, _qunit.module)('Unit | Initializer | component router injector', {
     beforeEach: function beforeEach() {
       var _this = this;
 
-      Ember.run(function () {
-        _this.application = Ember.Application.create();
+      run(function () {
+        _this.application = Application.create();
         _this.application.deferReadiness();
       });
     },

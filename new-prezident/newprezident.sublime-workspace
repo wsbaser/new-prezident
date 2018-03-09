@@ -4,16 +4,28 @@
 		"selected_items":
 		[
 			[
-				"vide",
-				"videoId"
+				"mar",
+				"margin-left"
 			],
 			[
-				"video",
-				"video"
+				"bor",
+				"border-radius"
 			],
 			[
 				"set",
-				"setVideo"
+				"setStartPosition"
+			],
+			[
+				"setVideo",
+				"setVideoRange"
+			],
+			[
+				"video",
+				"videoRange"
+			],
+			[
+				"vide",
+				"videoId"
 			],
 			[
 				"get",
@@ -56,10 +68,6 @@
 				"list-style-type"
 			],
 			[
-				"mar",
-				"margin"
-			],
-			[
 				"fon",
 				"font-size"
 			],
@@ -79,9 +87,21 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 392.0,
+		"height": 187.0,
 		"selected_items":
 		[
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"pac",
+				"Package Control: Install Package"
+			],
 			[
 				"packa",
 				"Package Control: Install Package"
@@ -104,17 +124,21 @@
 	},
 	"file_history":
 	[
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/application.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.sass",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/index.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/components/video-collection.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/components/video-collection.hbs",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/application.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video-range.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/playlist.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/range.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/services/video-navigator.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/services/video-history.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/index.hbs",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/router.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/application.hbs",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/index.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/now.hbs",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/services/video-history.js",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/services/video-navigator.js",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video.js",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/components/video-collection.hbs",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.css",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/ember-cli-build.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/index.html",
@@ -145,6 +169,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"font-family",
+			"summary",
+			"setVideo",
+			"getNextVideo",
+			"getNextPlaylist",
 			"description",
 			"videoNavigator",
 			"store",
@@ -168,7 +197,7 @@
 		"replace_history":
 		[
 		],
-		"reverse": false,
+		"reverse": true,
 		"show_context": true,
 		"use_buffer2": true,
 		"whole_word": false,
@@ -184,7 +213,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 0.0
+		"height": 34.0
 	},
 	"input":
 	{

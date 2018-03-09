@@ -8,7 +8,7 @@ module.exports = function(defaults) {
     'ember-bootstrap': {
       'bootstrapVersion': 4,
       'importBootstrapFont': true,
-      'importBootstrapCSS': true
+      'importBootstrapCSS': false
     }
   });
 

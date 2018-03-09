@@ -1,3 +1,5 @@
+@import "ember-bootstrap/bootstrap";
+
 .clearfix:after {
     content: "";
     display: table;
@@ -188,11 +190,6 @@ body{
 	margin-left: 30px;
 }
 
-.glyphicon-chevron-right:before{
-	content: "\e080";
-	color: black;
-}
-
 
 #videoDescription>.content{
 	border-top: 1px solid #eee;
@@ -238,8 +235,11 @@ body{
 	font-size: 10px;
 	font-weight: 400;
 	cursor: pointer;
+	width: 100%;
 }
 
 #navigation button:hover{
 	background-color: hsl(0,100%,50%);	
 }
+
+@import "ember-bootstrap/bootstrap";
