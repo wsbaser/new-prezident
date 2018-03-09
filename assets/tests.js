@@ -12,7 +12,22 @@ define('new-prezident/tests/app.lint-test', [], function () {
 
   QUnit.test('components/video-collection.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n7:20 - \'YT\' is not defined. (no-undef)\n8:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n9:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n10:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n11:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n12:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n13:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n14:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n21:25 - \'event\' is defined but never used. (no-unused-vars)');
+    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n22:13 - \'videoId\' is assigned a value but never used. (no-unused-vars)\n32:26 - \'YT\' is not defined. (no-undef)\n49:25 - \'event\' is defined but never used. (no-unused-vars)');
+  });
+
+  QUnit.test('initializers/component-router-injector.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'initializers/component-router-injector.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('models/playlist.js', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'models/playlist.js should pass ESLint\n\n2:10 - \'belongsTo\' is defined but never used. (no-unused-vars)');
+  });
+
+  QUnit.test('models/video-range.js', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'models/video-range.js should pass ESLint\n\n3:21 - \'hasMany\' is defined but never used. (no-unused-vars)');
   });
 
   QUnit.test('models/video.js', function (assert) {
@@ -35,29 +50,24 @@ define('new-prezident/tests/app.lint-test', [], function () {
     assert.ok(true, 'routes/application.js should pass ESLint\n\n');
   });
 
-  QUnit.test('routes/future.js', function (assert) {
-    assert.expect(1);
-    assert.ok(true, 'routes/future.js should pass ESLint\n\n');
-  });
-
-  QUnit.test('routes/history.js', function (assert) {
-    assert.expect(1);
-    assert.ok(true, 'routes/history.js should pass ESLint\n\n');
-  });
-
   QUnit.test('routes/index.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/index.js should pass ESLint\n\n4:18 - \'transition\' is defined but never used. (no-unused-vars)\n5:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)');
-  });
-
-  QUnit.test('routes/now.js', function (assert) {
-    assert.expect(1);
-    assert.ok(false, 'routes/now.js should pass ESLint\n\n5:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n6:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)');
+    assert.ok(false, 'routes/index.js should pass ESLint\n\n4:8 - \'params\' is defined but never used. (no-unused-vars)\n5:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n6:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)\n7:2 - Mixed spaces and tabs. (no-mixed-spaces-and-tabs)');
   });
 
   QUnit.test('serializers/application.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'serializers/application.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('services/video-history.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'services/video-history.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('services/video-navigator.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'services/video-navigator.js should pass ESLint\n\n');
   });
 });
 define('new-prezident/tests/helpers/destroy-app', ['exports'], function (exports) {
@@ -206,19 +216,24 @@ define('new-prezident/tests/tests.lint-test', [], function () {
     assert.ok(true, 'test-helper.js should pass ESLint\n\n');
   });
 
+  QUnit.test('unit/initializers/component-router-injector-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/initializers/component-router-injector-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/models/playlist-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/models/playlist-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/models/video-range-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/models/video-range-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('unit/models/video-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/models/video-test.js should pass ESLint\n\n');
-  });
-
-  QUnit.test('unit/routes/future-test.js', function (assert) {
-    assert.expect(1);
-    assert.ok(true, 'unit/routes/future-test.js should pass ESLint\n\n');
-  });
-
-  QUnit.test('unit/routes/history-test.js', function (assert) {
-    assert.expect(1);
-    assert.ok(true, 'unit/routes/history-test.js should pass ESLint\n\n');
   });
 
   QUnit.test('unit/routes/index-test.js', function (assert) {
@@ -226,9 +241,67 @@ define('new-prezident/tests/tests.lint-test', [], function () {
     assert.ok(true, 'unit/routes/index-test.js should pass ESLint\n\n');
   });
 
-  QUnit.test('unit/routes/now-test.js', function (assert) {
+  QUnit.test('unit/services/video-history-test.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'unit/routes/now-test.js should pass ESLint\n\n');
+    assert.ok(true, 'unit/services/video-history-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/services/video-navigator-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/services/video-navigator-test.js should pass ESLint\n\n');
+  });
+});
+define('new-prezident/tests/unit/initializers/component-router-injector-test', ['new-prezident/initializers/component-router-injector', 'qunit', 'new-prezident/tests/helpers/destroy-app'], function (_componentRouterInjector, _qunit, _destroyApp) {
+  'use strict';
+
+  (0, _qunit.module)('Unit | Initializer | component router injector', {
+    beforeEach: function beforeEach() {
+      var _this = this;
+
+      Ember.run(function () {
+        _this.application = Ember.Application.create();
+        _this.application.deferReadiness();
+      });
+    },
+    afterEach: function afterEach() {
+      (0, _destroyApp.default)(this.application);
+    }
+  });
+
+  // Replace this with your real tests.
+  (0, _qunit.test)('it works', function (assert) {
+    (0, _componentRouterInjector.initialize)(this.application);
+
+    // you would normally confirm the results of the initializer here
+    assert.ok(true);
+  });
+});
+define('new-prezident/tests/unit/models/playlist-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForModel)('playlist', 'Unit | Model | playlist', {
+    // Specify the other units that are required for this test.
+    needs: []
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var model = this.subject();
+    // let store = this.store();
+    assert.ok(!!model);
+  });
+});
+define('new-prezident/tests/unit/models/video-range-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForModel)('video-range', 'Unit | Model | video range', {
+    // Specify the other units that are required for this test.
+    needs: []
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var model = this.subject();
+    // let store = this.store();
+    assert.ok(!!model);
   });
 });
 define('new-prezident/tests/unit/models/video-test', ['ember-qunit'], function (_emberQunit) {
@@ -245,32 +318,6 @@ define('new-prezident/tests/unit/models/video-test', ['ember-qunit'], function (
     assert.ok(!!model);
   });
 });
-define('new-prezident/tests/unit/routes/future-test', ['ember-qunit'], function (_emberQunit) {
-  'use strict';
-
-  (0, _emberQunit.moduleFor)('route:future', 'Unit | Route | future', {
-    // Specify the other units that are required for this test.
-    // needs: ['controller:foo']
-  });
-
-  (0, _emberQunit.test)('it exists', function (assert) {
-    var route = this.subject();
-    assert.ok(route);
-  });
-});
-define('new-prezident/tests/unit/routes/history-test', ['ember-qunit'], function (_emberQunit) {
-  'use strict';
-
-  (0, _emberQunit.moduleFor)('route:history', 'Unit | Route | history', {
-    // Specify the other units that are required for this test.
-    // needs: ['controller:foo']
-  });
-
-  (0, _emberQunit.test)('it exists', function (assert) {
-    var route = this.subject();
-    assert.ok(route);
-  });
-});
 define('new-prezident/tests/unit/routes/index-test', ['ember-qunit'], function (_emberQunit) {
   'use strict';
 
@@ -284,17 +331,32 @@ define('new-prezident/tests/unit/routes/index-test', ['ember-qunit'], function (
     assert.ok(route);
   });
 });
-define('new-prezident/tests/unit/routes/now-test', ['ember-qunit'], function (_emberQunit) {
+define('new-prezident/tests/unit/services/video-history-test', ['ember-qunit'], function (_emberQunit) {
   'use strict';
 
-  (0, _emberQunit.moduleFor)('route:now', 'Unit | Route | now', {
+  (0, _emberQunit.moduleFor)('service:video-history', 'Unit | Service | video history', {
     // Specify the other units that are required for this test.
-    // needs: ['controller:foo']
+    // needs: ['service:foo']
   });
 
+  // Replace this with your real tests.
   (0, _emberQunit.test)('it exists', function (assert) {
-    var route = this.subject();
-    assert.ok(route);
+    var service = this.subject();
+    assert.ok(service);
+  });
+});
+define('new-prezident/tests/unit/services/video-navigator-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('service:video-navigator', 'Unit | Service | video navigator', {
+    // Specify the other units that are required for this test.
+    // needs: ['service:foo']
+  });
+
+  // Replace this with your real tests.
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var service = this.subject();
+    assert.ok(service);
   });
 });
 require('new-prezident/tests/test-helper');
