@@ -10,14 +10,15 @@
       </div>
       <div class="col-4">
       {{#bs-carousel 
-        nextControlIcon='glyphicon glyphicon-chevron-right'
-        prevControlIcon='glyphicon glyphicon-chevron-left'
+        nextControlIcon='fas fa-chevron-circle-right'
+        prevControlIcon='fas fa-chevron-circle-left'
+        wrap=false
         as |car|}}
         {{#car.slide}}
-          video range 1
+          <div class="car-item">video range 1</div>
         {{/car.slide}}
         {{#car.slide}}
-          video range 2
+          <div class="car-item">video range 2</div>
         {{/car.slide}}
       {{/bs-carousel}}
 
