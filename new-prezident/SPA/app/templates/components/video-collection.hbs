@@ -2,13 +2,26 @@
   <div id="videoDescription" class="container">
     <div class="row header">
       <span class="name">Нужны ли выборы 2018 года?</span>
+      <span class="timetotal">Время просмотра: 18 минут</span>
     </div>
     <div class="row content">
       <div class="summary col-8">
         {{playlist.description}}
       </div>
       <div class="col-4">
-        <div class="links-list">
+      {{#bs-carousel 
+        nextControlIcon='glyphicon glyphicon-chevron-right'
+        prevControlIcon='glyphicon glyphicon-chevron-left'
+        as |car|}}
+        {{#car.slide}}
+          video range 1
+        {{/car.slide}}
+        {{#car.slide}}
+          video range 2
+        {{/car.slide}}
+      {{/bs-carousel}}
+      
+<!--        <div class="links-list">
           См. также:
           {{#link-to "index"}}диктаторские режимы СНГ{{/link-to}},
           {{#link-to "index"}}фальсификация выборов{{/link-to}},
@@ -16,6 +29,7 @@
           {{#link-to "index"}}контроль над СМИ{{/link-to}},
           {{#link-to "index"}}квасной патриотизм{{/link-to}}
         </div>
+        -->
       </div>
     </div>
   </div>
@@ -26,7 +40,7 @@
   </div>
   <div id="navigation">
     {{#bs-button onClick=(action "nextVideo") type="primary"}}
-      СЛЕДУЮЩЕЕ
+      ПРОПУСТИТЬ
       <span class="glyphicon glyphicon-play"></span>
     {{/bs-button}}
     <span class="glyphicon glyphicon-play"></span>

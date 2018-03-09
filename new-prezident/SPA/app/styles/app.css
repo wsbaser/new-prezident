@@ -170,15 +170,29 @@ body{
 }
 
 #videoDescription>.header{
-	font-size: 1rem;
 	margin-bottom: 10px;
 }
 
 #videoDescription>.header>.name{
+	font-size: 1rem;
 	background-color: #E8F5FD;
 	padding: 3px 5px;
 	color: #444;
 }
+
+#videoDescription>.header>.timetotal{
+	padding: 3px 5px;
+	color: #666;
+	border: 1px solid #eee;
+	line-height: 22px;
+	margin-left: 30px;
+}
+
+.glyphicon-chevron-right:before{
+	content: "\e080";
+	color: black;
+}
+
 
 #videoDescription>.content{
 	border-top: 1px solid #eee;
