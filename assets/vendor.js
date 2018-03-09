@@ -69439,7 +69439,6 @@ createDeprecatedModule('resolver');
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
-  var get = Ember.get;
   function shapeOf(shape) {
     (true && !(arguments.length === 1) && Ember.assert('The \'shapeOf\' helper must receive exactly one shape', arguments.length === 1));
     (true && !((typeof shape === 'undefined' ? 'undefined' : _typeof(shape)) === 'object') && Ember.assert('The \'shapeOf\' helper must receive an object to match the shape to, received: ' + shape, (typeof shape === 'undefined' ? 'undefined' : _typeof(shape)) === 'object'));
@@ -69456,7 +69455,7 @@ createDeprecatedModule('resolver');
 
     return (0, _validators.makeValidator)('shapeOf({' + typeDesc.join() + '})', function (value) {
       for (var _key in shape) {
-        if (shape[_key](get(value, _key)) !== true) {
+        if (shape[_key](Ember.get(value, _key)) !== true) {
           return false;
         }
       }
@@ -69647,12 +69646,7 @@ createDeprecatedModule('resolver');
     }
   }
 
-  var EmberObject = Ember.Object;
-  var Mixin = Ember.Mixin;
-  var Component = Ember.Component;
-  var Controller = Ember.Controller;
-  var Service = Ember.Service;
-
+  var notifyPropertyChange = Ember.notifyPropertyChange || Ember.propertyDidChange;
 
   function guardBind(fn) {
     if (typeof fn === 'function') {
@@ -69749,7 +69743,7 @@ createDeprecatedModule('resolver');
 
       this.cachedValue = value;
 
-      Ember.propertyDidChange(obj, keyName);
+      notifyPropertyChange(obj, keyName);
 
       return this.cachedValue;
     };
@@ -69784,7 +69778,7 @@ createDeprecatedModule('resolver');
 
       this.desc.set.call(obj, value);
 
-      Ember.propertyDidChange(obj, keyName);
+      notifyPropertyChange(obj, keyName);
 
       return this._get(obj);
     };
@@ -69913,7 +69907,7 @@ createDeprecatedModule('resolver');
     });
   }
 
-  var ValidatingCreateMixin = Mixin.create({
+  var ValidatingCreateMixin = Ember.Mixin.create({
     create: function create() {
       var instance = this._super.apply(this, arguments);
 
@@ -69933,13 +69927,13 @@ createDeprecatedModule('resolver');
     }
   });
 
-  EmberObject.reopenClass(ValidatingCreateMixin);
+  Ember.Object.reopenClass(ValidatingCreateMixin);
 
   // Reopening a parent class does not apply the mixin to existing child classes,
   // so we need to apply it directly
-  ValidatingCreateMixin.apply(Component);
-  ValidatingCreateMixin.apply(Service);
-  ValidatingCreateMixin.apply(Controller);
+  ValidatingCreateMixin.apply(Ember.Component);
+  ValidatingCreateMixin.apply(Ember.Service);
+  ValidatingCreateMixin.apply(Ember.Controller);
 
   if (window.DS !== undefined && window.DS.Model !== undefined) {
     ValidatingCreateMixin.apply(window.DS.Model);
@@ -70119,8 +70113,6 @@ createDeprecatedModule('resolver');
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  var Component = Ember.Component;
-  var getWithDefault = Ember.getWithDefault;
 
 
   var validatedComponent = void 0;
@@ -70135,7 +70127,7 @@ createDeprecatedModule('resolver');
   };
 
   if (true) {
-    validatedComponent = Component.extend();
+    validatedComponent = Ember.Component.extend();
 
     validatedComponent.reopenClass({
       create: function create(props) {
@@ -70144,7 +70136,7 @@ createDeprecatedModule('resolver');
 
         var prototype = Object.getPrototypeOf(instance);
         var validations = (0, _validationsFor.getValidationsFor)(prototype) || {};
-        if (getWithDefault(_emberGetConfig.default, '@ember-decorators/argument.ignoreComponentsWithoutValidations', false) && Object.keys(validations).length === 0) {
+        if (Ember.getWithDefault(_emberGetConfig.default, '@ember-decorators/argument.ignoreComponentsWithoutValidations', false) && Object.keys(validations).length === 0) {
           return instance;
         }
 
@@ -70163,7 +70155,7 @@ createDeprecatedModule('resolver');
       }
     });
   } else {
-    validatedComponent = Component;
+    validatedComponent = Ember.Component;
   }
 
   exports.default = validatedComponent;
@@ -70207,9 +70199,6 @@ createDeprecatedModule('resolver');
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
-  var getWithDefault = Ember.getWithDefault;
-
-
   var valueMap = new WeakMap();
 
   function valuesFor(obj) {
@@ -70224,7 +70213,7 @@ createDeprecatedModule('resolver');
     if (true) {
       var validations = (0, _debug.getValidationsForKey)(target, key);
       validations.isArgument = true;
-      validations.typeRequired = getWithDefault(_emberGetConfig.default, '@ember-decorators/argument.typeRequired', false);
+      validations.typeRequired = Ember.getWithDefault(_emberGetConfig.default, '@ember-decorators/argument.typeRequired', false);
     }
 
     // always ensure the property is writeable, doesn't make sense otherwise (babel bug?)
@@ -70381,16 +70370,15 @@ createDeprecatedModule('resolver');
     value: true
   });
   exports.default = makeComputed;
-  var computed = Ember.computed;
   function makeComputed(desc) {
     if (true) {
-      return computed(desc);
+      return Ember.computed(desc);
     } else {
       var get = desc.get,
           set = desc.set;
 
 
-      return computed(function (key, value) {
+      return Ember.computed(function (key, value) {
         if (arguments.length > 1) {
           return set.call(this, key, value);
         }
