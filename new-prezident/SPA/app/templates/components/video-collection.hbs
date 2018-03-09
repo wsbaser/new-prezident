@@ -13,12 +13,20 @@
         nextControlIcon='fas fa-chevron-circle-right'
         prevControlIcon='fas fa-chevron-circle-left'
         wrap=false
+        autoPlay=false
+        showIndicators=false
         as |car|}}
         {{#car.slide}}
-          <div class="car-item">video range 1</div>
+          <div class="car-item">
+            <div class="range-index"><img id="img" class="style-scope yt-img-shadow" src="https://yt3.ggpht.com/-7I0BUCNSPPA/AAAAAAAAAAI/AAAAAAAAAAA/jUT_5vtw6CY/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg" width="30"></div>
+            <div class="range-length">7 мин. 30 сек.</div>
+            {{#bs-progress as |p|}}
+              {{p.bar value=1 minValue=0 maxValue=100 showLabel=true type="danger" striped=false animate=true}}
+            {{/bs-progress}}
+          </div>
         {{/car.slide}}
         {{#car.slide}}
-          <div class="car-item">video range 2</div>
+          <div class="car-item">2</div>
         {{/car.slide}}
       {{/bs-carousel}}
 
