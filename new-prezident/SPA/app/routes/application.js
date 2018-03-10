@@ -7,14 +7,14 @@ export default Route.extend({
 			playlists: [{
 					id: 'elections',
 					route: 'now',
-					name: 'Выборы',
+					name: 'Демократические институты: Выборы',
 					description: 'Описание выборы',
-					videoRanges: ['e1']
+					videoRanges: ['e1', 'e2']
 				},
 				{
 					id: 'propaganda',
 					route: 'now',
-					name: 'Пропаганда',
+					name: 'Пропаганда на ТВ и в сети',
 					description: 'Описание пропаганда',
 					videoRanges: ['p1'],
 				}],
@@ -22,8 +22,14 @@ export default Route.extend({
 					id: 'e1',
 					from: 20.5,
 					to: 180,
-					description: 'elections2018',
-					video: 'elections2018'
+					description: 'Выборы 2018. Часть 1.',
+					video: 'elections2018_p1'
+				},{
+					id: 'e2',
+					from: 20.5,
+					to: 600,
+					description: 'Выборы 2018. Часть 2.',
+					video: 'elections2018_p2'
 				},{
 					id: 'p1',
 					from: 10,
@@ -32,7 +38,11 @@ export default Route.extend({
 					video: 'illegalprezident'
 				}],
 			videos: [{
-					id: 'elections2018',
+					id: 'elections2018_p1',
+					youtubeId: '6kDqTi_xKoo',
+					channel: 'universeofhistory'
+				},{
+					id: 'elections2018_p2',
 					youtubeId: 'KuD0H_W8FDo',
 					channel: 'universeofhistory'
 				},

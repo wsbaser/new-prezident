@@ -5,9 +5,14 @@ export default Component.extend({
     videoNavigator: Ember.inject.service(),
     videoHistory: Ember.inject.service(),
     playlist: null,
+    currentVideoRangeIndex: 0,
 	didInsertElement(){
         this.setPlaylist(this.getNextPlaylist());
 	},
+    onVideoRangeIndexChanged: Ember.observer('currentVideoRangeIndex', function(){
+        var index = this.get('currentVideoRangeIndex');
+        this.setVideoRange(this.get('playlist.videoRanges').objectAt(index));
+    }),
     setPlaylist(playlist){
         this.set('playlist', playlist);
         let videoRange = this.get('playlist.videoRanges').get('firstObject');
@@ -53,7 +58,7 @@ export default Component.extend({
         // }
     },
     actions: {
-        nextVideo(){
+        nextPlaylist(){
             this.setPlaylist(this.getNextPlaylist());
         }
     }

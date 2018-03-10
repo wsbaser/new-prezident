@@ -12,7 +12,12 @@ define('new-prezident/tests/app.lint-test', [], function () {
 
   QUnit.test('components/video-collection.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n22:13 - \'videoId\' is assigned a value but never used. (no-unused-vars)\n32:26 - \'YT\' is not defined. (no-undef)\n49:25 - \'event\' is defined but never used. (no-unused-vars)');
+    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n27:13 - \'videoId\' is assigned a value but never used. (no-unused-vars)\n37:26 - \'YT\' is not defined. (no-undef)\n54:25 - \'event\' is defined but never used. (no-unused-vars)');
+  });
+
+  QUnit.test('helpers/minutes-string.js', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'helpers/minutes-string.js should pass ESLint\n\n3:44 - \'rest\' is defined but never used. (no-unused-vars)');
   });
 
   QUnit.test('initializers/component-router-injector.js', function (assert) {
@@ -27,7 +32,7 @@ define('new-prezident/tests/app.lint-test', [], function () {
 
   QUnit.test('models/playlist.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'models/playlist.js should pass ESLint\n\n2:10 - \'belongsTo\' is defined but never used. (no-unused-vars)');
+    assert.ok(false, 'models/playlist.js should pass ESLint\n\n2:10 - \'belongsTo\' is defined but never used. (no-unused-vars)\n10:16 - \'Ember\' is not defined. (no-undef)');
   });
 
   QUnit.test('models/video-range.js', function (assert) {
@@ -185,6 +190,26 @@ define('new-prezident/tests/integration/components/video-collection-test', ['emb
     assert.equal(this.$().text().trim(), 'template block text');
   });
 });
+define('new-prezident/tests/integration/helpers/minutes-string-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('minutes-string', 'helper:minutes-string', {
+    integration: true
+  });
+
+  // Replace this with your real tests.
+  (0, _emberQunit.test)('it renders', function (assert) {
+    this.set('inputValue', '1234');
+
+    this.render(Ember.HTMLBars.template({
+      "id": "Pclb98WY",
+      "block": "{\"symbols\":[],\"statements\":[[1,[25,\"minutes-string\",[[20,[\"inputValue\"]]],null],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '1234');
+  });
+});
 define('new-prezident/tests/test-helper', ['new-prezident/tests/helpers/resolver', 'ember-qunit', 'ember-cli-qunit'], function (_resolver, _emberQunit, _emberCliQunit) {
   'use strict';
 
@@ -219,6 +244,11 @@ define('new-prezident/tests/tests.lint-test', [], function () {
   QUnit.test('integration/components/video-collection-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'integration/components/video-collection-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('integration/helpers/minutes-string-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/helpers/minutes-string-test.js should pass ESLint\n\n');
   });
 
   QUnit.test('test-helper.js', function (assert) {

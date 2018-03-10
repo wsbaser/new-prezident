@@ -1,8 +1,8 @@
 <div id="contentContainer">
   <div id="videoDescription" class="container">
     <div class="row header">
-      <span class="name">Нужны ли выборы 2018 года?</span>
-      <span class="timetotal">18 минут</span>
+      <span class="name">{{playlist.name}}</span>
+      <span class="timetotal">{{minutes-string playlist.totalMinutes}}</span>
     </div>
     <div class="row content">
       <div class="summary col-8" style="padding: 0 5px">
@@ -12,6 +12,7 @@
       {{#bs-carousel 
         nextControlIcon='fas fa-chevron-circle-right'
         prevControlIcon='fas fa-chevron-circle-left'
+        currentIndex = currentVideoRangeIndex
         wrap=false
         autoPlay=false
         showIndicators=false
@@ -19,8 +20,8 @@
         {{#each playlist.videoRanges as |videoRange|}}
           {{#car.slide}}
             <div class="car-item">
-              <div class="range-index"><img src={{videoRange.video.channel.logoUrl}} width="30"></div>
-              <div class="range-length"> {{videoRange.minutes}} минут</div>
+              <img src={{videoRange.video.channel.logoUrl}} width="30">
+              <div class="range-length"> {{minutes-string videoRange.minutes}}</div>
               {{#bs-progress as |p|}}
                 {{p.bar value=30 minValue=videoRange.from maxValue=videoRange.to showLabel=false type="danger" striped=false animate=true}}
               {{/bs-progress}}
@@ -38,7 +39,7 @@
     </div>
   </div>
   <div id="navigation">
-    {{#bs-button onClick=(action "nextVideo") type="primary"}}
+    {{#bs-button onClick=(action "nextPlaylist") type="primary"}}
       ПЕРЕЙТИ К СЛЕДУЮЩЕЙ ТЕМЕ
       <span class="glyphicon glyphicon-play"></span>
     {{/bs-button}}
