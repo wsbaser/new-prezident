@@ -1218,6 +1218,17 @@ define("new-prezident/instance-initializers/ember-data", ["exports", "ember-data
     initialize: _initializeStoreService.default
   };
 });
+define('new-prezident/models/channel', ['exports', 'ember-data', 'ember-data/attr'], function (exports, _emberData, _attr) {
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.default = _emberData.default.Model.extend({
+		name: (0, _attr.default)('string'),
+		logoUrl: (0, _attr.default)('string')
+	});
+});
 define('new-prezident/models/playlist', ['exports', 'ember-data', 'ember-data/relationships', 'ember-data/attr'], function (exports, _emberData, _relationships, _attr) {
 	'use strict';
 
@@ -1241,10 +1252,16 @@ define('new-prezident/models/video-range', ['exports', 'ember-data', 'ember-data
 		video: (0, _relationships.belongsTo)('video'),
 		description: (0, _attr.default)('string'),
 		from: (0, _attr.default)('number'),
-		to: (0, _attr.default)('number')
+		to: (0, _attr.default)('number'),
+		position: (0, _attr.default)('number'),
+		minutes: Ember.computed('from', 'to', function () {
+			var from = this.get('from');
+			var to = this.get('to');
+			return Math.floor((to - from) / 60);
+		})
 	});
 });
-define('new-prezident/models/video', ['exports', 'ember-data', 'ember-data/attr'], function (exports, _emberData, _attr) {
+define('new-prezident/models/video', ['exports', 'ember-data', 'ember-data/attr', 'ember-data/relationships'], function (exports, _emberData, _attr, _relationships) {
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -1252,7 +1269,7 @@ define('new-prezident/models/video', ['exports', 'ember-data', 'ember-data/attr'
 	});
 	exports.default = _emberData.default.Model.extend({
 		youtubeId: (0, _attr.default)('string'),
-		channel: (0, _attr.default)('string')
+		channel: (0, _relationships.belongsTo)('channel')
 	});
 });
 define('new-prezident/resolver', ['exports', 'ember-resolver'], function (exports, _emberResolver) {
@@ -1310,7 +1327,7 @@ define('new-prezident/routes/application', ['exports'], function (exports) {
 				videoRanges: [{
 					id: 'e1',
 					from: 20.5,
-					to: null,
+					to: 180,
 					description: 'elections2018',
 					video: 'elections2018'
 				}, {
@@ -1322,10 +1339,21 @@ define('new-prezident/routes/application', ['exports'], function (exports) {
 				}],
 				videos: [{
 					id: 'elections2018',
-					youtubeId: 'KuD0H_W8FDo'
+					youtubeId: 'KuD0H_W8FDo',
+					channel: 'universeofhistory'
 				}, {
 					id: 'illegalprezident',
-					youtubeId: 'oqN1bQ7w89c'
+					youtubeId: 'oqN1bQ7w89c',
+					channel: 'sotavision'
+				}],
+				channels: [{
+					id: 'sotavision',
+					name: 'sotavision',
+					logoUrl: 'https://yt3.ggpht.com/-4p862zcrijI/AAAAAAAAAAI/AAAAAAAAAAA/a2-CRhE8IH0/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				}, {
+					id: 'universeofhistory',
+					name: 'Вселенная Истории',
+					logoUrl: 'https://yt3.ggpht.com/-7I0BUCNSPPA/AAAAAAAAAAI/AAAAAAAAAAA/jUT_5vtw6CY/s88-c-k-no-mo-rj-c0xffffff/photo.jpg'
 				}]
 			});
 			return window.youTubeIframeAPIPromise;
@@ -1449,7 +1477,7 @@ define("new-prezident/templates/components/video-collection", ["exports"], funct
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "HYBfvJx2", "block": "{\"symbols\":[\"car\",\"p\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[0,\"Нужны ли выборы 2018 года?\"],[8],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[0,\"Время просмотра: 18 минут\"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[7],[0,\"\\n        \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"col-4\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\",\"wrap\",\"autoPlay\",\"showIndicators\"],[\"fas fa-chevron-circle-right\",\"fas fa-chevron-circle-left\",false,false,false]],{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"          \"],[6,\"div\"],[9,\"class\",\"car-item\"],[7],[0,\"\\n            \"],[6,\"div\"],[9,\"class\",\"range-index\"],[7],[6,\"img\"],[9,\"id\",\"img\"],[9,\"class\",\"style-scope yt-img-shadow\"],[9,\"src\",\"https://yt3.ggpht.com/-7I0BUCNSPPA/AAAAAAAAAAI/AAAAAAAAAAA/jUT_5vtw6CY/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg\"],[9,\"width\",\"30\"],[7],[8],[8],[0,\"\\n            \"],[6,\"div\"],[9,\"class\",\"range-length\"],[7],[0,\"7 мин. 30 сек.\"],[8],[0,\"\\n\"],[4,\"bs-progress\",null,null,{\"statements\":[[0,\"              \"],[1,[25,\"component\",[[19,2,[\"bar\"]]],[[\"value\",\"minValue\",\"maxValue\",\"showLabel\",\"type\",\"striped\",\"animate\"],[1,0,100,true,\"danger\",false,true]]],false],[0,\"\\n\"]],\"parameters\":[2]},null],[0,\"          \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"          \"],[6,\"div\"],[9,\"class\",\"car-item\"],[7],[0,\"2\"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[1]},null],[0,\"\\n\"],[2,\"        <div class=\\\"links-list\\\">\\n          См. также:\\n          {{#link-to \\\"index\\\"}}диктаторские режимы СНГ{{/link-to}},\\n          {{#link-to \\\"index\\\"}}фальсификация выборов{{/link-to}},\\n          {{#link-to \\\"index\\\"}}создание \\\"Единой России\\\"{{/link-to}},\\n          {{#link-to \\\"index\\\"}}контроль над СМИ{{/link-to}},\\n          {{#link-to \\\"index\\\"}}квасной патриотизм{{/link-to}}\\n        </div>\\n        \"],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextVideo\"],null],\"primary\"]],{\"statements\":[[0,\"      ПЕРЕЙТИ К СЛЕДУЮЩЕЙ ТЕМЕ\\n      \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "owMKhhgg", "block": "{\"symbols\":[\"car\",\"videoRange\",\"p\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[0,\"Нужны ли выборы 2018 года?\"],[8],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[0,\"18 минут\"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n        \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"col-4\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\",\"wrap\",\"autoPlay\",\"showIndicators\"],[\"fas fa-chevron-circle-right\",\"fas fa-chevron-circle-left\",false,false,false]],{\"statements\":[[4,\"each\",[[20,[\"playlist\",\"videoRanges\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"            \"],[6,\"div\"],[9,\"class\",\"car-item\"],[7],[0,\"\\n              \"],[6,\"div\"],[9,\"class\",\"range-index\"],[7],[6,\"img\"],[10,\"src\",[19,2,[\"video\",\"channel\",\"logoUrl\"]],null],[9,\"width\",\"30\"],[7],[8],[8],[0,\"\\n              \"],[6,\"div\"],[9,\"class\",\"range-length\"],[7],[0,\" \"],[1,[19,2,[\"minutes\"]],false],[0,\" минут\"],[8],[0,\"\\n\"],[4,\"bs-progress\",null,null,{\"statements\":[[0,\"                \"],[1,[25,\"component\",[[19,3,[\"bar\"]]],[[\"value\",\"minValue\",\"maxValue\",\"showLabel\",\"type\",\"striped\",\"animate\"],[30,[19,2,[\"from\"]],[19,2,[\"to\"]],false,\"danger\",false,true]]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[0,\"            \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"      \\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextVideo\"],null],\"primary\"]],{\"statements\":[[0,\"      ПЕРЕЙТИ К СЛЕДУЮЩЕЙ ТЕМЕ\\n      \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
 });
 define("new-prezident/templates/index", ["exports"], function (exports) {
   "use strict";
@@ -1481,6 +1509,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+c9c9b326"});
+  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+629f80a7"});
 }
 //# sourceMappingURL=new-prezident.map

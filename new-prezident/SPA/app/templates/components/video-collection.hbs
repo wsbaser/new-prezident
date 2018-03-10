@@ -2,13 +2,13 @@
   <div id="videoDescription" class="container">
     <div class="row header">
       <span class="name">Нужны ли выборы 2018 года?</span>
-      <span class="timetotal">Время просмотра: 18 минут</span>
+      <span class="timetotal">18 минут</span>
     </div>
     <div class="row content">
-      <div class="summary col-8">
+      <div class="summary col-8" style="padding: 0 5px">
         {{playlist.description}}
       </div>
-      <div class="col-4">
+      <div class="col-4" style="padding: 0 5px">
       {{#bs-carousel 
         nextControlIcon='fas fa-chevron-circle-right'
         prevControlIcon='fas fa-chevron-circle-left'
@@ -16,29 +16,19 @@
         autoPlay=false
         showIndicators=false
         as |car|}}
-        {{#car.slide}}
-          <div class="car-item">
-            <div class="range-index"><img id="img" class="style-scope yt-img-shadow" src="https://yt3.ggpht.com/-7I0BUCNSPPA/AAAAAAAAAAI/AAAAAAAAAAA/jUT_5vtw6CY/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg" width="30"></div>
-            <div class="range-length">7 мин. 30 сек.</div>
-            {{#bs-progress as |p|}}
-              {{p.bar value=1 minValue=0 maxValue=100 showLabel=true type="danger" striped=false animate=true}}
-            {{/bs-progress}}
-          </div>
-        {{/car.slide}}
-        {{#car.slide}}
-          <div class="car-item">2</div>
-        {{/car.slide}}
+        {{#each playlist.videoRanges as |videoRange|}}
+          {{#car.slide}}
+            <div class="car-item">
+              <div class="range-index"><img src={{videoRange.video.channel.logoUrl}} width="30"></div>
+              <div class="range-length"> {{videoRange.minutes}} минут</div>
+              {{#bs-progress as |p|}}
+                {{p.bar value=30 minValue=videoRange.from maxValue=videoRange.to showLabel=false type="danger" striped=false animate=true}}
+              {{/bs-progress}}
+            </div>
+          {{/car.slide}}
+        {{/each}}
       {{/bs-carousel}}
-
-<!--        <div class="links-list">
-          См. также:
-          {{#link-to "index"}}диктаторские режимы СНГ{{/link-to}},
-          {{#link-to "index"}}фальсификация выборов{{/link-to}},
-          {{#link-to "index"}}создание "Единой России"{{/link-to}},
-          {{#link-to "index"}}контроль над СМИ{{/link-to}},
-          {{#link-to "index"}}квасной патриотизм{{/link-to}}
-        </div>
-        -->
+      
       </div>
     </div>
   </div>

@@ -20,6 +20,11 @@ define('new-prezident/tests/app.lint-test', [], function () {
     assert.ok(true, 'initializers/component-router-injector.js should pass ESLint\n\n');
   });
 
+  QUnit.test('models/channel.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'models/channel.js should pass ESLint\n\n');
+  });
+
   QUnit.test('models/playlist.js', function (assert) {
     assert.expect(1);
     assert.ok(false, 'models/playlist.js should pass ESLint\n\n2:10 - \'belongsTo\' is defined but never used. (no-unused-vars)');
@@ -27,12 +32,12 @@ define('new-prezident/tests/app.lint-test', [], function () {
 
   QUnit.test('models/video-range.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'models/video-range.js should pass ESLint\n\n3:21 - \'hasMany\' is defined but never used. (no-unused-vars)');
+    assert.ok(false, 'models/video-range.js should pass ESLint\n\n3:21 - \'hasMany\' is defined but never used. (no-unused-vars)\n11:11 - \'Ember\' is not defined. (no-undef)');
   });
 
   QUnit.test('models/video.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'models/video.js should pass ESLint\n\n');
+    assert.ok(false, 'models/video.js should pass ESLint\n\n3:21 - \'hasMany\' is defined but never used. (no-unused-vars)');
   });
 
   QUnit.test('resolver.js', function (assert) {
@@ -226,6 +231,11 @@ define('new-prezident/tests/tests.lint-test', [], function () {
     assert.ok(true, 'unit/initializers/component-router-injector-test.js should pass ESLint\n\n');
   });
 
+  QUnit.test('unit/models/channel-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/models/channel-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('unit/models/playlist-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/models/playlist-test.js should pass ESLint\n\n');
@@ -283,6 +293,20 @@ define('new-prezident/tests/unit/initializers/component-router-injector-test', [
 
     // you would normally confirm the results of the initializer here
     assert.ok(true);
+  });
+});
+define('new-prezident/tests/unit/models/channel-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForModel)('channel', 'Unit | Model | channel', {
+    // Specify the other units that are required for this test.
+    needs: []
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var model = this.subject();
+    // let store = this.store();
+    assert.ok(!!model);
   });
 });
 define('new-prezident/tests/unit/models/playlist-test', ['ember-qunit'], function (_emberQunit) {

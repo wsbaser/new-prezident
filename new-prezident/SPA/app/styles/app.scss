@@ -185,7 +185,7 @@ body{
 	color: #666;
 	border: 1px solid #eee;
 	line-height: 22px;
-	margin-left: 20px;
+	margin-left: 30px;
 	background-color: #f5f8fa;
 }
 
@@ -194,9 +194,6 @@ body{
 	border-top: 1px solid #eee;
 	min-height: 100px;
 	padding-top: 10px;
-}
-#videoDescription .summary{
-	padding: 0 5px;
 }
 
 .links-list{
@@ -234,11 +231,17 @@ body{
 	font-size: 10px;
 	font-weight: 400;
 	cursor: pointer;
-	width: 100%;
+	width: 200px;
 }
 
 #navigation button:hover{
 	background-color: hsl(0,100%,50%);	
+}
+
+.carousel{
+	border-left: 1px solid #eee;
+	border-right: 1px solid #eee;
+	color: #888;
 }
 
 .car-item{
@@ -258,32 +261,22 @@ body{
 }
 
 .car-item .range-length{
-	margin: 3px 0;
+	margin: 4px 0;
+}
+
+.car-item>img{
+	border-radius: 50%;
 }
 
 .carousel-control-prev,
 .carousel-control-next{
-	color: black !important;
+	color: red !important;
 	font-size: 16px;
-}
-
-.carousel-indicators{
-	margin: 0;
-}
-
-.carousel-indicators{
-	color: black !important;	
-}
-
-.carousel{
-	border-left: 1px solid #eee;
-	border-right: 1px solid #eee;
-	color: #888;
 }
 
 .progress{
 	width: 120px !important;
-	height: 12px !important;
+	height: 10px !important;
 	font-size: 10px !important;
 }
 
