@@ -12,7 +12,7 @@ define('new-prezident/tests/app.lint-test', [], function () {
 
   QUnit.test('components/video-collection.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n27:13 - \'videoId\' is assigned a value but never used. (no-unused-vars)\n37:26 - \'YT\' is not defined. (no-undef)\n54:25 - \'event\' is defined but never used. (no-unused-vars)');
+    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n29:13 - \'videoId\' is assigned a value but never used. (no-unused-vars)\n42:26 - \'YT\' is not defined. (no-undef)\n61:27 - \'YT\' is not defined. (no-undef)\n63:17 - Unexpected console statement. (no-console)\n65:21 - \'from\' is assigned a value but never used. (no-unused-vars)\n83:30 - \'YT\' is not defined. (no-undef)\n83:66 - \'YT\' is not defined. (no-undef)\n85:17 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('helpers/minutes-string.js', function (assert) {
