@@ -218,7 +218,7 @@ body {
   color: rgba(17, 17, 17, 0.6); }
 
 .car-item .range-length {
-  margin: 4px 0; }
+  margin: 5px 0 10px; }
 
 .car-item > img {
   border-radius: 50%; }
@@ -230,8 +230,8 @@ body {
 
 .progress {
   width: 120px !important;
-  height: 10px !important;
-  font-size: 10px !important; }
+  height: 3px !important;
+  border-radius: 0 !important; }
 
 /*!
  * Bootstrap v4.0.0 (https://getbootstrap.com)

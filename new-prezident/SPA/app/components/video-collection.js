@@ -5,6 +5,7 @@ export default Component.extend({
     videoNavigator: Ember.inject.service(),
     videoHistory: Ember.inject.service(),
     playlist: null,
+    videoRangeIndex:0,
     currentVideoRangeIndex: 0,
 	didInsertElement(){
         this.setPlaylist(this.getNextPlaylist());
@@ -16,6 +17,7 @@ export default Component.extend({
     setPlaylist(playlist){
         this.set('playlist', playlist);
         let videoRange = this.get('playlist.videoRanges').get('firstObject');
+        this.set('videoRangeIndex', 0);
         this.setVideoRange(videoRange);
 
         // .should it be here or somerwhere else?
@@ -29,8 +31,11 @@ export default Component.extend({
         if(!player){
             this.initPlayer(youtubeId);
         }else{
-            player.loadVideoById(youtubeId);
-            player.seekTo(videoRange.get('from'), true);
+            player.loadVideoById({
+                'videoId': youtubeId,
+                'startSeconds': videoRange.get('from'),
+                'endSeconds': videoRange.get('to')
+            });
         }
     },
     initPlayer(youtubeId){
@@ -40,7 +45,7 @@ export default Component.extend({
             videoId: youtubeId,
             events: {
                 'onReady': this.onPlayerReady.bind(this),
-                'onStateChange': this.onPlayerStateChange
+                'onStateChange': this.onPlayerStateChange.bind(this)
             }
         });
         this.set('player', player);
@@ -52,10 +57,36 @@ export default Component.extend({
         event.target.seekTo(this.get('videoRange.from'), true);
     },
     onPlayerStateChange(event) {
-        // if (event.data == YT.PlayerState.PLAYING && !done) {
-        //   //setTimeout(stopVideo, 6000);
-        //   done = true;
-        // }
+        let timerId = this.get('timerId');
+        if (event.data == YT.PlayerState.PLAYING) {
+            if(!timerId){
+                console.log('set interval');
+                let player = event.target;
+                let from = this.get('videoRange.from');
+                let to = this.get('videoRange.to');
+                this.set('timerId', window.setInterval(function(){
+                    let position = player.getCurrentTime();
+                    if(position > to){
+                        timerId = this.get('timerId');
+                        window.clearInterval(timerId);
+                        let videoRangesCount = this.get('playlist.videoRanges.length');
+                        let nextVideoRangeIndex = this.get('videoRangeIndex')+1;
+                        if(nextVideoRangeIndex<videoRangesCount){
+                            this.set('videoRangeIndex', nextVideoRangeIndex);
+                        }else{
+                            this.setPlaylist(this.getNextPlaylist());
+                        }
+                    }
+                    this.set('videoRange.position', position);
+                }.bind(this), 300)); 
+            }
+        }else if(event.data==YT.PlayerState.ENDED || event.data==YT.PlayerState.PAUSED){
+            if(timerId){
+                console.log('clear interval');
+                window.clearInterval(timerId);
+                this.set('timerId', null);
+            }
+        }
     },
     actions: {
         nextPlaylist(){

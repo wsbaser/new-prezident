@@ -21,19 +21,19 @@ export default Route.extend({
 			videoRanges:[{
 					id: 'e1',
 					from: 20.5,
-					to: 180,
+					to: 30,
 					description: 'Выборы 2018. Часть 1.',
 					video: 'elections2018_p1'
 				},{
 					id: 'e2',
 					from: 20.5,
-					to: 600,
+					to: 30,
 					description: 'Выборы 2018. Часть 2.',
 					video: 'elections2018_p2'
 				},{
 					id: 'p1',
 					from: 10,
-					to: 100,
+					to: 20,
 					description: 'illegalprezident',
 					video: 'illegalprezident'
 				}],

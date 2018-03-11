@@ -11,6 +11,6 @@ export default DS.Model.extend({
 	minutes: Ember.computed('from','to', function(){
 		let from = this.get('from');
 		let to = this.get('to');
-		return Math.floor((to-from)/60);
+		return Math.ceil((to-from)/60);
 	})
 });

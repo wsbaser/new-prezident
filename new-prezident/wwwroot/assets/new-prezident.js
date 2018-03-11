@@ -812,6 +812,7 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
         videoNavigator: Ember.inject.service(),
         videoHistory: Ember.inject.service(),
         playlist: null,
+        videoRangeIndex: 0,
         currentVideoRangeIndex: 0,
         didInsertElement: function didInsertElement() {
             this.setPlaylist(this.getNextPlaylist());
@@ -824,6 +825,7 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
         setPlaylist: function setPlaylist(playlist) {
             this.set('playlist', playlist);
             var videoRange = this.get('playlist.videoRanges').get('firstObject');
+            this.set('videoRangeIndex', 0);
             this.setVideoRange(videoRange);
 
             // .should it be here or somerwhere else?
@@ -837,8 +839,11 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
             if (!player) {
                 this.initPlayer(youtubeId);
             } else {
-                player.loadVideoById(youtubeId);
-                player.seekTo(videoRange.get('from'), true);
+                player.loadVideoById({
+                    'videoId': youtubeId,
+                    'startSeconds': videoRange.get('from'),
+                    'endSeconds': videoRange.get('to')
+                });
             }
         },
         initPlayer: function initPlayer(youtubeId) {
@@ -848,7 +853,7 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
                 videoId: youtubeId,
                 events: {
                     'onReady': this.onPlayerReady.bind(this),
-                    'onStateChange': this.onPlayerStateChange
+                    'onStateChange': this.onPlayerStateChange.bind(this)
                 }
             });
             this.set('player', player);
@@ -860,10 +865,36 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
             event.target.seekTo(this.get('videoRange.from'), true);
         },
         onPlayerStateChange: function onPlayerStateChange(event) {
-            // if (event.data == YT.PlayerState.PLAYING && !done) {
-            //   //setTimeout(stopVideo, 6000);
-            //   done = true;
-            // }
+            var timerId = this.get('timerId');
+            if (event.data == YT.PlayerState.PLAYING) {
+                if (!timerId) {
+                    console.log('set interval');
+                    var player = event.target;
+                    var from = this.get('videoRange.from');
+                    var to = this.get('videoRange.to');
+                    this.set('timerId', window.setInterval(function () {
+                        var position = player.getCurrentTime();
+                        if (position > to) {
+                            timerId = this.get('timerId');
+                            window.clearInterval(timerId);
+                            var videoRangesCount = this.get('playlist.videoRanges.length');
+                            var nextVideoRangeIndex = this.get('videoRangeIndex') + 1;
+                            if (nextVideoRangeIndex < videoRangesCount) {
+                                this.set('videoRangeIndex', nextVideoRangeIndex);
+                            } else {
+                                this.setPlaylist(this.getNextPlaylist());
+                            }
+                        }
+                        this.set('videoRange.position', position);
+                    }.bind(this), 300));
+                }
+            } else if (event.data == YT.PlayerState.ENDED || event.data == YT.PlayerState.PAUSED) {
+                if (timerId) {
+                    console.log('clear interval');
+                    window.clearInterval(timerId);
+                    this.set('timerId', null);
+                }
+            }
         },
 
         actions: {
@@ -1320,7 +1351,7 @@ define('new-prezident/models/video-range', ['exports', 'ember-data', 'ember-data
 		minutes: Ember.computed('from', 'to', function () {
 			var from = this.get('from');
 			var to = this.get('to');
-			return Math.floor((to - from) / 60);
+			return Math.ceil((to - from) / 60);
 		})
 	});
 });
@@ -1390,19 +1421,19 @@ define('new-prezident/routes/application', ['exports'], function (exports) {
 				videoRanges: [{
 					id: 'e1',
 					from: 20.5,
-					to: 180,
+					to: 30,
 					description: 'Выборы 2018. Часть 1.',
 					video: 'elections2018_p1'
 				}, {
 					id: 'e2',
 					from: 20.5,
-					to: 600,
+					to: 30,
 					description: 'Выборы 2018. Часть 2.',
 					video: 'elections2018_p2'
 				}, {
 					id: 'p1',
 					from: 10,
-					to: 100,
+					to: 20,
 					description: 'illegalprezident',
 					video: 'illegalprezident'
 				}],
@@ -1550,7 +1581,7 @@ define("new-prezident/templates/components/video-collection", ["exports"], funct
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "DhbooTLO", "block": "{\"symbols\":[\"car\",\"videoRange\",\"p\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[1,[20,[\"playlist\",\"name\"]],false],[8],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[1,[25,\"minutes-string\",[[20,[\"playlist\",\"totalMinutes\"]]],null],false],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n        \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"col-4\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\",\"currentIndex\",\"wrap\",\"autoPlay\",\"showIndicators\"],[\"fas fa-chevron-circle-right\",\"fas fa-chevron-circle-left\",[20,[\"currentVideoRangeIndex\"]],false,false,false]],{\"statements\":[[4,\"each\",[[20,[\"playlist\",\"videoRanges\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"            \"],[6,\"div\"],[9,\"class\",\"car-item\"],[7],[0,\"\\n              \"],[6,\"img\"],[10,\"src\",[19,2,[\"video\",\"channel\",\"logoUrl\"]],null],[9,\"width\",\"30\"],[7],[8],[0,\"\\n              \"],[6,\"div\"],[9,\"class\",\"range-length\"],[7],[0,\" \"],[1,[25,\"minutes-string\",[[19,2,[\"minutes\"]]],null],false],[8],[0,\"\\n\"],[4,\"bs-progress\",null,null,{\"statements\":[[0,\"                \"],[1,[25,\"component\",[[19,3,[\"bar\"]]],[[\"value\",\"minValue\",\"maxValue\",\"showLabel\",\"type\",\"striped\",\"animate\"],[30,[19,2,[\"from\"]],[19,2,[\"to\"]],false,\"danger\",false,true]]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[0,\"            \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"      \\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextPlaylist\"],null],\"primary\"]],{\"statements\":[[0,\"      ПЕРЕЙТИ К СЛЕДУЮЩЕЙ ТЕМЕ\\n      \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "JR3RKhKj", "block": "{\"symbols\":[\"car\",\"videoRange\",\"p\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[1,[20,[\"playlist\",\"name\"]],false],[8],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[0,\"Длительность: \"],[1,[25,\"minutes-string\",[[20,[\"playlist\",\"totalMinutes\"]]],null],false],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n        \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"col-4\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\",\"currentIndex\",\"index\",\"wrap\",\"autoPlay\",\"showIndicators\"],[\"fas fa-chevron-circle-right\",\"fas fa-chevron-circle-left\",[20,[\"currentVideoRangeIndex\"]],[20,[\"videoRangeIndex\"]],false,false,false]],{\"statements\":[[4,\"each\",[[20,[\"playlist\",\"videoRanges\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"            \"],[6,\"div\"],[9,\"class\",\"car-item\"],[7],[0,\"\\n              \"],[6,\"img\"],[10,\"src\",[19,2,[\"video\",\"channel\",\"logoUrl\"]],null],[9,\"width\",\"30\"],[7],[8],[0,\"\\n              \"],[6,\"div\"],[9,\"class\",\"range-length\"],[7],[0,\" \"],[1,[25,\"minutes-string\",[[19,2,[\"minutes\"]]],null],false],[8],[0,\"\\n\"],[4,\"bs-progress\",null,null,{\"statements\":[[0,\"                \"],[1,[25,\"component\",[[19,3,[\"bar\"]]],[[\"value\",\"minValue\",\"maxValue\",\"showLabel\",\"type\",\"striped\",\"animate\"],[[19,2,[\"position\"]],[19,2,[\"from\"]],[19,2,[\"to\"]],false,\"danger\",false,true]]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[0,\"            \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"      \\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextPlaylist\"],null],\"primary\"]],{\"statements\":[[0,\"      СЛЕДУЮЩЕЕ: Пропанагда на ТВ и в сети\\n      \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
 });
 define("new-prezident/templates/index", ["exports"], function (exports) {
   "use strict";
@@ -1582,6 +1613,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+2fb0d85d"});
+  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+74fa5bab"});
 }
 //# sourceMappingURL=new-prezident.map

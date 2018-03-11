@@ -255,7 +255,7 @@ body{
 }
 
 .car-item .range-length{
-	margin: 4px 0;
+	margin: 5px 0 10px;
 }
 
 .car-item>img{
@@ -270,8 +270,8 @@ body{
 
 .progress{
 	width: 120px !important;
-	height: 10px !important;
-	font-size: 10px !important;
+	height: 3px !important;
+	border-radius: 0 !important;
 }
 
 @import "ember-bootstrap/bootstrap";
