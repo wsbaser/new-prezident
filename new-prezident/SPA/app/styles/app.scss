@@ -68,6 +68,12 @@ body{
 	background: red;
 }
 
+#landmark{
+	min-width: 732px;
+	width: 67%;
+	margin: 0 auto;
+}
+
 #landmark .navbar-header{
 	margin-left: 1rem;
 }
@@ -89,7 +95,8 @@ body{
 }
 
 #contentContainer{
-	max-width: 732px; 
+	min-width: 732px; 
+	width: 67%;
 	margin: 0 auto;
 	box-sizing: border-box;
 	position: relative;
@@ -255,7 +262,7 @@ body{
 }
 
 .car-item .range-length{
-	margin: 5px 0 10px;
+	margin: 8px 0 10px;
 }
 
 .car-item>img{
