@@ -813,25 +813,54 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
         videoHistory: Ember.inject.service(),
         playlist: null,
         videoRangeIndex: 0,
-        currentVideoRangeIndex: 0,
+        currentVideoRangeIndex: -1,
         didInsertElement: function didInsertElement() {
             this.setPlaylist(this.getNextPlaylist());
+            // Ember.run.scheduleOnce('afterRender', this.afterRender.bind(this));
         },
 
-        onVideoRangeIndexChanged: Ember.observer('currentVideoRangeIndex', function () {
-            var index = this.get('currentVideoRangeIndex');
-            this.setVideoRange(this.get('playlist.videoRanges').objectAt(index));
+        // afterRender(){
+        //     this.updateCarouselArrows();
+        //     console.log('update arrows');
+        // },
+        updateCarouselArrows: function updateCarouselArrows() {
+            var videoRangeIndex = this.get('videoRangeIndex');
+            var videoRangesCount = this.get('playlist.videoRanges.length');
+            var showPrev = videoRangeIndex > 0;
+            var showNext = videoRangeIndex < videoRangesCount - 1;
+
+            var $carousel = $('.carousel');
+            var $prevButton = $carousel.children('.carousel-control-prev');
+            var $nextButton = $carousel.children('.carousel-control-next');
+
+            if (showPrev) {
+                $prevButton.show();
+            } else {
+                $prevButton.hide();
+            }
+            if (showNext) {
+                $nextButton.show();
+            } else {
+                $nextButton.hide();
+            }
+        },
+
+        onCurrentVideoRangeIndexChanged: Ember.observer('currentVideoRangeIndex', function () {
+            Ember.run.scheduleOnce('afterRender', function () {
+                this.setVideoRange(this.get('currentVideoRangeIndex'));
+                this.updateCarouselArrows();
+            }.bind(this));
         }),
         setPlaylist: function setPlaylist(playlist) {
             this.set('playlist', playlist);
-            var videoRange = this.get('playlist.videoRanges').get('firstObject');
-            this.set('videoRangeIndex', 0);
-            this.setVideoRange(videoRange);
+            // this.setVideoRange(0);
 
             // .should it be here or somerwhere else?
             this.get('videoHistory').save(this.get('playlist.id'));
         },
-        setVideoRange: function setVideoRange(videoRange) {
+        setVideoRange: function setVideoRange(index) {
+            var videoRange = this.get('playlist.videoRanges').objectAt(index);
+            this.set('videoRangeIndex', index);
             this.set('videoRange', videoRange);
             var youtubeId = videoRange.get('video.youtubeId');
             var videoId = videoRange.get('video.id');
@@ -1581,7 +1610,7 @@ define("new-prezident/templates/components/video-collection", ["exports"], funct
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "yXRJzW4i", "block": "{\"symbols\":[\"car\",\"videoRange\",\"p\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[1,[20,[\"playlist\",\"name\"]],false],[8],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[0,\"Время просмотра: \"],[1,[25,\"minutes-string\",[[20,[\"playlist\",\"totalMinutes\"]]],null],false],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n        \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"col-4\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\",\"currentIndex\",\"index\",\"wrap\",\"autoPlay\",\"showIndicators\"],[\"fas fa-chevron-circle-right\",\"fas fa-chevron-circle-left\",[20,[\"currentVideoRangeIndex\"]],[20,[\"videoRangeIndex\"]],false,false,false]],{\"statements\":[[4,\"each\",[[20,[\"playlist\",\"videoRanges\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"            \"],[6,\"div\"],[9,\"class\",\"car-item\"],[7],[0,\"\\n              \"],[6,\"img\"],[10,\"src\",[19,2,[\"video\",\"channel\",\"logoUrl\"]],null],[9,\"width\",\"30\"],[7],[8],[0,\"\\n              \"],[6,\"div\"],[9,\"class\",\"range-length\"],[7],[0,\" \"],[1,[25,\"minutes-string\",[[19,2,[\"minutes\"]]],null],false],[8],[0,\"\\n\"],[4,\"bs-progress\",null,null,{\"statements\":[[0,\"                \"],[1,[25,\"component\",[[19,3,[\"bar\"]]],[[\"value\",\"minValue\",\"maxValue\",\"showLabel\",\"type\",\"striped\",\"animate\"],[[19,2,[\"position\"]],[19,2,[\"from\"]],[19,2,[\"to\"]],false,\"danger\",false,true]]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[0,\"            \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"      \\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextPlaylist\"],null],\"primary\"]],{\"statements\":[[0,\"      СЛЕДУЮЩЕЕ: Пропанагда на ТВ и в сети\\n      \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "dqdyE00V", "block": "{\"symbols\":[\"car\",\"videoRange\",\"p\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[1,[20,[\"playlist\",\"name\"]],false],[8],[0,\"\\n      \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[0,\"Время просмотра: \"],[1,[25,\"minutes-string\",[[20,[\"playlist\",\"totalMinutes\"]]],null],false],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n        \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"col-4\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\",\"currentIndex\",\"index\",\"wrap\",\"autoPlay\",\"showIndicators\"],[\"fas fa-caret-right\",\"fas fa-caret-left\",[20,[\"currentVideoRangeIndex\"]],[20,[\"videoRangeIndex\"]],false,false,false]],{\"statements\":[[4,\"each\",[[20,[\"playlist\",\"videoRanges\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"            \"],[6,\"div\"],[9,\"class\",\"car-item\"],[7],[0,\"\\n              \"],[6,\"img\"],[10,\"src\",[19,2,[\"video\",\"channel\",\"logoUrl\"]],null],[9,\"width\",\"30\"],[7],[8],[0,\"\\n              \"],[6,\"div\"],[9,\"class\",\"range-length\"],[7],[0,\" \"],[1,[25,\"minutes-string\",[[19,2,[\"minutes\"]]],null],false],[8],[0,\"\\n\"],[4,\"bs-progress\",null,null,{\"statements\":[[0,\"                \"],[1,[25,\"component\",[[19,3,[\"bar\"]]],[[\"value\",\"minValue\",\"maxValue\",\"showLabel\",\"type\",\"striped\",\"animate\"],[[19,2,[\"position\"]],[19,2,[\"from\"]],[19,2,[\"to\"]],false,\"danger\",false,true]]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[0,\"            \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"      \\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextPlaylist\"],null],\"primary\"]],{\"statements\":[[0,\"      СЛЕДУЮЩЕЕ: Пропанагда на ТВ и в сети\\n      \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"    \"],[6,\"span\"],[9,\"class\",\"glyphicon glyphicon-play\"],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
 });
 define("new-prezident/templates/index", ["exports"], function (exports) {
   "use strict";
@@ -1613,6 +1642,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+47e46ca5"});
+  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+bfb17561"});
 }
 //# sourceMappingURL=new-prezident.map

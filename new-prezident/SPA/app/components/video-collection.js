@@ -5,25 +5,54 @@ export default Component.extend({
     videoNavigator: Ember.inject.service(),
     videoHistory: Ember.inject.service(),
     playlist: null,
-    videoRangeIndex:0,
-    currentVideoRangeIndex: 0,
+    videoRangeIndex: 0,
+    currentVideoRangeIndex: -1,
 	didInsertElement(){
         this.setPlaylist(this.getNextPlaylist());
+        // Ember.run.scheduleOnce('afterRender', this.afterRender.bind(this));
 	},
-    onVideoRangeIndexChanged: Ember.observer('currentVideoRangeIndex', function(){
-        var index = this.get('currentVideoRangeIndex');
-        this.setVideoRange(this.get('playlist.videoRanges').objectAt(index));
+    // afterRender(){
+    //     this.updateCarouselArrows();
+    //     console.log('update arrows');
+    // },
+    updateCarouselArrows(){
+        let videoRangeIndex = this.get('videoRangeIndex');
+        let videoRangesCount = this.get('playlist.videoRanges.length');
+        let showPrev = videoRangeIndex > 0;
+        let showNext = videoRangeIndex < (videoRangesCount-1);
+
+        let $carousel = $('.carousel');
+        let $prevButton = $carousel.children('.carousel-control-prev');
+        let $nextButton = $carousel.children('.carousel-control-next');
+
+        if(showPrev){
+            $prevButton.show();
+        }
+        else{
+            $prevButton.hide();
+        }
+        if(showNext){
+            $nextButton.show();
+        }else{
+            $nextButton.hide();
+        }
+    },
+    onCurrentVideoRangeIndexChanged: Ember.observer('currentVideoRangeIndex', function(){
+        Ember.run.scheduleOnce('afterRender', function(){
+            this.setVideoRange(this.get('currentVideoRangeIndex'));
+            this.updateCarouselArrows();
+        }.bind(this));
     }),
     setPlaylist(playlist){
         this.set('playlist', playlist);
-        let videoRange = this.get('playlist.videoRanges').get('firstObject');
-        this.set('videoRangeIndex', 0);
-        this.setVideoRange(videoRange);
+        // this.setVideoRange(0);
 
         // .should it be here or somerwhere else?
         this.get('videoHistory').save(this.get('playlist.id'));
     },
-    setVideoRange(videoRange){
+    setVideoRange(index){
+        let videoRange = this.get('playlist.videoRanges').objectAt(index);
+        this.set('videoRangeIndex', index);
         this.set('videoRange', videoRange);
         let youtubeId = videoRange.get('video.youtubeId');
         let videoId = videoRange.get('video.id');
