@@ -12,7 +12,7 @@ define('new-prezident/tests/app.lint-test', [], function () {
 
   QUnit.test('components/video-collection.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n29:13 - \'videoId\' is assigned a value but never used. (no-unused-vars)\n42:26 - \'YT\' is not defined. (no-undef)\n61:27 - \'YT\' is not defined. (no-undef)\n63:17 - Unexpected console statement. (no-console)\n65:21 - \'from\' is assigned a value but never used. (no-unused-vars)\n83:30 - \'YT\' is not defined. (no-undef)\n83:66 - \'YT\' is not defined. (no-undef)\n85:17 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n24:25 - \'$\' is not defined. (no-undef)\n58:13 - \'videoId\' is assigned a value but never used. (no-unused-vars)\n71:26 - \'YT\' is not defined. (no-undef)\n90:27 - \'YT\' is not defined. (no-undef)\n92:17 - Unexpected console statement. (no-console)\n94:21 - \'from\' is assigned a value but never used. (no-unused-vars)\n112:30 - \'YT\' is not defined. (no-undef)\n112:66 - \'YT\' is not defined. (no-undef)\n114:17 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('helpers/minutes-string.js', function (assert) {
