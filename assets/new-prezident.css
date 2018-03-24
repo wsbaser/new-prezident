@@ -194,17 +194,25 @@ body {
   border-top: 1px solid #eee; }
 
 #navigation button {
-  background-color: #cc0000;
-  border: 0;
-  border-radius: 0;
+  background-color: #fff;
+  border: 1px solid #eee;
+  color: #aaa;
+  border-radius: 4px;
   font-family: 'Roboto', 'Noto', sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
   cursor: pointer;
-  width: 200px; }
+  width: 100%;
+  padding: 2px;
+  opacity: 0.9;
+  text-transform: uppercase; }
 
 #navigation button:hover {
-  background-color: red; }
+  opacity: 1;
+  background-color: #E8F5FD; }
+
+#navigation button:focus {
+  box-shadow: none; }
 
 .carousel {
   border-left: 1px solid #eee;
