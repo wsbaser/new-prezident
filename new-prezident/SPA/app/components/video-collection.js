@@ -37,9 +37,13 @@ export default Component.extend({
             $nextButton.hide();
         }
     },
-    onCurrentVideoRangeIndexChanged: Ember.observer('currentVideoRangeIndex', function(){
+    afterVideoRangeChanged: Ember.observer('currentVideoRangeIndex', function(){
         Ember.run.scheduleOnce('afterRender', function(){
             this.stopCurrentVideo();
+            if(this.get('videoRange')){
+                this.set('videoRange.position', 0);
+                this.set('videoRange.showResumeButton', false);
+            }
             this.setVideoRange(this.get('currentVideoRangeIndex'));
         }.bind(this));
     }),
@@ -56,11 +60,7 @@ export default Component.extend({
         this.updateCarouselArrows();
     },
     stopCurrentVideo(){
-        if(this.get('videoRange')){
-            this.set('videoRange.position', 0);
-        }
-        if(this.get('playing')){
-            console.log('stop video');
+        if(this.get('player') && this.get('player').pauseVideo){
             this.get('player').pauseVideo();
         }
     },
@@ -70,21 +70,28 @@ export default Component.extend({
             this.get('initPlayerPromise').then(function(){
                 this.get('player').loadVideoById({
                     'videoId': videoRange.get('video.youtubeId'),
-                    'startSeconds': videoRange.get('from'),
-                    'endSeconds': videoRange.get('to')
+                    'startSeconds': videoRange.get('from')
                 });
             }.bind(this));
         }
     },
     initPlayer(){
         return new Promise(function(resolve, reject) {
-            let onPlayerReady = function(e){ resolve(); };
+            let onPlayerReady = function(e){ 
+                resolve();
+                this.onPlayerReady();
+            }.bind(this);
             let player = new YT.Player('player', {
                 height: '360',
                 width: '640',
                 events: {
                     'onReady': onPlayerReady,
                     'onStateChange': this.onPlayerStateChange.bind(this)
+                },
+                playerVars: {
+                    rel: 0,
+                    showinfo: 0,
+                    fs: 0
                 }
             });
             this.set('player', player);
@@ -93,12 +100,17 @@ export default Component.extend({
     getNextPlaylist(){
         return this.get('videoNavigator').getNextPlaylist(this.get('route'))
     },
-    // onPlayerReady(event) {
-    //     event.target.seekTo(this.get('videoRange.from'), true);
-    // },
+    onPlayerReady(event) {
+        this.hideLoader();
+    },
+    hideLoader(){
+        this.$('#loaderContainer').css('visibility','hidden');
+        setTimeout(function(){
+            this.$('#videoContainer').css('visibility','visible');
+        }.bind(this), 300);
+    },
     onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
-            this.set('playing', true);
             console.log('video PLAYING');
             if(!this.get('timerId')){
                 this.initVideoTimer(event.target);
@@ -107,10 +119,6 @@ export default Component.extend({
             this.clearVideoTimer();
             if(event.data==YT.PlayerState.ENDED ){
                 console.log('video ENDED');
-                if(this.get('playing')){
-                    this.set('playing', false);
-                    this.setNextVideoRange();
-                }
             }
             if(event.data==YT.PlayerState.PAUSED){
                 console.log('video PAUSED');   
@@ -119,7 +127,23 @@ export default Component.extend({
     },
     initVideoTimer(player){
         let timerId = window.setInterval(function(){
-            this.set('videoRange.position', player.getCurrentTime());
+            let from = this.get('videoRange.from');
+            let to = this.get('videoRange.to');
+            let oldPosition = this.get('videoRange.position') || from;
+            let newPosition = player.getCurrentTime();
+            // console.log('old: '+oldPosition+', new: '+newPosition);
+
+            if(oldPosition>=(to-1) && oldPosition<=to 
+                && newPosition>=to && newPosition<=(to+1)){
+                this.setNextVideoRange();
+            }else{
+                if(newPosition>=from && newPosition<=to){
+                    this.set('videoRange.showResumeButton', false);
+                    this.set('videoRange.position', newPosition);
+                }else{
+                    this.set('videoRange.showResumeButton', true);
+                }
+            }
         }.bind(this), 500);
         this.set('timerId', timerId);
     },
@@ -132,6 +156,10 @@ export default Component.extend({
     },
     setNextPlayList(){
         this.stopCurrentVideo();
+        if(this.get('videoRange')){
+            this.set('videoRange.position', 0);
+            this.set('videoRange.showResumeButton', false);
+        }
         let nextPlaylist = this.getNextPlaylist();
         if(nextPlaylist){
             this.setPlaylist(nextPlaylist);
@@ -151,6 +179,10 @@ export default Component.extend({
     actions: {
         nextPlaylist(){
             this.setNextPlayList();    
+        },
+        resumeVideoRange(){
+            this.get('player').seekTo(this.get('videoRange.position'), true);
+            this.set('videoRange.showResumeButton', false);
         }
     }
 });

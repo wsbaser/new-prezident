@@ -1,43 +1,57 @@
 <div id="contentContainer">
-  <div id="videoDescription" class="container">
-    <div class="row header">
-      <span class="name">{{playlist.name}}</span>
-      <span class="timetotal">Время просмотра: {{minutes-string playlist.totalMinutes}}</span>
-    </div>
-    <div class="row content">
-      <div class="summary col-8" style="padding: 0 5px">
-        {{playlist.description}}
+  <div id="videoContainer">
+    <div id="videoDescription" class="container">
+      <div class="row header">
+        <span class="name">{{playlist.name}}</span>
+        <span class="timetotal">Время просмотра: {{minutes-string playlist.totalMinutes}}</span>
       </div>
-      <div class="col-4" style="padding: 0 5px">
-      {{#bs-carousel 
-        nextControlIcon='fas fa-caret-right'
-        prevControlIcon='fas fa-caret-left'
-        currentIndex = currentVideoRangeIndex
-        index = videoRangeIndex
-        wrap=false
-        autoPlay=false
-        interval=-1
-        showIndicators=false
-        as |car|}}
-        {{#each playlist.videoRanges as |videoRange|}}
-          {{#car.slide}}
-            <div class="car-item">
-              <img src={{videoRange.video.channel.logoUrl}} width="30">
-              <div class="range-length"> {{minutes-string videoRange.minutes}}</div>
-              {{#bs-progress as |p|}}
-                {{p.bar value=videoRange.position minValue=videoRange.from maxValue=videoRange.to showLabel=false type="danger" striped=false animate=true}}
-              {{/bs-progress}}
-            </div>
-          {{/car.slide}}
-        {{/each}}
-      {{/bs-carousel}}
-      
+      <div class="row content">
+        <div class="summary col-8" style="padding: 0 5px">
+          {{playlist.description}}
+        </div>
+        <div class="col-4" style="padding: 0 5px">
+        {{#bs-carousel 
+          nextControlIcon='fas fa-caret-right'
+          prevControlIcon='fas fa-caret-left'
+          currentIndex = currentVideoRangeIndex
+          index = videoRangeIndex
+          wrap=false
+          autoPlay=false
+          interval=-1
+          showIndicators=false
+          as |car|}}
+          {{#each playlist.videoRanges as |videoRange|}}
+            {{#car.slide}}
+              <div class="car-item">
+                <img src={{videoRange.video.channel.logoUrl}} width="30">
+                <div class="range-length"> {{minutes-string videoRange.minutes}}</div>
+                {{#if videoRange.showResumeButton}}
+                  <a class="resume-video" {{action "resumeVideoRange"}} href="#">Вернуться на <span>{{videoRange.positionTime}}</span></a>
+                {{else}}
+                  {{#bs-progress as |p|}}
+                    {{p.bar value=videoRange.position minValue=videoRange.from maxValue=videoRange.to showLabel=false type="danger" striped=false animate=true}}
+                  {{/bs-progress}}
+                {{/if}}
+              </div>
+            {{/car.slide}}
+          {{/each}}
+        {{/bs-carousel}}
+        
+        </div>
       </div>
     </div>
-  </div>
-  <div id="containingBlock">
-    <div class="videoWrapper">
-      <div id="player"></div>
+    <div id="containingBlock">
+      <div class="videoWrapper">
+        <div id="player"></div>
+      </div>
+    </div>
+    <div id="loaderContainer">
+      <div class="cssload-loader">
+        <div class="cssload-flipper">
+          <div class="cssload-front"></div>
+          <div class="cssload-back"></div>
+        </div>
+      </div>
     </div>
   </div>
   <div id="navigation">

@@ -12,5 +12,11 @@ export default DS.Model.extend({
 		let from = this.get('from');
 		let to = this.get('to');
 		return Math.ceil((to-from)/60);
+	}),
+	positionTime: Ember.computed('position', function(){
+		let totalSeconds = this.get('position') || this.get('from');
+		let minutes = Math.floor(totalSeconds/60);
+		let seconds = Math.floor(totalSeconds%60);
+		return minutes+':'+seconds;
 	})
 });
