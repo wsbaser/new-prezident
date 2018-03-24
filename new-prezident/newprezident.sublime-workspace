@@ -4,12 +4,108 @@
 		"selected_items":
 		[
 			[
-				"mar",
-				"margin-left"
+				"show",
+				"showNext"
+			],
+			[
+				"video",
+				"videoRangesCount"
+			],
+			[
+				"vide",
+				"videoRangeIndex"
+			],
+			[
+				"vi",
+				"videoRangeIndex"
+			],
+			[
+				"nex",
+				"nextVideoRangeIndex"
+			],
+			[
+				"ne",
+				"nextVideoRangeIndex"
+			],
+			[
+				"tim",
+				"timerId"
+			],
+			[
+				"impo",
+				"important"
+			],
+			[
+				"pl",
+				"player"
+			],
+			[
+				"play",
+				"playlist"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"onSli",
+				"onSlide"
+			],
+			[
+				"minutes",
+				"minutes-string"
+			],
+			[
+				"мин",
+				"минута"
+			],
+			[
+				"t",
+				"text"
+			],
+			[
+				"pa",
+				"playlist"
+			],
+			[
+				"tot",
+				"totalSeconds"
+			],
+			[
+				"vid",
+				"videoRange"
+			],
+			[
+				"channe",
+				"channel"
 			],
 			[
 				"bor",
-				"border-radius"
+				"border-radius: "
+			],
+			[
+				"flex-",
+				"flex-direction: "
+			],
+			[
+				"ali",
+				"align-items: "
+			],
+			[
+				"mar",
+				"margin-top: "
+			],
+			[
+				"marg",
+				"margin-bottom: "
+			],
+			[
+				"font",
+				"font-size: "
+			],
+			[
+				"bac",
+				"background-color: "
 			],
 			[
 				"set",
@@ -20,32 +116,12 @@
 				"setVideoRange"
 			],
 			[
-				"video",
-				"videoRange"
-			],
-			[
-				"vide",
-				"videoId"
-			],
-			[
 				"get",
 				"getNextVideo"
 			],
 			[
-				"nex",
-				"nextVideo"
-			],
-			[
-				"vi",
-				"videosWatched"
-			],
-			[
 				"ma",
 				"max-width"
-			],
-			[
-				"font",
-				"font-weight"
 			],
 			[
 				"in",
@@ -83,6 +159,23 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "SPA/app/components/video-collection.js",
+			"settings":
+			{
+				"buffer_size": 4541,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "1. Если иное прямо не предусмотрено законом, не допускаются без согласия гражданина сбор, хранение, распространение и использование любой информации о его частной жизни, в частности сведений о его происхождении, о месте его пребывания или жительства, о личной и семейной жизни.\nНе являются нарушением правил, установленных абзацем первым настоящего пункта, сбор, хранение, распространение и использование информации о частной жизни гражданина в государственных, общественных или иных публичных интересах, а также в случаях, если информация о частной жизни гражданина ранее стала общедоступной либо была раскрыта самим гражданином или по его воле.\n2. Стороны обязательства не вправе разглашать ставшую известной им при возникновении и (или) исполнении обязательства информацию о частной жизни гражданина, являющегося стороной или третьим лицом в данном обязательстве, если соглашением не предусмотрена возможность такого разглашения информации о сторонах.\n3. Неправомерным распространением полученной с нарушением закона информации о частной жизни гражданина считается, в частности, ее использование при создании произведений науки, литературы и искусства, если такое использование нарушает интересы гражданина.\n4. В случаях, когда информация о частной жизни гражданина, полученная с нарушением закона, содержится в документах, видеозаписях или на иных материальных носителях, гражданин вправе обратиться в суд с требованием об удалении соответствующей информации, а также о пресечении или запрещении дальнейшего ее распространения путем изъятия и уничтожения без какой бы то ни было компенсации изготовленных в целях введения в гражданский оборот экземпляров материальных носителей, содержащих соответствующую информацию, если без уничтожения таких экземпляров материальных носителей удаление соответствующей информации невозможно.\n5. Право требовать защиты частной жизни гражданина способами, предусмотренными пунктом 2 статьи 150 настоящего Кодекса и настоящей статьей, в случае его смерти имеют дети, родители и переживший супруг такого гражданина.",
+			"settings":
+			{
+				"buffer_size": 2051,
+				"line_ending": "Unix",
+				"name": "1. Если иное прямо не предусмотрено законом, не до"
+			}
+		}
 	],
 	"build_system": "",
 	"command_palette":
@@ -124,14 +217,20 @@
 	},
 	"file_history":
 	[
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.sass",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video.js",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/index.js",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/components/video-collection.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video-range.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/components/video-collection.hbs",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/application.js",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video-range.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.scss",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/helpers/minutes-string.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/playlist.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/components/video-collection.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/ember-cli-build.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/index.html",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/channel.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.sсss",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.sass",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/index.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/range.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/services/video-navigator.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/services/video-history.js",
@@ -140,8 +239,6 @@
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/application.hbs",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/now.hbs",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.css",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/ember-cli-build.js",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/index.html",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/now.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/initializers/component-router-injector.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/serializers/application.js",
@@ -169,6 +266,15 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"videoRangeIndex",
+			"setVideoRange",
+			"updateCarouselArrows",
+			"setPlaylist",
+			"videoRangeIndex",
+			"67",
+			"fillQueue",
+			"onPlayerReady",
+			"summary",
 			"font-family",
 			"summary",
 			"setVideo",
@@ -206,8 +312,63 @@
 	"groups":
 	[
 		{
+			"selected": 1,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "SPA/app/components/video-collection.js",
+					"settings":
+					{
+						"buffer_size": 4541,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1048,
+								1048
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 127.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"settings":
+					{
+						"buffer_size": 2051,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2051,
+								2051
+							]
+						],
+						"settings":
+						{
+							"auto_name": "1. Если иное прямо не предусмотрено законом, не до",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
 			]
 		}
 	],

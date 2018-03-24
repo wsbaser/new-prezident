@@ -16,6 +16,7 @@
         index = videoRangeIndex
         wrap=false
         autoPlay=false
+        interval=-1
         showIndicators=false
         as |car|}}
         {{#each playlist.videoRanges as |videoRange|}}
@@ -41,9 +42,7 @@
   </div>
   <div id="navigation">
     {{#bs-button onClick=(action "nextPlaylist") type="primary"}}
-      СЛЕДУЮЩЕЕ: Пропанагда на ТВ и в сети
-      <span class="glyphicon glyphicon-play"></span>
+     {{fa-icon "step-forward"}} Далее
     {{/bs-button}}
-    <span class="glyphicon glyphicon-play"></span>
   </div>
 </div>

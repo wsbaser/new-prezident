@@ -7,14 +7,14 @@ export default Component.extend({
     playlist: null,
     videoRangeIndex: 0,
     currentVideoRangeIndex: -1,
+    didReceiveAttrs(){
+        this._super(...arguments);
+        this.setNextPlayList();
+    },
 	didInsertElement(){
-        this.setPlaylist(this.getNextPlaylist());
-        // Ember.run.scheduleOnce('afterRender', this.afterRender.bind(this));
+        this._super(...arguments);
+        this.set('initPlayerPromise', this.initPlayer());
 	},
-    // afterRender(){
-    //     this.updateCarouselArrows();
-    //     console.log('update arrows');
-    // },
     updateCarouselArrows(){
         let videoRangeIndex = this.get('videoRangeIndex');
         let videoRangesCount = this.get('playlist.videoRanges.length');
@@ -39,87 +39,118 @@ export default Component.extend({
     },
     onCurrentVideoRangeIndexChanged: Ember.observer('currentVideoRangeIndex', function(){
         Ember.run.scheduleOnce('afterRender', function(){
+            this.stopCurrentVideo();
             this.setVideoRange(this.get('currentVideoRangeIndex'));
-            this.updateCarouselArrows();
         }.bind(this));
     }),
     setPlaylist(playlist){
         this.set('playlist', playlist);
-        // this.setVideoRange(0);
-
-        // .should it be here or somerwhere else?
-        this.get('videoHistory').save(this.get('playlist.id'));
+        this.setVideoRange(0);
+        this.get('videoHistory').save(playlist.id);
     },
     setVideoRange(index){
-        let videoRange = this.get('playlist.videoRanges').objectAt(index);
         this.set('videoRangeIndex', index);
+        let videoRange = this.get('playlist.videoRanges').objectAt(index);
         this.set('videoRange', videoRange);
-        let youtubeId = videoRange.get('video.youtubeId');
-        let videoId = videoRange.get('video.id');
-        let player = this.get('player');
-        if(!player){
-            this.initPlayer(youtubeId);
-        }else{
-            player.loadVideoById({
-                'videoId': youtubeId,
-                'startSeconds': videoRange.get('from'),
-                'endSeconds': videoRange.get('to')
-            });
+        this.loadVideoToPlayer(videoRange);
+        this.updateCarouselArrows();
+    },
+    stopCurrentVideo(){
+        if(this.get('videoRange')){
+            this.set('videoRange.position', 0);
+        }
+        if(this.get('playing')){
+            console.log('stop video');
+            this.get('player').pauseVideo();
         }
     },
-    initPlayer(youtubeId){
-        var player = new YT.Player('player', {
-            height: '360',
-            width: '640',
-            videoId: youtubeId,
-            events: {
-                'onReady': this.onPlayerReady.bind(this),
-                'onStateChange': this.onPlayerStateChange.bind(this)
-            }
-        });
-        this.set('player', player);
+    loadVideoToPlayer(videoRange){
+        if(videoRange && this.get('initPlayerPromise')){
+            console.log('loadVideo: '+ videoRange.id);
+            this.get('initPlayerPromise').then(function(){
+                this.get('player').loadVideoById({
+                    'videoId': videoRange.get('video.youtubeId'),
+                    'startSeconds': videoRange.get('from'),
+                    'endSeconds': videoRange.get('to')
+                });
+            }.bind(this));
+        }
+    },
+    initPlayer(){
+        return new Promise(function(resolve, reject) {
+            let onPlayerReady = function(e){ resolve(); };
+            let player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': this.onPlayerStateChange.bind(this)
+                }
+            });
+            this.set('player', player);
+        }.bind(this));
     },
     getNextPlaylist(){
         return this.get('videoNavigator').getNextPlaylist(this.get('route'))
     },
-    onPlayerReady(event) {
-        event.target.seekTo(this.get('videoRange.from'), true);
-    },
+    // onPlayerReady(event) {
+    //     event.target.seekTo(this.get('videoRange.from'), true);
+    // },
     onPlayerStateChange(event) {
-        let timerId = this.get('timerId');
         if (event.data == YT.PlayerState.PLAYING) {
-            if(!timerId){
-                console.log('set interval');
-                let player = event.target;
-                let from = this.get('videoRange.from');
-                let to = this.get('videoRange.to');
-                this.set('timerId', window.setInterval(function(){
-                    let position = player.getCurrentTime();
-                    if(position > to){
-                        timerId = this.get('timerId');
-                        window.clearInterval(timerId);
-                        let videoRangesCount = this.get('playlist.videoRanges.length');
-                        let nextVideoRangeIndex = this.get('videoRangeIndex')+1;
-                        if(nextVideoRangeIndex<videoRangesCount){
-                            this.set('videoRangeIndex', nextVideoRangeIndex);
-                        }else{
-                            this.setPlaylist(this.getNextPlaylist());
-                        }
-                    }
-                    this.set('videoRange.position', position);
-                }.bind(this), 300)); 
+            this.set('playing', true);
+            console.log('video PLAYING');
+            if(!this.get('timerId')){
+                this.initVideoTimer(event.target);
             }
         }else if(event.data==YT.PlayerState.ENDED || event.data==YT.PlayerState.PAUSED){
-            if(timerId){
-                console.log('clear interval');
-                window.clearInterval(timerId);
-                this.set('timerId', null);
+            this.clearVideoTimer();
+            if(event.data==YT.PlayerState.ENDED ){
+                console.log('video ENDED');
+                if(this.get('playing')){
+                    this.set('playing', false);
+                    this.setNextVideoRange();
+                }
             }
+            if(event.data==YT.PlayerState.PAUSED){
+                console.log('video PAUSED');   
+            }
+        }
+    },
+    initVideoTimer(player){
+        let timerId = window.setInterval(function(){
+            this.set('videoRange.position', player.getCurrentTime());
+        }.bind(this), 500);
+        this.set('timerId', timerId);
+    },
+    clearVideoTimer(){
+        let timerId = this.get('timerId');
+        if(timerId){
+            window.clearInterval(timerId);
+            this.set('timerId', null);
+        }
+    },
+    setNextPlayList(){
+        this.stopCurrentVideo();
+        let nextPlaylist = this.getNextPlaylist();
+        if(nextPlaylist){
+            this.setPlaylist(nextPlaylist);
+        }else{
+            console.log('it was the last video.');
+        }
+    },
+    setNextVideoRange(){
+        let videoRangesCount = this.get('playlist.videoRanges.length');
+        let nextVideoRangeIndex = this.get('videoRangeIndex')+1;
+        if(nextVideoRangeIndex<videoRangesCount){
+            this.set('videoRangeIndex', nextVideoRangeIndex);
+        }else{
+            this.setNextPlayList();
         }
     },
     actions: {
         nextPlaylist(){
-            this.setPlaylist(this.getNextPlaylist());
+            this.setNextPlayList();    
         }
     }
 });
