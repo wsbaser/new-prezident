@@ -846,12 +846,17 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
 
         afterVideoRangeChanged: Ember.observer('currentVideoRangeIndex', function () {
             Ember.run.scheduleOnce('afterRender', function () {
-                this.stopCurrentVideo();
-                if (this.get('videoRange')) {
-                    this.set('videoRange.position', 0);
-                    this.set('videoRange.showResumeButton', false);
+                var currentVideoRangeIndex = this.get('currentVideoRangeIndex');
+
+                var currentVideoRangeId = this.get('videoRange.id');
+                var newVideoRangeId = this.get('playlist.videoRanges').objectAt(currentVideoRangeIndex).id;
+
+                if (currentVideoRangeId !== newVideoRangeId) {
+                    // . id changed, stop previos video
+                    this.stopPlaying();
                 }
-                this.setVideoRange(this.get('currentVideoRangeIndex'));
+
+                this.setVideoRange(currentVideoRangeIndex);
             }.bind(this));
         }),
         setPlaylist: function setPlaylist(playlist) {
@@ -860,27 +865,90 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
             this.get('videoHistory').save(playlist.id);
         },
         setVideoRange: function setVideoRange(index) {
-            this.set('videoRangeIndex', index);
             var videoRange = this.get('playlist.videoRanges').objectAt(index);
+            this.set('videoRangeIndex', index);
             this.set('videoRange', videoRange);
-            this.loadVideoToPlayer(videoRange);
             this.updateCarouselArrows();
+            this.preparePlaying(videoRange);
         },
-        stopCurrentVideo: function stopCurrentVideo() {
-            if (this.get('player') && this.get('player').pauseVideo) {
-                this.get('player').pauseVideo();
-            }
-        },
-        loadVideoToPlayer: function loadVideoToPlayer(videoRange) {
-            if (videoRange && this.get('initPlayerPromise')) {
-                console.log('loadVideo: ' + videoRange.id);
-                this.get('initPlayerPromise').then(function () {
-                    this.get('player').loadVideoById({
-                        'videoId': videoRange.get('video.youtubeId'),
-                        'startSeconds': videoRange.get('from')
-                    });
+        preparePlaying: function preparePlaying(videoRange) {
+            var initPlayerPromise = this.get('initPlayerPromise');
+            if (videoRange && initPlayerPromise && !this.get('playingQueued')) {
+                this.set('playingQueued', true);
+                console.log('prepare playing for ' + videoRange.id);
+                initPlayerPromise.then(function () {
+                    this.loadVideoToPlayer(videoRange);
+                    Ember.run.scheduleOnce('afterRender', function () {
+                        this.showPreviewOverlay();
+                    }.bind(this));
                 }.bind(this));
             }
+        },
+        startPlaying: function startPlaying() {
+            this.hidePreviewOverlay().then(function () {
+                this.get('player').playVideo();
+            }.bind(this));
+        },
+        stopPlaying: function stopPlaying() {
+            if (this.get('playingQueued')) {
+                this.set('playingQueued', false);
+                this.get('player').pauseVideo();
+                this.clearVideoTimer();
+                this.set('videoRange.position', 0);
+            }
+        },
+        hidePreviewOverlay: function hidePreviewOverlay() {
+            return new Promise(function (resolve, reject) {
+                var $playerOverlay = this.$('#playerOverlay');
+                var $speaker = $playerOverlay.find('.speaker');
+                var $description = $playerOverlay.find('.description');
+                $speaker.css('opacity', 0);
+                $description.css('opacity', 0);
+                setTimeout(function () {
+                    $playerOverlay.css('opacity', 0);
+                    setTimeout(function () {
+                        $playerOverlay.hide();
+                        this.set('previewOverlayState', 0);
+                        resolve();
+                    }.bind(this), 300);
+                }.bind(this), 1000);
+            }.bind(this));
+        },
+        showPreviewOverlay: function showPreviewOverlay() {
+            this.set('previewOverlayState', 1);
+            var $playerOverlay = this.$('#playerOverlay');
+            var $speaker = $playerOverlay.find('.speaker');
+            var $description = $playerOverlay.find('.description');
+            $playerOverlay.show();
+            $playerOverlay.css('opacity', 1);
+            var showDescription = function () {
+                $description.css('opacity', 1);
+                setTimeout(function () {
+                    this.set('previewOverlayState', 2);
+                    if (this.get('readyToPlay')) {
+                        this.startPlaying();
+                    }
+                }.bind(this), 3000);
+            }.bind(this);
+            var showSpeaker = function showSpeaker() {
+                if ($speaker[0]) {
+                    $speaker.css('opacity', 1);
+                    setTimeout(showDescription, 3000);
+                } else {
+                    showDescription();
+                }
+            };
+            setTimeout(function () {
+                showSpeaker();
+            }, 300);
+        },
+        loadVideoToPlayer: function loadVideoToPlayer(videoRange) {
+            console.log('loadVideo: ' + videoRange.id);
+            this.set('readyToPlay', false);
+            this.get('player').loadVideoById({
+                'videoId': videoRange.get('video.youtubeId'),
+                'startSeconds': videoRange.get('from')
+            });
         },
         initPlayer: function initPlayer() {
             return new Promise(function (resolve, reject) {
@@ -896,6 +964,7 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
                         'onStateChange': this.onPlayerStateChange.bind(this)
                     },
                     playerVars: {
+                        controls: 0,
                         rel: 0,
                         showinfo: 0,
                         fs: 0
@@ -917,13 +986,30 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
             }.bind(this), 300);
         },
         onPlayerStateChange: function onPlayerStateChange(event) {
+            var player = event.target;
             if (event.data == YT.PlayerState.PLAYING) {
-                console.log('video PLAYING');
-                if (!this.get('timerId')) {
-                    this.initVideoTimer(event.target);
+                switch (this.get('previewOverlayState')) {
+                    case 0:
+                        // . started laying after preview is hidden.
+                        // . init position tracking timer
+                        if (!this.get('timerId')) {
+                            this.initVideoTimer(event.target);
+                        }
+                        console.log('video PLAYING');
+                        break;
+                    case 1:
+                        // . video loading completed before preview is ready
+                        // . pause playing and set readyToPlay to true
+                        player.pauseVideo();
+                        this.set('readyToPlay', true);
+                        break;
+                    case 2:
+                        // . preview was ready before video loading completer
+                        // . start playing
+                        this.startPlaying();
+                        break;
                 }
             } else if (event.data == YT.PlayerState.ENDED || event.data == YT.PlayerState.PAUSED) {
-                this.clearVideoTimer();
                 if (event.data == YT.PlayerState.ENDED) {
                     console.log('video ENDED');
                 }
@@ -936,19 +1022,13 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
             var timerId = window.setInterval(function () {
                 var from = this.get('videoRange.from');
                 var to = this.get('videoRange.to');
-                var oldPosition = this.get('videoRange.position') || from;
-                var newPosition = player.getCurrentTime();
+                var position = player.getCurrentTime();
                 // console.log('old: '+oldPosition+', new: '+newPosition);
 
-                if (oldPosition >= to - 1 && oldPosition <= to && newPosition >= to && newPosition <= to + 1) {
-                    this.setNextVideoRange();
+                if (position <= to) {
+                    this.set('videoRange.position', position);
                 } else {
-                    if (newPosition >= from && newPosition <= to) {
-                        this.set('videoRange.showResumeButton', false);
-                        this.set('videoRange.position', newPosition);
-                    } else {
-                        this.set('videoRange.showResumeButton', true);
-                    }
+                    this.setNextVideoRange();
                 }
             }.bind(this), 500);
             this.set('timerId', timerId);
@@ -961,10 +1041,9 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
             }
         },
         setNextPlayList: function setNextPlayList() {
-            this.stopCurrentVideo();
+            this.stopPlaying();
             if (this.get('videoRange')) {
                 this.set('videoRange.position', 0);
-                this.set('videoRange.showResumeButton', false);
             }
             var nextPlaylist = this.getNextPlaylist();
             if (nextPlaylist) {
@@ -974,6 +1053,7 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
             }
         },
         setNextVideoRange: function setNextVideoRange() {
+            this.stopPlaying();
             var videoRangesCount = this.get('playlist.videoRanges.length');
             var nextVideoRangeIndex = this.get('videoRangeIndex') + 1;
             if (nextVideoRangeIndex < videoRangesCount) {
@@ -986,10 +1066,6 @@ define('new-prezident/components/video-collection', ['exports'], function (expor
         actions: {
             nextPlaylist: function nextPlaylist() {
                 this.setNextPlayList();
-            },
-            resumeVideoRange: function resumeVideoRange() {
-                this.get('player').seekTo(this.get('videoRange.position'), true);
-                this.set('videoRange.showResumeButton', false);
             }
         }
     });
@@ -1403,6 +1479,7 @@ define('new-prezident/models/channel', ['exports', 'ember-data', 'ember-data/att
 	});
 	exports.default = _emberData.default.Model.extend({
 		name: (0, _attr.default)('string'),
+		youtubeId: (0, _attr.default)('string'),
 		logoUrl: (0, _attr.default)('string')
 	});
 });
@@ -1434,6 +1511,7 @@ define('new-prezident/models/video-range', ['exports', 'ember-data', 'ember-data
 	});
 	exports.default = _emberData.default.Model.extend({
 		video: (0, _relationships.belongsTo)('video'),
+		speaker: (0, _attr.default)('string'),
 		description: (0, _attr.default)('string'),
 		from: (0, _attr.default)('number'),
 		to: (0, _attr.default)('number'),
@@ -1505,7 +1583,6 @@ define('new-prezident/routes/application', ['exports'], function (exports) {
 					id: 'elections',
 					route: 'now',
 					name: 'Демократические институты: Выборы',
-					description: 'Описание выборы',
 					videoRanges: ['e1', 'e2']
 				}, {
 					id: 'propaganda',
@@ -1524,13 +1601,14 @@ define('new-prezident/routes/application', ['exports'], function (exports) {
 					id: 'e2',
 					from: 20.5,
 					to: 30,
-					description: 'Выборы 2018. Часть 2.',
+					description: 'Почему отсутствует конкуренция на президентских выборах?',
 					video: 'elections2018_p2'
 				}, {
 					id: 'p1',
 					from: 10,
 					to: 20,
-					description: 'illegalprezident',
+					speaker: 'Сергей Филатов',
+					description: 'о нелегитимности 3-го президентского срока.',
 					video: 'illegalprezident'
 				}],
 				videos: [{
@@ -1549,10 +1627,12 @@ define('new-prezident/routes/application', ['exports'], function (exports) {
 				channels: [{
 					id: 'sotavision',
 					name: 'sotavision',
+					youtubeId: 'UCk9F6pe9Z2IPxm1VO9lS6NA',
 					logoUrl: 'https://yt3.ggpht.com/-4p862zcrijI/AAAAAAAAAAI/AAAAAAAAAAA/a2-CRhE8IH0/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				}, {
 					id: 'universeofhistory',
 					name: 'Вселенная Истории',
+					youtubeId: 'UC42ZrgA4ezCWVm8RHnS-xNA',
 					logoUrl: 'https://yt3.ggpht.com/-7I0BUCNSPPA/AAAAAAAAAAI/AAAAAAAAAAA/jUT_5vtw6CY/s88-c-k-no-mo-rj-c0xffffff/photo.jpg'
 				}]
 			});
@@ -1677,7 +1757,7 @@ define("new-prezident/templates/components/video-collection", ["exports"], funct
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "JXbd0bXS", "block": "{\"symbols\":[\"car\",\"videoRange\",\"p\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoContainer\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n        \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[1,[20,[\"playlist\",\"name\"]],false],[8],[0,\"\\n        \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[0,\"Время просмотра: \"],[1,[25,\"minutes-string\",[[20,[\"playlist\",\"totalMinutes\"]]],null],false],[8],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n          \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-4\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\",\"currentIndex\",\"index\",\"wrap\",\"autoPlay\",\"interval\",\"showIndicators\"],[\"fas fa-caret-right\",\"fas fa-caret-left\",[20,[\"currentVideoRangeIndex\"]],[20,[\"videoRangeIndex\"]],false,false,-1,false]],{\"statements\":[[4,\"each\",[[20,[\"playlist\",\"videoRanges\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"              \"],[6,\"div\"],[9,\"class\",\"car-item\"],[7],[0,\"\\n                \"],[6,\"img\"],[10,\"src\",[19,2,[\"video\",\"channel\",\"logoUrl\"]],null],[9,\"width\",\"30\"],[7],[8],[0,\"\\n                \"],[6,\"div\"],[9,\"class\",\"range-length\"],[7],[0,\" \"],[1,[25,\"minutes-string\",[[19,2,[\"minutes\"]]],null],false],[8],[0,\"\\n\"],[4,\"if\",[[19,2,[\"showResumeButton\"]]],null,{\"statements\":[[0,\"                  \"],[6,\"a\"],[9,\"class\",\"resume-video\"],[9,\"href\",\"#\"],[3,\"action\",[[19,0,[]],\"resumeVideoRange\"]],[7],[0,\"Вернуться на \"],[6,\"span\"],[7],[1,[19,2,[\"positionTime\"]],false],[8],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"bs-progress\",null,null,{\"statements\":[[0,\"                    \"],[1,[25,\"component\",[[19,3,[\"bar\"]]],[[\"value\",\"minValue\",\"maxValue\",\"showLabel\",\"type\",\"striped\",\"animate\"],[[19,2,[\"position\"]],[19,2,[\"from\"]],[19,2,[\"to\"]],false,\"danger\",false,true]]],false],[0,\"\\n\"]],\"parameters\":[3]},null]],\"parameters\":[]}],[0,\"              \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"        \\n        \"],[8],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"loaderContainer\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"cssload-loader\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"cssload-flipper\"],[7],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"cssload-front\"],[7],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"cssload-back\"],[7],[8],[0,\"\\n        \"],[8],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextPlaylist\"],null],\"primary\"]],{\"statements\":[[0,\"     \"],[6,\"i\"],[9,\"class\",\"fa fa-step-forward\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\" Далее\\n\"]],\"parameters\":[]},null],[0,\"  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "WasCYeXw", "block": "{\"symbols\":[\"car\",\"videoRange\",\"p\"],\"statements\":[[6,\"div\"],[9,\"id\",\"contentContainer\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"videoContainer\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"videoDescription\"],[9,\"class\",\"container\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"row header\"],[7],[0,\"\\n        \"],[6,\"span\"],[9,\"class\",\"name\"],[7],[1,[20,[\"playlist\",\"name\"]],false],[8],[0,\"\\n        \"],[6,\"span\"],[9,\"class\",\"timetotal\"],[7],[0,\"Время просмотра: \"],[1,[25,\"minutes-string\",[[20,[\"playlist\",\"totalMinutes\"]]],null],false],[8],[0,\"\\n      \"],[8],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"row content\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"summary col-8\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n          \"],[1,[20,[\"playlist\",\"description\"]],false],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-4\"],[9,\"style\",\"padding: 0 5px\"],[7],[0,\"\\n\"],[4,\"bs-carousel\",null,[[\"nextControlIcon\",\"prevControlIcon\",\"currentIndex\",\"index\",\"wrap\",\"autoPlay\",\"interval\",\"showIndicators\"],[\"fas fa-caret-right\",\"fas fa-caret-left\",[20,[\"currentVideoRangeIndex\"]],[20,[\"videoRangeIndex\"]],false,false,-1,false]],{\"statements\":[[4,\"each\",[[20,[\"playlist\",\"videoRanges\"]]],null,{\"statements\":[[4,\"component\",[[19,1,[\"slide\"]]],null,{\"statements\":[[0,\"              \"],[6,\"div\"],[9,\"class\",\"car-item\"],[7],[0,\"\\n                \"],[6,\"a\"],[10,\"href\",[26,[\"https://www.youtube.com/channel/\",[19,2,[\"video\",\"channel\",\"youtubeId\"]]]]],[9,\"target\",\"_blank\"],[7],[0,\"\\n                  \"],[6,\"img\"],[10,\"src\",[19,2,[\"video\",\"channel\",\"logoUrl\"]],null],[9,\"width\",\"30\"],[10,\"title\",[19,2,[\"video\",\"channel\",\"name\"]],null],[7],[8],[0,\"\\n                \"],[8],[0,\"\\n                \"],[6,\"div\"],[9,\"class\",\"range-length\"],[7],[0,\" \"],[1,[25,\"minutes-string\",[[19,2,[\"minutes\"]]],null],false],[8],[0,\"\\n\"],[4,\"if\",[[19,2,[\"showResumeButton\"]]],null,{\"statements\":[[0,\"                  \"],[6,\"a\"],[9,\"class\",\"resume-video\"],[9,\"href\",\"#\"],[3,\"action\",[[19,0,[]],\"resumeVideoRange\"]],[7],[0,\"Вернуться на \"],[6,\"span\"],[7],[1,[19,2,[\"positionTime\"]],false],[8],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"bs-progress\",null,null,{\"statements\":[[0,\"                    \"],[1,[25,\"component\",[[19,3,[\"bar\"]]],[[\"value\",\"minValue\",\"maxValue\",\"showLabel\",\"type\",\"striped\",\"animate\"],[[19,2,[\"position\"]],[19,2,[\"from\"]],[19,2,[\"to\"]],false,\"danger\",false,true]]],false],[0,\"\\n\"]],\"parameters\":[3]},null]],\"parameters\":[]}],[0,\"              \"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"        \\n        \"],[8],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"containingBlock\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"videoWrapper\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"id\",\"player\"],[7],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"id\",\"playerOverlay\"],[7],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"back\"],[7],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"content\"],[7],[0,\"\\n\"],[4,\"if\",[[20,[\"videoRange\",\"speaker\"]]],null,{\"statements\":[[0,\"              \"],[6,\"div\"],[9,\"class\",\"block speaker\"],[7],[0,\"\\n                \"],[1,[20,[\"videoRange\",\"speaker\"]],false],[0,\"\\n                \"],[6,\"br\"],[7],[8],[0,\"\\n                рассказывает\\n              \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"            \"],[6,\"div\"],[9,\"class\",\"block description\"],[7],[0,\"\\n              \"],[1,[20,[\"videoRange\",\"description\"]],false],[0,\"\\n            \"],[8],[0,\"\\n          \"],[8],[0,\"\\n        \"],[8],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"loaderContainer\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"cssload-loader\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"cssload-flipper\"],[7],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"cssload-front\"],[7],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"cssload-back\"],[7],[8],[0,\"\\n        \"],[8],[0,\"\\n      \"],[8],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"navigation\"],[7],[0,\"\\n\"],[4,\"bs-button\",null,[[\"onClick\",\"type\"],[[25,\"action\",[[19,0,[]],\"nextPlaylist\"],null],\"primary\"]],{\"statements\":[[0,\"     \"],[6,\"i\"],[9,\"class\",\"fa fa-step-forward\"],[9,\"aria-hidden\",\"true\"],[7],[8],[0,\" Далее\\n\"]],\"parameters\":[]},null],[0,\"  \"],[8],[0,\"\\n\"],[8]],\"hasEval\":false}", "meta": { "moduleName": "new-prezident/templates/components/video-collection.hbs" } });
 });
 define("new-prezident/templates/index", ["exports"], function (exports) {
   "use strict";
@@ -1709,6 +1789,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+77d44d37"});
+  require("new-prezident/app")["default"].create({"name":"new-prezident","version":"0.0.0+9752e15b"});
 }
 //# sourceMappingURL=new-prezident.map

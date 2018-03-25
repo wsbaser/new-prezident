@@ -39,12 +39,17 @@ export default Component.extend({
     },
     afterVideoRangeChanged: Ember.observer('currentVideoRangeIndex', function(){
         Ember.run.scheduleOnce('afterRender', function(){
-            this.stopCurrentVideo();
-            if(this.get('videoRange')){
-                this.set('videoRange.position', 0);
-                this.set('videoRange.showResumeButton', false);
+            let currentVideoRangeIndex = this.get('currentVideoRangeIndex');
+
+            let currentVideoRangeId = this.get('videoRange.id');
+            let newVideoRangeId = this.get('playlist.videoRanges').objectAt(currentVideoRangeIndex).id;
+
+            if(currentVideoRangeId!==newVideoRangeId){
+                // . id changed, stop previos video
+                this.stopPlaying();
             }
-            this.setVideoRange(this.get('currentVideoRangeIndex'));
+
+            this.setVideoRange(currentVideoRangeIndex);
         }.bind(this));
     }),
     setPlaylist(playlist){
@@ -53,27 +58,90 @@ export default Component.extend({
         this.get('videoHistory').save(playlist.id);
     },
     setVideoRange(index){
-        this.set('videoRangeIndex', index);
         let videoRange = this.get('playlist.videoRanges').objectAt(index);
+        this.set('videoRangeIndex', index);
         this.set('videoRange', videoRange);
-        this.loadVideoToPlayer(videoRange);
         this.updateCarouselArrows();
+        this.preparePlaying(videoRange);
     },
-    stopCurrentVideo(){
-        if(this.get('player') && this.get('player').pauseVideo){
-            this.get('player').pauseVideo();
-        }
-    },
-    loadVideoToPlayer(videoRange){
-        if(videoRange && this.get('initPlayerPromise')){
-            console.log('loadVideo: '+ videoRange.id);
-            this.get('initPlayerPromise').then(function(){
-                this.get('player').loadVideoById({
-                    'videoId': videoRange.get('video.youtubeId'),
-                    'startSeconds': videoRange.get('from')
-                });
+    preparePlaying(videoRange){
+        let initPlayerPromise = this.get('initPlayerPromise');
+        if(videoRange && initPlayerPromise && !this.get('playingQueued')){
+            this.set('playingQueued', true);
+            console.log('prepare playing for ' + videoRange.id);
+            initPlayerPromise.then(function(){
+                this.loadVideoToPlayer(videoRange);
+                Ember.run.scheduleOnce('afterRender', function(){
+                    this.showPreviewOverlay();
+                }.bind(this));
             }.bind(this));
         }
+    },
+    startPlaying(){
+        this.hidePreviewOverlay().then(function(){
+            this.get('player').playVideo();
+        }.bind(this));
+    },
+    stopPlaying(){
+        if(this.get('playingQueued')){
+            this.set('playingQueued', false);
+            this.get('player').pauseVideo();
+            this.clearVideoTimer();
+            this.set('videoRange.position', 0);
+        }
+    },
+    hidePreviewOverlay(){
+        return new Promise(function(resolve, reject){
+            let $playerOverlay = this.$('#playerOverlay');
+            let $speaker = $playerOverlay.find('.speaker');
+            let $description = $playerOverlay.find('.description');
+            $speaker.css('opacity', 0);
+            $description.css('opacity', 0);
+            setTimeout(function(){
+                $playerOverlay.css('opacity', 0);
+                setTimeout(function(){
+                    $playerOverlay.hide();
+                    this.set('previewOverlayState', 0);
+                    resolve();
+                }.bind(this), 300);
+            }.bind(this), 1000);
+        }.bind(this));
+    },
+    showPreviewOverlay(){
+        this.set('previewOverlayState', 1);
+        let $playerOverlay = this.$('#playerOverlay');
+        let $speaker = $playerOverlay.find('.speaker');
+        let $description = $playerOverlay.find('.description');
+        $playerOverlay.show();
+        $playerOverlay.css('opacity', 1);
+        let showDescription = function(){
+            $description.css('opacity', 1);
+            setTimeout(function(){
+                this.set('previewOverlayState', 2);
+                if(this.get('readyToPlay')){
+                    this.startPlaying();
+                }
+            }.bind(this), 3000);
+        }.bind(this);
+        let showSpeaker = function(){
+            if($speaker[0]){
+                $speaker.css('opacity', 1);
+                setTimeout(showDescription, 3000);
+            }else{
+                showDescription();
+            }
+        };
+        setTimeout(function(){
+            showSpeaker();
+        }, 300);
+    },
+    loadVideoToPlayer(videoRange){
+        console.log('loadVideo: '+ videoRange.id);
+        this.set('readyToPlay', false);
+        this.get('player').loadVideoById({
+            'videoId': videoRange.get('video.youtubeId'),
+            'startSeconds': videoRange.get('from')
+        });
     },
     initPlayer(){
         return new Promise(function(resolve, reject) {
@@ -89,6 +157,7 @@ export default Component.extend({
                     'onStateChange': this.onPlayerStateChange.bind(this)
                 },
                 playerVars: {
+                    controls: 0,
                     rel: 0,
                     showinfo: 0,
                     fs: 0
@@ -110,13 +179,30 @@ export default Component.extend({
         }.bind(this), 300);
     },
     onPlayerStateChange(event) {
+        let player = event.target;
         if (event.data == YT.PlayerState.PLAYING) {
-            console.log('video PLAYING');
-            if(!this.get('timerId')){
-                this.initVideoTimer(event.target);
+            switch(this.get('previewOverlayState')){
+                case 0:
+                    // . started laying after preview is hidden.
+                    // . init position tracking timer
+                    if(!this.get('timerId')){
+                        this.initVideoTimer(event.target);
+                    }
+                    console.log('video PLAYING');
+                    break;
+                case 1:
+                    // . video loading completed before preview is ready
+                    // . pause playing and set readyToPlay to true
+                    player.pauseVideo();
+                    this.set('readyToPlay', true);
+                    break
+                case 2:
+                    // . preview was ready before video loading completer
+                    // . start playing
+                    this.startPlaying();
+                    break
             }
         }else if(event.data==YT.PlayerState.ENDED || event.data==YT.PlayerState.PAUSED){
-            this.clearVideoTimer();
             if(event.data==YT.PlayerState.ENDED ){
                 console.log('video ENDED');
             }
@@ -129,20 +215,13 @@ export default Component.extend({
         let timerId = window.setInterval(function(){
             let from = this.get('videoRange.from');
             let to = this.get('videoRange.to');
-            let oldPosition = this.get('videoRange.position') || from;
-            let newPosition = player.getCurrentTime();
+            let position = player.getCurrentTime();
             // console.log('old: '+oldPosition+', new: '+newPosition);
 
-            if(oldPosition>=(to-1) && oldPosition<=to 
-                && newPosition>=to && newPosition<=(to+1)){
-                this.setNextVideoRange();
+            if(position<=to){
+                this.set('videoRange.position', position);
             }else{
-                if(newPosition>=from && newPosition<=to){
-                    this.set('videoRange.showResumeButton', false);
-                    this.set('videoRange.position', newPosition);
-                }else{
-                    this.set('videoRange.showResumeButton', true);
-                }
+                this.setNextVideoRange();
             }
         }.bind(this), 500);
         this.set('timerId', timerId);
@@ -155,10 +234,9 @@ export default Component.extend({
         }
     },
     setNextPlayList(){
-        this.stopCurrentVideo();
+        this.stopPlaying();
         if(this.get('videoRange')){
             this.set('videoRange.position', 0);
-            this.set('videoRange.showResumeButton', false);
         }
         let nextPlaylist = this.getNextPlaylist();
         if(nextPlaylist){
@@ -168,6 +246,7 @@ export default Component.extend({
         }
     },
     setNextVideoRange(){
+        this.stopPlaying();
         let videoRangesCount = this.get('playlist.videoRanges.length');
         let nextVideoRangeIndex = this.get('videoRangeIndex')+1;
         if(nextVideoRangeIndex<videoRangesCount){
@@ -179,10 +258,6 @@ export default Component.extend({
     actions: {
         nextPlaylist(){
             this.setNextPlayList();    
-        },
-        resumeVideoRange(){
-            this.get('player').seekTo(this.get('videoRange.position'), true);
-            this.set('videoRange.showResumeButton', false);
         }
     }
 });

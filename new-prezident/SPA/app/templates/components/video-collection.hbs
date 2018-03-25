@@ -23,7 +23,9 @@
           {{#each playlist.videoRanges as |videoRange|}}
             {{#car.slide}}
               <div class="car-item">
-                <img src={{videoRange.video.channel.logoUrl}} width="30">
+                <a href="https://www.youtube.com/channel/{{videoRange.video.channel.youtubeId}}" target="_blank">
+                  <img src={{videoRange.video.channel.logoUrl}} width="30" title={{videoRange.video.channel.name}}>
+                </a>
                 <div class="range-length"> {{minutes-string videoRange.minutes}}</div>
                 {{#if videoRange.showResumeButton}}
                   <a class="resume-video" {{action "resumeVideoRange"}} href="#">Вернуться на <span>{{videoRange.positionTime}}</span></a>
@@ -43,6 +45,21 @@
     <div id="containingBlock">
       <div class="videoWrapper">
         <div id="player"></div>
+        <div id="playerOverlay">
+          <div class="back"></div>
+          <div class="content">
+            {{#if videoRange.speaker}}
+              <div class="block speaker">
+                {{videoRange.speaker}}
+                <br>
+                рассказывает
+              </div>
+            {{/if}}
+            <div class="block description">
+              {{videoRange.description}}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div id="loaderContainer">

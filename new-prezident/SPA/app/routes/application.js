@@ -8,7 +8,6 @@ export default Route.extend({
 					id: 'elections',
 					route: 'now',
 					name: 'Демократические институты: Выборы',
-					description: 'Описание выборы',
 					videoRanges: ['e1', 'e2']
 				},
 				{
@@ -28,13 +27,14 @@ export default Route.extend({
 					id: 'e2',
 					from: 20.5,
 					to: 30,
-					description: 'Выборы 2018. Часть 2.',
+					description: 'Почему отсутствует конкуренция на президентских выборах?',
 					video: 'elections2018_p2'
 				},{
 					id: 'p1',
 					from: 10,
 					to: 20,
-					description: 'illegalprezident',
+					speaker: 'Сергей Филатов',
+					description: 'о нелегитимности 3-го президентского срока.',
 					video: 'illegalprezident'
 				}],
 			videos: [{
@@ -54,11 +54,13 @@ export default Route.extend({
 			channels: [{
 					id: 'sotavision',
 					name: 'sotavision',
+					youtubeId: 'UCk9F6pe9Z2IPxm1VO9lS6NA',
 					logoUrl: 'https://yt3.ggpht.com/-4p862zcrijI/AAAAAAAAAAI/AAAAAAAAAAA/a2-CRhE8IH0/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},
 				{
 					id: 'universeofhistory',
 					name: 'Вселенная Истории',
+					youtubeId: 'UC42ZrgA4ezCWVm8RHnS-xNA',
 					logoUrl: 'https://yt3.ggpht.com/-7I0BUCNSPPA/AAAAAAAAAAI/AAAAAAAAAAA/jUT_5vtw6CY/s88-c-k-no-mo-rj-c0xffffff/photo.jpg'
 				}]
 			});

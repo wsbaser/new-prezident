@@ -4,6 +4,7 @@ import { belongsTo, hasMany } from 'ember-data/relationships';
 
 export default DS.Model.extend({
 	video: belongsTo('video'),
+	speaker: attr('string'),
 	description: attr('string'),
 	from: attr('number'),
 	to: attr('number'),
