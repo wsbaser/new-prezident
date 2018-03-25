@@ -12,7 +12,7 @@ define('new-prezident/tests/app.lint-test', [], function () {
 
   QUnit.test('components/video-collection.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n24:25 - \'$\' is not defined. (no-undef)\n69:13 - Unexpected console statement. (no-console)\n79:20 - \'Promise\' is not defined. (no-undef)\n79:46 - \'reject\' is defined but never used. (no-unused-vars)\n80:42 - \'e\' is defined but never used. (no-unused-vars)\n84:30 - \'YT\' is not defined. (no-undef)\n103:19 - \'event\' is defined but never used. (no-unused-vars)\n113:27 - \'YT\' is not defined. (no-undef)\n114:13 - Unexpected console statement. (no-console)\n118:30 - \'YT\' is not defined. (no-undef)\n118:66 - \'YT\' is not defined. (no-undef)\n120:28 - \'YT\' is not defined. (no-undef)\n121:17 - Unexpected console statement. (no-console)\n123:28 - \'YT\' is not defined. (no-undef)\n124:17 - Unexpected console statement. (no-console)\n167:13 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'components/video-collection.js should pass ESLint\n\n24:25 - \'$\' is not defined. (no-undef)\n71:13 - Unexpected console statement. (no-console)\n94:20 - \'Promise\' is not defined. (no-undef)\n94:46 - \'reject\' is defined but never used. (no-unused-vars)\n139:9 - Unexpected console statement. (no-console)\n147:20 - \'Promise\' is not defined. (no-undef)\n147:46 - \'reject\' is defined but never used. (no-unused-vars)\n148:42 - \'e\' is defined but never used. (no-unused-vars)\n152:30 - \'YT\' is not defined. (no-undef)\n172:19 - \'event\' is defined but never used. (no-unused-vars)\n183:27 - \'YT\' is not defined. (no-undef)\n191:21 - Unexpected console statement. (no-console)\n205:30 - \'YT\' is not defined. (no-undef)\n205:66 - \'YT\' is not defined. (no-undef)\n206:28 - \'YT\' is not defined. (no-undef)\n207:17 - Unexpected console statement. (no-console)\n209:28 - \'YT\' is not defined. (no-undef)\n210:17 - Unexpected console statement. (no-console)\n216:17 - \'from\' is assigned a value but never used. (no-unused-vars)\n245:13 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('helpers/minutes-string.js', function (assert) {
@@ -37,7 +37,7 @@ define('new-prezident/tests/app.lint-test', [], function () {
 
   QUnit.test('models/video-range.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'models/video-range.js should pass ESLint\n\n3:21 - \'hasMany\' is defined but never used. (no-unused-vars)\n11:11 - \'Ember\' is not defined. (no-undef)\n16:16 - \'Ember\' is not defined. (no-undef)');
+    assert.ok(false, 'models/video-range.js should pass ESLint\n\n3:21 - \'hasMany\' is defined but never used. (no-unused-vars)\n12:11 - \'Ember\' is not defined. (no-undef)\n17:16 - \'Ember\' is not defined. (no-undef)');
   });
 
   QUnit.test('models/video.js', function (assert) {
