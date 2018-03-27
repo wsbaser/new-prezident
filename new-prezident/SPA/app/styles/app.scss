@@ -178,24 +178,38 @@ body{
 	width: 90%;
 }
 
+#videoDescription .btn-group{
+	margin-right: 10px;
+}
+
+#videoDescription .dropdown-toggle{
+	border-radius: 0;
+    padding: 0px 10px;
+    background-color: #fff;
+    color: #666;
+    border: 0;
+    box-shadow: 1px 1px 5px #aaa;
+}
+
 #videoDescription>.header{
 	margin-bottom: 10px;
 }
 
-#videoDescription>.header>.name{
-	font-size: 1rem;
-	background-color: #E8F5FD;
-	padding: 3px 5px;
+#videoDescription .name{
 	color: #444;
+	box-shadow: 1px 1px 5px #aaa;
+	padding: 3px 50px;
+	font-size: 1rem;
+	line-height: 26px;
 }
 
-#videoDescription>.header>.timetotal{
-	padding: 3px 5px;
+#videoDescription .timetotal{
 	color: #666;
-	border: 1px solid #eee;
-	line-height: 22px;
-	margin-left: 30px;
-	background-color: #f5f8fa;
+	box-shadow: 1px 1px 5px #aaa;
+	line-height: 32px;
+	margin-left: 10px;
+	padding: 0 5px;
+	background-color: #E8F5FD;
 }
 
 #videoDescription>.content{
@@ -253,6 +267,7 @@ body{
 	color: #fff;
 	transition: all 300ms linear;
 	text-align: center;
+	opacity: 0;
 }
 
 #playerOverlay>.content>.block.speaker{
@@ -278,7 +293,7 @@ body{
 #navigation button{
 	background-color: #fff;
 	border: 1px solid #eee;
-	color: #aaa;
+	color: #666;
 	border-radius: 4px;
 	font-family: 'Roboto', 'Noto', sans-serif;
 	font-size: 11px;

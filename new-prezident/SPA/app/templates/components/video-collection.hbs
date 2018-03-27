@@ -2,8 +2,15 @@
   <div id="videoContainer">
     <div id="videoDescription" class="container">
       <div class="row header">
+      {{#bs-dropdown as |dd|}}
+        {{#dd.button}}{{fa-icon "bars"}}{{/dd.button}}
+        {{#dd.menu as |menu|}}
+          <li>ААА</li>
+          <li>BBB</li>
+        {{/dd.menu}}
+      {{/bs-dropdown}}
         <span class="name">{{playlist.name}}</span>
-        <span class="timetotal">Время просмотра: {{minutes-string playlist.totalMinutes}}</span>
+        <span class="timetotal">{{minutes-string playlist.totalMinutes}}</span>
       </div>
       <div class="row content">
         <div class="summary col-8" style="padding: 0 5px">
@@ -51,8 +58,6 @@
             {{#if videoRange.speaker}}
               <div class="block speaker">
                 {{videoRange.speaker}}
-                <br>
-                рассказывает
               </div>
             {{/if}}
             <div class="block description">

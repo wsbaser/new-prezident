@@ -13,7 +13,7 @@ export default Route.extend({
 				{
 					id: 'propaganda',
 					route: 'now',
-					name: 'Пропаганда на ТВ и в сети',
+					name: 'Демократические институты: Свободные СМИ',
 					description: 'Описание пропаганда',
 					videoRanges: ['p1'],
 				}],
@@ -27,13 +27,13 @@ export default Route.extend({
 					id: 'e2',
 					from: 20.5,
 					to: 30,
-					description: 'Почему отсутствует конкуренция на президентских выборах?',
+					description: 'Президентские выборы. Почему нет конкуренции.',
 					video: 'elections2018_p2'
 				},{
 					id: 'p1',
 					from: 10,
 					to: 20,
-					speaker: 'Сергей Филатов',
+					speaker: 'Сергей Александрович Филатов',
 					description: 'о нелегитимности 3-го президентского срока.',
 					video: 'illegalprezident'
 				}],

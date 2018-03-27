@@ -79,6 +79,7 @@ export default Component.extend({
     },
     startPlaying(){
         this.hidePreviewOverlay().then(function(){
+            this.get('player').unMute();
             this.get('player').playVideo();
         }.bind(this));
     },
@@ -126,7 +127,7 @@ export default Component.extend({
         let showSpeaker = function(){
             if($speaker[0]){
                 $speaker.css('opacity', 1);
-                setTimeout(showDescription, 3000);
+                setTimeout(showDescription, 1000);
             }else{
                 showDescription();
             }
@@ -138,6 +139,7 @@ export default Component.extend({
     loadVideoToPlayer(videoRange){
         console.log('loadVideo: '+ videoRange.id);
         this.set('readyToPlay', false);
+        this.get('player').mute();
         this.get('player').loadVideoById({
             'videoId': videoRange.get('video.youtubeId'),
             'startSeconds': videoRange.get('from')
