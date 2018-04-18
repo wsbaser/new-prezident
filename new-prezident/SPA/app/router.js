@@ -7,6 +7,7 @@ const Router = EmberRouter.extend({
 });
 
 Router.map(function() {
+  this.route('time', { path: '/' });
   this.route('index', { path: '/:route_id' });
 });
 

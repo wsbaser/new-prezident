@@ -138,6 +138,11 @@ export default Route.extend({
 					id: 'propaganda_3',
 					youtubeId: '9HZFIAH1hnY',
 					channel: 'openuniversity'
+				},
+				{
+					id: 'propaganda_3',
+					youtubeId: '2yOaCBOnkSE',
+					channel: 'openuniversity'
 				}],
 			channels: [{
 					id: 'beincourse',
