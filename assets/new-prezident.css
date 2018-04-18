@@ -163,6 +163,34 @@ body {
   border: 0;
   box-shadow: 1px 1px 5px #aaa; }
 
+#videoDescription .dropdown-menu {
+  padding: 0;
+  border-radius: 0;
+  margin-top: 10px;
+  z-index: 2000;
+  color: #666;
+  font-family: Roboto, Arial, sans-serif; }
+
+#videoDescription .dropdown-item {
+  cursor: pointer;
+  padding: 1px 15px;
+  border-bottom: 1px solid #f5f8fa; }
+
+#videoDescription .dropdown-item:hover {
+  background-color: #f5f8fa; }
+
+#videoDescription .dropdown-item span {
+  margin-left: 10px;
+  font-size: 13px; }
+
+#videoDescription .dropdown-item .youtube-icon {
+  width: 19px;
+  height: 19px;
+  display: inline-block;
+  background-image: url("Youtube.png");
+  background-size: contain;
+  vertical-align: middle; }
+
 #videoDescription > .header {
   margin-bottom: 10px; }
 
@@ -174,11 +202,12 @@ body {
   line-height: 26px; }
 
 #videoDescription .timetotal {
-  color: #666;
+  color: #000;
   box-shadow: 1px 1px 5px #aaa;
   line-height: 32px;
   margin-left: 10px;
   padding: 0 5px;
+  opacity: 0.5;
   background-color: #E8F5FD; }
 
 #videoDescription > .content {
@@ -292,11 +321,11 @@ body {
 .carousel-control-next {
   color: red !important;
   font-size: 16px;
-  opacity: 0.3 !important; }
+  opacity: 0.6 !important; }
 
 .carousel-control-prev:hover,
 .carousel-control-next:hover {
-  opacity: 0.4 !important; }
+  opacity: 0.9 !important; }
 
 .car-item .progress {
   margin-top: 12px;
