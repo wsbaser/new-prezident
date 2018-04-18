@@ -4,16 +4,124 @@
 		"selected_items":
 		[
 			[
-				"show",
-				"showNext"
+				"ba",
+				"background-image: "
+			],
+			[
+				"wi",
+				"width"
+			],
+			[
+				"fon",
+				"font-family: "
+			],
+			[
+				"bor",
+				"border-bottom: "
+			],
+			[
+				"marg",
+				"margin-left: "
+			],
+			[
+				"ma",
+				"margin-top: "
 			],
 			[
 				"video",
-				"videoRangesCount"
+				"videoRange"
+			],
+			[
+				"new",
+				"newVideoRangeId"
+			],
+			[
+				"the",
+				"then"
+			],
+			[
+				"ready",
+				"readyToPlay"
+			],
+			[
+				"play",
+				"Player"
+			],
+			[
+				"start",
+				"startPlaying"
+			],
+			[
+				"hid",
+				"hide"
+			],
+			[
+				"hide",
+				"hidePreviewOverlay"
+			],
+			[
+				"show",
+				"showDescription"
+			],
+			[
+				"mar",
+				"margin: "
+			],
+			[
+				"tra",
+				"transition: "
+			],
+			[
+				"ol",
+				"oldPosition"
+			],
+			[
+				"bak",
+				"background-color: "
+			],
+			[
+				"on",
+				"onPlayerReady"
+			],
+			[
+				"sho",
+				"showLoader"
+			],
+			[
+				"vid",
+				"videoRange"
+			],
+			[
+				"set",
+				"setVideoRange"
+			],
+			[
+				"pla",
+				"player"
+			],
+			[
+				"cle",
+				"clearVideoTimer"
+			],
+			[
+				"time",
+				"timerId"
+			],
+			[
+				"setne",
+				"setNextPlayList"
+			],
+			[
+				"em",
+				"Ember"
 			],
 			[
 				"vide",
-				"videoRangeIndex"
+				"videoRange"
+			],
+			[
+				"lo",
+				"loadVideoToPlayer"
 			],
 			[
 				"vi",
@@ -38,10 +146,6 @@
 			[
 				"pl",
 				"player"
-			],
-			[
-				"play",
-				"playlist"
 			],
 			[
 				"fun",
@@ -72,16 +176,8 @@
 				"totalSeconds"
 			],
 			[
-				"vid",
-				"videoRange"
-			],
-			[
 				"channe",
 				"channel"
-			],
-			[
-				"bor",
-				"border-radius: "
 			],
 			[
 				"flex-",
@@ -92,24 +188,12 @@
 				"align-items: "
 			],
 			[
-				"mar",
-				"margin-top: "
-			],
-			[
-				"marg",
-				"margin-bottom: "
-			],
-			[
 				"font",
 				"font-size: "
 			],
 			[
 				"bac",
 				"background-color: "
-			],
-			[
-				"set",
-				"setStartPosition"
 			],
 			[
 				"setVideo",
@@ -120,16 +204,8 @@
 				"getNextVideo"
 			],
 			[
-				"ma",
-				"max-width"
-			],
-			[
 				"in",
 				"inline-block"
-			],
-			[
-				"ba",
-				"background-color"
 			],
 			[
 				"co",
@@ -142,10 +218,6 @@
 			[
 				"l",
 				"list-style-type"
-			],
-			[
-				"fon",
-				"font-size"
 			],
 			[
 				"visi",
@@ -163,17 +235,48 @@
 			"file": "SPA/app/components/video-collection.js",
 			"settings":
 			{
-				"buffer_size": 4541,
+				"buffer_size": 9261,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "1. Если иное прямо не предусмотрено законом, не допускаются без согласия гражданина сбор, хранение, распространение и использование любой информации о его частной жизни, в частности сведений о его происхождении, о месте его пребывания или жительства, о личной и семейной жизни.\nНе являются нарушением правил, установленных абзацем первым настоящего пункта, сбор, хранение, распространение и использование информации о частной жизни гражданина в государственных, общественных или иных публичных интересах, а также в случаях, если информация о частной жизни гражданина ранее стала общедоступной либо была раскрыта самим гражданином или по его воле.\n2. Стороны обязательства не вправе разглашать ставшую известной им при возникновении и (или) исполнении обязательства информацию о частной жизни гражданина, являющегося стороной или третьим лицом в данном обязательстве, если соглашением не предусмотрена возможность такого разглашения информации о сторонах.\n3. Неправомерным распространением полученной с нарушением закона информации о частной жизни гражданина считается, в частности, ее использование при создании произведений науки, литературы и искусства, если такое использование нарушает интересы гражданина.\n4. В случаях, когда информация о частной жизни гражданина, полученная с нарушением закона, содержится в документах, видеозаписях или на иных материальных носителях, гражданин вправе обратиться в суд с требованием об удалении соответствующей информации, а также о пресечении или запрещении дальнейшего ее распространения путем изъятия и уничтожения без какой бы то ни было компенсации изготовленных в целях введения в гражданский оборот экземпляров материальных носителей, содержащих соответствующую информацию, если без уничтожения таких экземпляров материальных носителей удаление соответствующей информации невозможно.\n5. Право требовать защиты частной жизни гражданина способами, предусмотренными пунктом 2 статьи 150 настоящего Кодекса и настоящей статьей, в случае его смерти имеют дети, родители и переживший супруг такого гражданина.",
+			"file": "SPA/app/templates/components/video-collection.hbs",
 			"settings":
 			{
-				"buffer_size": 2051,
-				"line_ending": "Unix",
-				"name": "1. Если иное прямо не предусмотрено законом, не до"
+				"buffer_size": 3637,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "SPA/app/styles/app.scss",
+			"settings":
+			{
+				"buffer_size": 9134,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "SPA/app/routes/application.js",
+			"settings":
+			{
+				"buffer_size": 3134,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "SPA/app/services/video-navigator.js",
+			"settings":
+			{
+				"buffer_size": 619,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "SPA/app/routes/index.js",
+			"settings":
+			{
+				"buffer_size": 299,
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -217,17 +320,18 @@
 	},
 	"file_history":
 	[
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video-range.js",
+		"/Users/Mac/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/templates/components/video-collection.hbs",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/application.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.scss",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/application.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video-range.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/components/video-collection.js",
+		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/channel.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/helpers/minutes-string.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/playlist.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/video.js",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/components/video-collection.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/ember-cli-build.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/index.html",
-		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/models/channel.js",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.sсss",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/styles/app.sass",
 		"/Users/Mac/dev/new-prezident/new-prezident/SPA/app/routes/index.js",
@@ -266,6 +370,26 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"right",
+			"stopCurrentVideo",
+			"content",
+			"loadVideoToPlayer",
+			"load",
+			"stopCurrentVideo",
+			"showResumeButton",
+			"font-fa",
+			"transform",
+			"transition",
+			"stopCurrentVideo",
+			"setNextVideoRange",
+			"            \n",
+			"resume-video",
+			"progre",
+			"stopCurrentVideo",
+			"setVideoRange",
+			"setPlaylist",
+			"playlist",
+			"setPlaylist",
 			"videoRangeIndex",
 			"setVideoRange",
 			"updateCarouselArrows",
@@ -312,7 +436,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -320,15 +444,15 @@
 					"file": "SPA/app/components/video-collection.js",
 					"settings":
 					{
-						"buffer_size": 4541,
+						"buffer_size": 9261,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1048,
-								1048
+								3940,
+								3940
 							]
 						],
 						"settings":
@@ -338,30 +462,139 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 127.0,
+						"translation.y": 1552.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
+					"file": "SPA/app/templates/components/video-collection.hbs",
 					"settings":
 					{
-						"buffer_size": 2051,
+						"buffer_size": 3637,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2051,
-								2051
+								3578,
+								3578
 							]
 						],
 						"settings":
 						{
-							"auto_name": "1. Если иное прямо не предусмотрено законом, не до",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Ember Syntax/Glimmer.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 682.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "SPA/app/styles/app.scss",
+					"settings":
+					{
+						"buffer_size": 9134,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3268,
+								3268
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Sass/Syntaxes/SCSS.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 3029.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "SPA/app/routes/application.js",
+					"settings":
+					{
+						"buffer_size": 3134,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								260,
+								260
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "SPA/app/services/video-navigator.js",
+					"settings":
+					{
+						"buffer_size": 619,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								585,
+								585
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "SPA/app/routes/index.js",
+					"settings":
+					{
+						"buffer_size": 299,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								202,
+								202
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,

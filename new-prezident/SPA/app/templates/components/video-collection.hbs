@@ -5,12 +5,16 @@
       {{#bs-dropdown as |dd|}}
         {{#dd.button}}{{fa-icon "bars"}}{{/dd.button}}
         {{#dd.menu as |menu|}}
-          <li>ААА</li>
-          <li>BBB</li>
+          <a class="dropdown-item"><i class="youtube-icon"></i><span>Демократические институты: Выборы</span></a>
+          <a class="dropdown-item"><i class="youtube-icon"></i><span>Демократические институты: СМИ</span></a>
+          <a class="dropdown-item"><i class="youtube-icon"></i><span>Демократические институты: Митинги</span></a>
+          <a class="dropdown-item"><i class="youtube-icon"></i><span>Экономика. Нефть</span></a>
+          <a class="dropdown-item"><i class="youtube-icon"></i><span>Экономика. Госмонополизм<</span></a>
+          <a class="dropdown-item"><i class="youtube-icon"></i><span>Здравоохранение</span></a>
         {{/dd.menu}}
       {{/bs-dropdown}}
         <span class="name">{{playlist.name}}</span>
-        <span class="timetotal">{{minutes-string playlist.totalMinutes}}</span>
+        <span class="timetotal"><i class="far fa-clock"></i> {{minutes-string playlist.totalMinutes}}</span>
       </div>
       <div class="row content">
         <div class="summary col-8" style="padding: 0 5px">
@@ -78,7 +82,7 @@
   </div>
   <div id="navigation">
     {{#bs-button onClick=(action "nextPlaylist") type="primary"}}
-     {{fa-icon "step-forward"}} Далее
+     {{fa-icon "step-forward"}} перейти к следующей теме
     {{/bs-button}}
   </div>
 </div>

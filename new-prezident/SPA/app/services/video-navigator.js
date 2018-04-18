@@ -13,6 +13,7 @@ export default Service.extend({
 		let notWatched = this.getAllFor(route).reject(function(item){
 			return watched.includes(item.id);
 		});
-		return notWatched[Math.floor(Math.random() * notWatched.length)];
+		//return notWatched[Math.floor(Math.random() * notWatched.length)];
+		return this.get('store').peekRecord('playlist','propaganda');
 	}
 });

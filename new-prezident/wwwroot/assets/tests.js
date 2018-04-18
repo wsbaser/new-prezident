@@ -77,7 +77,7 @@ define('new-prezident/tests/app.lint-test', [], function () {
 
   QUnit.test('services/video-navigator.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'services/video-navigator.js should pass ESLint\n\n');
+    assert.ok(false, 'services/video-navigator.js should pass ESLint\n\n13:7 - \'notWatched\' is assigned a value but never used. (no-unused-vars)');
   });
 });
 define('new-prezident/tests/helpers/destroy-app', ['exports'], function (exports) {
