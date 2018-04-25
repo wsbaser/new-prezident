@@ -1,12 +1,21 @@
 import Route from '@ember/routing/route';
 
 export default Route.extend({
-	model(params) {
- 		// var model = this.get('store').peekRecord('video', params.video_id);
- 		// return model;
- 		return 'history';
+	citesHistory: Ember.inject.service(),
+	model(){
+		let allCites = this.get('store').peekAll('cite');
+		let watchedCites = this.get('citesHistory').get();
+		let notWatched = allCites.reject(function(item){
+			return watchedCites.includes(item.id);
+		});
+		var todayCite;
+		if(notWatched.get('length')){
+			todayCite = notWatched.get('firstObject');
+		}else{
+			this.get('citesHistory').clear();
+			todayCite = allCites.get('firstObject');
+		}
+		this.get('citesHistory').save(todayCite.id);
+		return todayCite;
 	}
-	// redirect(model, transition){
-	//  	this.transitionTo('now', 'elections2018');
-	// }
 });
