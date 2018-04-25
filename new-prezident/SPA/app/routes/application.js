@@ -17,7 +17,15 @@ export default Route.extend({
 					id: 'votsarenie',
 					route: 'history',
 					name: 'Путин. Приход к власти',
-					videoRanges: ['vts1', 'vts2']
+					description: 'Описание',
+					videoRanges: ['vts1', 'vts2', 'vts3', 'vts4']
+				},
+				{
+					id: 'propaganda',
+					route: 'now',
+					name: 'Пропаганда',
+					description: 'Описание пропаганда',
+					videoRanges: ['propaganda_1_range', 'propaganda_2_range', 'propaganda_3_range'],
 				},
 				{
 					id: 'smi',
@@ -51,13 +59,6 @@ export default Route.extend({
 					route: 'now',
 					name: 'Демократические институты: Выборы',
 					videoRanges: ['e1', 'e2']
-				},
-				{
-					id: 'propaganda',
-					route: 'now',
-					name: 'Пропаганда',
-					description: 'Описание пропаганда',
-					videoRanges: ['propaganda_1_range', 'propaganda_2_range', 'propaganda_3_range'],
 				}],
 			videoRanges:[{
 					id: 'vts1',
@@ -74,6 +75,20 @@ export default Route.extend({
 					speaker: 'Сергей Доренко',
 					description: 'Как Березовский уговорил Путина стать президентом',
 					video: 'dorenkoputin'
+				},{
+					id: 'vts3',
+					from: 12,
+					to: 88,
+					speaker: 'Анна Политковская',
+					description: 'о том как война в Чечне помогла Путину стать президентом',
+					video: 'politkovskaya_putin_war'
+				},{
+					id: 'vts4',
+					from: 932.5,
+					to: 1001,
+					speaker: 'Артем Боровик',
+					description: 'о роли войны для популярности Путина',
+					video: 'borovic_war_for_pr'
 				},{
 					id: 'e1',
 					from: 20.5,
@@ -119,6 +134,15 @@ export default Route.extend({
 					id: 'dorenkoputin',
 					youtubeId: 'ErI8CPUDPXY',
 					channel: 'beincourse'
+				},
+				{
+					id: 'borovic_war_for_pr',
+					youtubeId: 'xqDqFbhiV-k',
+					channel: 'openuniversity'
+				},{
+					id: 'politkovskaya_putin_war',
+					youtubeId: 'vlN91jrnkZ8',
+					channel: 'openuniversity'
 				},{
 					id: 'elections2018_p1',
 					youtubeId: '6kDqTi_xKoo',
@@ -146,11 +170,6 @@ export default Route.extend({
 				{
 					id: 'propaganda_3',
 					youtubeId: '9HZFIAH1hnY',
-					channel: 'openuniversity'
-				},
-				{
-					id: 'propaganda_3',
-					youtubeId: '2yOaCBOnkSE',
 					channel: 'openuniversity'
 				}],
 			channels: [{

@@ -14,6 +14,6 @@ export default Service.extend({
 			return watched.includes(item.id);
 		});
 		//return notWatched[Math.floor(Math.random() * notWatched.length)];
-		return this.get('store').peekRecord('playlist','propaganda');
+		return this.get('store').peekRecord('playlist','votsarenie');
 	}
 });
