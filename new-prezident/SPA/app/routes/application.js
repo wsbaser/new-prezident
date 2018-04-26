@@ -18,7 +18,7 @@ export default Route.extend({
 					route: 'history',
 					name: 'Путин. Приход к власти',
 					description: 'Описание',
-					videoRanges: ['vts1', 'vts2', 'vts3', 'vts4']
+					videoRanges: ['vts7','vts6','vts5', 'vts3', 'vts4','vts1', 'vts2']
 				},
 				{
 					id: 'propaganda',
@@ -90,6 +90,28 @@ export default Route.extend({
 					description: 'о роли войны для популярности Путина',
 					video: 'borovic_war_for_pr'
 				},{
+					id: 'vts5',
+					from: 1043.5,
+					to: 1518.7,
+					speaker: 'Борис Березовский',
+					description: 'о списке кандидатов на роль президента и о роли преемственности',
+					video: 'gordon_berezovsky_2012_1'
+				},{
+					id: 'vts6',
+					from: 219,
+					to: 319.3,
+					speaker: 'Борис Березовский',
+					description: 'первое предложение Путину',
+					video: 'gordon_berezovsky_2007_2'
+				},{
+					id: 'vts7',
+					from: 0,
+					to: 231,
+					speaker: 'Борис Немцов',
+					description: 'о том, почему Ельцин выбрал Путина',
+					video: 'nemtsov_eltcins_choice'
+				},
+				{
 					id: 'e1',
 					from: 20.5,
 					to: 30,
@@ -143,7 +165,23 @@ export default Route.extend({
 					id: 'politkovskaya_putin_war',
 					youtubeId: 'vlN91jrnkZ8',
 					channel: 'openuniversity'
-				},{
+				},
+				{
+					id: 'gordon_berezovsky_2012_1',
+					youtubeId: 'yqTUqYuKPVM',
+					channel: 'gordon'
+				},
+				{
+					id: 'gordon_berezovsky_2007_2',
+					youtubeId: 'C0O7d9ZyQFQ',
+					channel: 'gordon'
+				},
+				{
+					id: 'nemtsov_eltcins_choice',
+					youtubeId: '2LIstvYImSU',
+					channel: 'openuniversity'
+				},
+				{
 					id: 'elections2018_p1',
 					youtubeId: '6kDqTi_xKoo',
 					channel: 'universeofhistory'
@@ -193,6 +231,11 @@ export default Route.extend({
 					name: 'Открытый университет',
 					youtubeId: 'UCG1i_bM5A4JMNjBszBOCasw',
 					logoUrl: 'https://yt3.ggpht.com/-lutbsJAOAfY/AAAAAAAAAAI/AAAAAAAAAAA/JpMbFk20ls8/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				},{
+					id: 'gordon',
+					name: 'В гостях у Гордона',
+					youtubeId: 'UCCcprrrcbdaj14kYPjcbj9w',
+					logoUrl: 'https://yt3.ggpht.com/-A8a8PrspQ2I/AAAAAAAAAAI/AAAAAAAAAAA/yqYE6zboWGc/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				}]
 			});
 		return window.youTubeIframeAPIPromise;
