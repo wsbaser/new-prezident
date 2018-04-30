@@ -169,7 +169,7 @@ export default Component.extend({
         }.bind(this));
     },
     getNextPlaylist(){
-        return this.get('videoNavigator').getNextPlaylist(this.get('route'))
+        return this.get('videoNavigator').getNextPlaylist(this.get('time'))
     },
     onPlayerReady(event) {
         this.hideLoader();

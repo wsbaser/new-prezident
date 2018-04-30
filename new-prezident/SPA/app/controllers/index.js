@@ -1,6 +1,15 @@
 import Controller from '@ember/controller';
 
 export default Controller.extend({
+    init: function () {
+		this._super();
+		Ember.run.schedule("afterRender", this, function(){
+			setTimeout(this.startAnimation.bind(this), 5000);
+		});
+	},
+	startAnimation(){
+		$('#goToVideos').css('opacity', 1);
+	},
 	actions:{
 		goToVideos(){
 			var dividerElement = document.getElementById("divider");

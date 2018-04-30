@@ -12,6 +12,18 @@ export default Route.extend({
 				id: "freud",
 				text: "МАССЫ НИКОГДА НЕ ЖАЖДАЛИ ЗНАТЬ ПРАВДУ. ИМ НУЖНЫ ИЛЛЮЗИИ, БЕЗ КОТОРЫХ ОНИ ЖИТЬ НЕ МОГУТ. НЕРЕАЛЬНОЕ ДЛЯ НИХ ВСЕГДА ПРЕВАЛИРУЕТ НАД РЕАЛЬНЫМ, И ФАЛЬШЬ ВОЗДЕЙСТВУЕТ НА НИХ С НЕ МЕНЬШЕЙ СИЛОЙ, ЧЕМ ПРАВДА. ОНИ ПОПРОСТУ НЕ ОТЛИЧАЮТ ОДНО ОТ ДРУГОГО",
 				author: "Зигмунд Фрейд"
+			},{
+				id: "hoking",
+				text: "Главный враг знания — не невежество, а иллюзия знания",
+				author: "Стивен Хокинг"
+			}, {
+				id: 'orwell',
+				text: '– В вашем восстановлении три этапа, – сказал О’Брайен, – Учеба, понимание и приятие.',
+				author: 'Джордж Оруэлл, "1984"'
+			},{
+				id:'mirzoev',
+				text: 'Человечество долго и мучительно шло к политической и экономической конкуренции, к свободе слова. Это и есть иммунная система государства. Если вы разрушили иммунную систему страны, ждите обвала всей системы от любого чиха.',
+				author: 'режиссер Владимир Мирзоев'
 			}],
 			playlists: [{
 					id: 'votsarenie',
@@ -28,37 +40,11 @@ export default Route.extend({
 					videoRanges: ['propaganda_1_range', 'propaganda_2_range', 'propaganda_3_range'],
 				},
 				{
-					id: 'smi',
-					route: 'history',
-					name: 'Захват СМИ',
-					videoRanges: ['']
-				},
-				{
-					id: 'beslan',
-					route: 'history',
-					name: 'Беслан (18+)',
-					videoRanges: ['']
-				},
-				{
-					id: 'nordost',
-					route: 'history',
-					name: 'Захват Норд-Ост',
-					videoRanges: ['']
-				},{
-					id: 'politkovskaya',
-					route: 'history',
-					name: 'Политковская',
-					videoRanges: ['']
-				},{
-					id: 'elections2011',
-					route: 'history',
-					name: 'Политковская',
-					videoRanges: ['']
-				},{
-					id: 'elections',
-					route: 'now',
-					name: 'Демократические институты: Выборы',
-					videoRanges: ['e1', 'e2']
+					id: 'accomodation',
+					route: 'future',
+					name: 'Город в котором хочется жить',
+					description: 'Описание',
+					videoRanges: [],
 				}],
 			videoRanges:[{
 					id: 'vts1',
@@ -87,7 +73,7 @@ export default Route.extend({
 					from: 932.5,
 					to: 1001,
 					speaker: 'Артем Боровик',
-					description: 'о роли войны для популярности Путина',
+					description: 'о роли войны в популярности Путина',
 					video: 'borovic_war_for_pr'
 				},{
 					id: 'vts5',
@@ -108,7 +94,7 @@ export default Route.extend({
 					from: 0,
 					to: 231,
 					speaker: 'Борис Немцов',
-					description: 'о том, почему Ельцин выбрал Путина',
+					description: 'о том, почему Борис Ельцин выбрал преемником Путина',
 					video: 'nemtsov_eltcins_choice'
 				},
 				{
@@ -239,5 +225,40 @@ export default Route.extend({
 				}]
 			});
 		return window.youTubeIframeAPIPromise;
+		// ,
+		// 		{
+		// 			id: 'smi',
+		// 			route: 'history',
+		// 			name: 'Захват СМИ',
+		// 			videoRanges: ['']
+		// 		},
+		// 		{
+		// 			id: 'beslan',
+		// 			route: 'history',
+		// 			name: 'Беслан (18+)',
+		// 			videoRanges: ['']
+		// 		},
+		// 		{
+		// 			id: 'nordost',
+		// 			route: 'history',
+		// 			name: 'Захват Норд-Ост',
+		// 			videoRanges: ['']
+		// 		},{
+		// 			id: 'politkovskaya',
+		// 			route: 'history',
+		// 			name: 'Политковская',
+		// 			videoRanges: ['']
+		// 		},{
+		// 			id: 'elections2011',
+		// 			route: 'history',
+		// 			name: 'Выборы 2011',
+		// 			videoRanges: ['']
+		// 		}
+		// ,{
+		// 			id: 'elections',
+		// 			route: 'now',
+		// 			name: 'Демократические институты: Выборы',
+		// 			videoRanges: ['e1', 'e2']
+		// 		}
 	}
 });

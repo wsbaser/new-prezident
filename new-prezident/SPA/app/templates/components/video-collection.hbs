@@ -5,12 +5,9 @@
       {{#bs-dropdown as |dd|}}
         {{#dd.button}}{{fa-icon "bars"}}{{/dd.button}}
         {{#dd.menu as |menu|}}
-          <a class="dropdown-item"><i class="youtube-icon"></i><span>Демократические институты: Выборы</span></a>
-          <a class="dropdown-item"><i class="youtube-icon"></i><span>Демократические институты: СМИ</span></a>
-          <a class="dropdown-item"><i class="youtube-icon"></i><span>Демократические институты: Митинги</span></a>
-          <a class="dropdown-item"><i class="youtube-icon"></i><span>Экономика. Нефть</span></a>
-          <a class="dropdown-item"><i class="youtube-icon"></i><span>Экономика. Госмонополизм<</span></a>
-          <a class="dropdown-item"><i class="youtube-icon"></i><span>Здравоохранение</span></a>
+            {{#each playlists as |playlist|}}
+              <a class="dropdown-item"><i class="youtube-icon"></i><span>{{playlist.name}}</span></a>
+            {{/each}}
         {{/dd.menu}}
       {{/bs-dropdown}}
         <span class="name">{{playlist.name}}</span>

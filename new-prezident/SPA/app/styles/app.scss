@@ -45,6 +45,7 @@ body{
 		text-align:center;
 
 		.cite{
+			text-transform: uppercase;
 			margin-bottom:10px;
 			font-size:15px;
 			line-height: 1.5;
@@ -58,16 +59,18 @@ body{
 	}
 
 	#controlsContainer{
-		width: 100px;
+		width: 250px;
 		margin: 0 auto;
 
-		button{
-			width: 100px;
+		#goToVideos{
+			width: 250px;
 			background-color: red;
 			border-color: red;
 			color: #fff;
 			padding: 5px;
 			cursor: pointer;
+			transition: all 800ms linear;
+			opacity: 0;
 		}
 	}
 }
@@ -371,7 +374,7 @@ body{
 }
 
 #playerOverlay>.content>.block.speaker{
-	font-size: 14px;
+	font-size: 13px;
 	color: #ddd;
 	opacity: 0;
 }
