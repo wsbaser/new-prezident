@@ -30,14 +30,14 @@ export default Route.extend({
 					route: 'history',
 					name: 'Путин. Приход к власти',
 					description: 'Описание',
-					videoRanges: ['vts7','vts6','vts5', 'vts3', 'vts4','vts1', 'vts2']
+					videoRanges: ['vts1', 'vts2', 'vts4', 'vts3', 'vts5','vts6','vts7']
 				},
 				{
 					id: 'propaganda',
 					route: 'now',
 					name: 'Пропаганда',
 					description: 'Описание пропаганда',
-					videoRanges: ['propaganda_1_range', 'propaganda_2_range', 'propaganda_3_range'],
+					videoRanges: ['propaganda_1_range', 'propaganda_2_range', 'propaganda_3_range','tv_vs_streets_range','slavyanskboy_range','statisticslies_range','boingversions_range'],
 				},
 				{
 					id: 'accomodation',
@@ -48,16 +48,16 @@ export default Route.extend({
 				}],
 			videoRanges:[{
 					id: 'vts1',
-					from: 771.8,
-					to: 1652,
+					from: 745,
+					to: 1606.5,
 					speaker: 'Сергей Доренко',
 					description: 'Как создавалась партия "Единая Россия"',
 					video: 'dorenkoputin'
 				},
 				{
 					id: 'vts2',
-					from: 2019.8,
-					to: 2137.5,
+					from: 1972.3,
+					to: 2091,
 					speaker: 'Сергей Доренко',
 					description: 'Как Березовский уговорил Путина стать президентом',
 					video: 'dorenkoputin'
@@ -137,11 +137,41 @@ export default Route.extend({
 					speaker: 'Открытый университет',
 					description: 'Как распознать пропаганду',
 					video: 'propaganda_3'
+				},{
+					id: 'tv_vs_streets_range',
+					from: 9.1,
+					to: 453,
+					description: 'Митинги оппозиции и как их освещает телевидение, контроллируемое В. Путиным',
+					video: 'tv_vs_streets'
+				},{
+					id: 'boingversions_range',
+					from: 6.1,
+					to: 390,
+					description: 'Как менялись версии российской пропаганды о сбитом малазийском боинге',
+					video: 'boeingversions'
+				},{
+					id: 'statisticslies_range',
+					from: 8.5,
+					to: 237.8,
+					description: 'Искажение статистики В. Путиным на прямой линии 2017-го года',
+					video: 'statisticslies'
+				},{
+					id: 'spech_freedom_control_range',
+					from: 24,
+					to: 546,
+					description: 'Хроника уничтожения свободы слова при В. Путине',
+					video: 'spech_freedom_control'
+				},{
+					id: 'slavyanskboy_range',
+					from: 0,
+					to: 310,
+					description: 'Фейк Первого Канала о распятом мальчике в Славянске',
+					video: 'slavyanskboy'
 				}],
 			videos: [{
 					id: 'dorenkoputin',
-					youtubeId: 'ErI8CPUDPXY',
-					channel: 'beincourse'
+					youtubeId: 'phr4nUI_5CQ',
+					channel: 'nparchive'
 				},
 				{
 					id: 'borovic_war_for_pr',
@@ -195,12 +225,47 @@ export default Route.extend({
 					id: 'propaganda_3',
 					youtubeId: '9HZFIAH1hnY',
 					channel: 'openuniversity'
+				},{
+					id: 'tv_vs_streets',
+					youtubeId: 'PM0ugwbBgh4',
+					channel: 'alternative'
+				},{
+					id: 'spech_freedom_control',
+					youtubeId: 'TjLKq3wLGco',
+					channel: 'alternative'
+				},{
+					id: 'boeingversions',
+					youtubeId: 'I-9fRjhWFvo',
+					channel: 'putinregimelies'
+				},{
+					id: 'statisticslies',
+					youtubeId: 'KUd1w-hK1zc',
+					channel: 'putinregimelies'
+				},{
+					id: 'slavyanskboy',
+					youtubeId: '_-SxR16JCCY',
+					channel: 'rtvi'
 				}],
 			channels: [{
-					id: 'beincourse',
-					name: 'Быть в курсе',
-					youtubeId: 'UC1tFWEY-XuY7fOFLGj7sWcA',
-					logoUrl: 'https://yt3.ggpht.com/a-/AJLlDp1m0UdUYnpHPnLJ1RZPzcqeSvseuYkAWs0xxw=s88-mo-c-c0xffffffff-rj-k-no'
+					id: 'rtvi',
+					name: 'RTVI',
+					youtubeId: 'UCPU28A9z_ka_R5dQfecHJlA',
+					logoUrl: 'https://yt3.ggpht.com/-CnMwEbuTBrY/AAAAAAAAAAI/AAAAAAAAAAA/RHfN_cYaKEk/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				},{
+					id: 'putinregimelies',
+					name: 'Ложь путинского режима',
+					youtubeId: 'UCBReV5bfLRI8pFtTrokH7mw',
+					logoUrl: 'https://yt3.ggpht.com/-l0nxYVNJeWU/AAAAAAAAAAI/AAAAAAAAAAA/DRX_yR9aOb0/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				},{
+					id: 'alternative',
+					name: 'ALTERNATIVE MEDIA',
+					youtubeId: 'UCS9DnIddkX6LhV8h4mCuW2Q',
+					logoUrl: 'https://yt3.ggpht.com/-TrSfpyquPAM/AAAAAAAAAAI/AAAAAAAAAAA/7GxVqYWCWtY/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				},{
+					id: 'nparchive',
+					name: 'Архив newprezident.ru',
+					youtubeId: 'UCwEN4wbUR0eM4uVSeBefPoA',
+					logoUrl: 'https://yt3.ggpht.com/-4p862zcrijI/AAAAAAAAAAI/AAAAAAAAAAA/a2-CRhE8IH0/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'sotavision',
 					name: 'sotavision',
