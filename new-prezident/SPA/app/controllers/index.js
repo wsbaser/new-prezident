@@ -4,13 +4,17 @@ export default Controller.extend({
     init: function () {
 		this._super();
 		Ember.run.schedule("afterRender", this, function(){
-			setTimeout(this.startAnimation.bind(this), 5000);
+			
 		});
 	},
-	startAnimation(){
+	showContinueButton(){
 		$('#goToVideos').css('opacity', 1);
 	},
 	actions:{
+		onTextAnimationComplete(){
+			$('#citeContainer .author').css('opacity', 1);
+			setTimeout(this.showContinueButton.bind(this), 1500);
+		},
 		goToVideos(){
 			var dividerElement = document.getElementById("divider");
       		dividerElement.style.width="0%";

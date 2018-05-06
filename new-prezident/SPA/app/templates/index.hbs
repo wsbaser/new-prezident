@@ -9,7 +9,7 @@
 
     <div id="citeContainer">
       <div class="cite">
-        {{model.text}}
+        {{typing-effect text=model.text onComplete=(action "onTextAnimationComplete")}}
       </div>
       <div class="author">
         - {{model.author}}

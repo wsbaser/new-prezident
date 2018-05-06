@@ -55,6 +55,8 @@ body{
 		.author{
 			padding: 3px;
 			font-size:15px;
+			opacity: 0;
+			transition: all 800ms linear;
 		}
 	}
 

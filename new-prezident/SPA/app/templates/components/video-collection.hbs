@@ -2,14 +2,14 @@
   <div id="videoContainer">
     <div id="videoDescription" class="container">
       <div class="row header">
-      {{#bs-dropdown as |dd|}}
-        {{#dd.button}}{{fa-icon "bars"}}{{/dd.button}}
-        {{#dd.menu as |menu|}}
-            {{#each playlists as |playlist|}}
-              <a class="dropdown-item"><i class="youtube-icon"></i><span>{{playlist.name}}</span></a>
-            {{/each}}
-        {{/dd.menu}}
-      {{/bs-dropdown}}
+        {{#bs-dropdown as |dd|}}
+          {{#dd.button}}{{fa-icon "bars"}}{{/dd.button}}
+          {{#dd.menu as |menu|}}
+              {{#each playlists as |playlist|}}
+                <a class="dropdown-item"><i class="youtube-icon"></i><span>{{playlist.name}}</span></a>
+              {{/each}}
+          {{/dd.menu}}
+        {{/bs-dropdown}}
         <span class="name">{{playlist.name}}</span>
         <span class="timetotal"><i class="far fa-clock"></i> {{minutes-string playlist.totalMinutes}}</span>
       </div>
