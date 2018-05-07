@@ -19,7 +19,7 @@ export default Component.extend({
 		    easing: "easeOutExpo",
 		    duration: 1500,
 		    delay: function(el, i) {
-		      return 500 + 30 * i;
+		      return 500 + 40 * i;
 		    },
 		    complete: function() {
 				this.get('onComplete')();

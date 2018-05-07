@@ -141,13 +141,13 @@ export default Route.extend({
 					id: 'tv_vs_streets_range',
 					from: 9.1,
 					to: 453,
-					description: 'Митинги оппозиции и как их освещает телевидение, контроллируемое В. Путиным',
+					description: 'Как кремлевские СМИ освещают митинги оппозиции',
 					video: 'tv_vs_streets'
 				},{
 					id: 'boingversions_range',
 					from: 6.1,
 					to: 390,
-					description: 'Как менялись версии российской пропаганды о сбитом малазийском боинге',
+					description: 'Как менялись версии кремлевских СМИ о сбитом над Донбасом малазийском боинге',
 					video: 'boeingversions'
 				},{
 					id: 'statisticslies_range',
@@ -165,7 +165,7 @@ export default Route.extend({
 					id: 'slavyanskboy_range',
 					from: 0,
 					to: 310,
-					description: 'Фейк Первого Канала о распятом мальчике в Славянске',
+					description: 'Фейк Первого канала о распятом мальчике в Славянске',
 					video: 'slavyanskboy'
 				}],
 			videos: [{
