@@ -29,14 +29,14 @@ export default Route.extend({
 					id: 'votsarenie',
 					route: 'history',
 					name: 'Путин. Приход к власти',
-					description: 'Описание',
+					description: 'Противостояние семьи Ельцина с Лужковым и Примаковым. Создание блока "Единство" для поддержки преемника Ельцина. Кандидаты в преемники. Почему именно Путин. Роль Бориса Березовского. Роль войны в Чечне.',
 					videoRanges: ['vts1', 'vts2', 'vts7', 'vts4', 'vts3', 'eltsin_first_offer', 'vts5', 'vts6']
 				},
 				{
 					id: 'propaganda',
 					route: 'now',
 					name: 'Пропаганда',
-					description: 'Описание пропаганда',
+					description: 'Пропаганда - это предвзятая информация, распространяемая с целью убедить людей в  верности определенного мнения или позиции. Чтобы не позволить себя обмануть нужно знать как она работает.',
 					videoRanges: ['propaganda_1_range', 'propaganda_2_range', 'propaganda_3_range','tv_vs_streets_range', 'boingversions_range' ,'slavyanskboy_range','statisticslies_range'],
 				},
 				{
@@ -177,7 +177,7 @@ export default Route.extend({
 					video: 'slavyanskboy'
 				},{
 					id: 'houses_finland_1_range',
-					from: 109.5,
+					from: 524.8,
 					to: 1036.8,
 					speaker: 'Илья Варламов',
 					description: 'Современное жилье в Финляндии',
