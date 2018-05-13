@@ -30,65 +30,73 @@ export default Route.extend({
 					route: 'history',
 					name: 'Путин. Приход к власти',
 					description: 'Описание',
-					videoRanges: ['vts1', 'vts2', 'vts4', 'vts3', 'vts5','vts6','vts7']
+					videoRanges: ['vts1', 'vts2', 'vts7', 'vts4', 'vts3', 'eltsin_first_offer', 'vts5', 'vts6']
 				},
 				{
 					id: 'propaganda',
 					route: 'now',
 					name: 'Пропаганда',
 					description: 'Описание пропаганда',
-					videoRanges: ['propaganda_1_range', 'propaganda_2_range', 'propaganda_3_range','tv_vs_streets_range','slavyanskboy_range','statisticslies_range','boingversions_range'],
+					videoRanges: ['propaganda_1_range', 'propaganda_2_range', 'propaganda_3_range','tv_vs_streets_range', 'boingversions_range' ,'slavyanskboy_range','statisticslies_range'],
 				},
 				{
-					id: 'accomodation',
+					id: 'modern_houses',
 					route: 'future',
-					name: 'Город в котором хочется жить',
+					name: 'Современное жильё',
 					description: 'Описание',
-					videoRanges: [],
+					videoRanges: ['houses_finland_1_range', 'houses_finland_2_range','houses_nz_range','houses_sweden_range','publicspace_london_range'],
 				}],
 			videoRanges:[{
 					id: 'vts1',
-					from: 745,
-					to: 1606.5,
+					from: 771.9,
+					to: 1652,
 					speaker: 'Сергей Доренко',
-					description: 'Как создавалась партия "Единая Россия"',
+					description: 'как создавалась партия "Единая Россия"',
 					video: 'dorenkoputin'
 				},
 				{
 					id: 'vts2',
-					from: 1972.3,
-					to: 2091,
+					from: 2019.6,
+					to: 2137.5,
 					speaker: 'Сергей Доренко',
-					description: 'Как Березовский уговорил Путина стать президентом',
+					description: 'как Березовский уговаривал Путина стать президентом',
 					video: 'dorenkoputin'
 				},{
 					id: 'vts3',
 					from: 12,
 					to: 88,
 					speaker: 'Анна Политковская',
-					description: 'о том как война в Чечне помогла Путину стать президентом',
+					description: 'как война в Чечне помогла Путину стать президентом',
 					video: 'politkovskaya_putin_war'
 				},{
 					id: 'vts4',
 					from: 932.5,
 					to: 1001,
 					speaker: 'Артем Боровик',
-					description: 'о роли войны в популярности Путина',
+					description: 'война в Чечне как PR ход для президентской кампании Путина',
 					video: 'borovic_war_for_pr'
 				},{
-					id: 'vts5',
+					id: 'eltsin_first_offer',
 					from: 1043.5,
-					to: 1518.7,
+					to: 1108,
 					speaker: 'Борис Березовский',
-					description: 'о списке кандидатов на роль президента и о роли преемственности',
+					description: 'кто первый предложил Ельцину кандидатуру Путина',
 					video: 'gordon_berezovsky_2012_1'
-				},{
-					id: 'vts6',
+				},
+				{
+					id: 'vts5',
 					from: 219,
 					to: 319.3,
 					speaker: 'Борис Березовский',
-					description: 'первое предложение Путину',
+					description: 'поездка в Биарриц и предложение Путину стать президентом в июле 1999-го года',
 					video: 'gordon_berezovsky_2007_2'
+				},{
+					id: 'vts6',
+					from: 1317,
+					to: 1518.7,
+					speaker: 'Борис Березовский',
+					description: 'список кандидатов на роль президента',
+					video: 'gordon_berezovsky_2012_1'
 				},{
 					id: 'vts7',
 					from: 0,
@@ -167,20 +175,55 @@ export default Route.extend({
 					to: 310,
 					description: 'Фейк Первого канала о распятом мальчике в Славянске',
 					video: 'slavyanskboy'
+				},{
+					id: 'houses_finland_1_range',
+					from: 109.5,
+					to: 1036.8,
+					speaker: 'Илья Варламов',
+					description: 'Современное жилье в Финляндии',
+					video: 'houses_finland_1'
+				},{
+					id: 'houses_finland_2_range',
+					from: 121,
+					to: 1194.2,
+					speaker: 'Илья Варламов',
+					description: 'Благоустройство новых жилых районов в Финляндии',
+					video: 'houses_finland_2'
+				},{
+					id: 'houses_nz_range',
+					from: 368,
+					to: 578,
+					speaker: 'Илья Варламов',
+					description: 'Современное жилье в Новой Зеландии',
+					video: 'houses_nz'
+				},{
+					id: 'publicspace_london_range',
+					from: 463,
+					to: 1057.5,
+					speaker: 'Илья Варламов',
+					description: 'Благоустройство жилых районов в Лондоне',
+					video: 'publicspace_london'
+				},{
+					id: 'houses_sweden_range',
+					from: 299,
+					to: 1434.4,
+					speaker: 'Илья Варламов',
+					description: 'Современное жилье в Швеции',
+					video: 'houses_sweden'
 				}],
 			videos: [{
 					id: 'dorenkoputin',
-					youtubeId: 'phr4nUI_5CQ',
+					youtubeId: 'J1SAtcBCL1o',
 					channel: 'nparchive'
 				},
 				{
 					id: 'borovic_war_for_pr',
-					youtubeId: 'xqDqFbhiV-k',
-					channel: 'openuniversity'
+					youtubeId: 'lGoS0XQ7BHk',
+					channel: 'nparchive'
 				},{
 					id: 'politkovskaya_putin_war',
-					youtubeId: 'vlN91jrnkZ8',
-					channel: 'openuniversity'
+					youtubeId: '8YwDWd8NqxI',
+					channel: 'nparchive'
 				},
 				{
 					id: 'gordon_berezovsky_2012_1',
@@ -194,8 +237,8 @@ export default Route.extend({
 				},
 				{
 					id: 'nemtsov_eltcins_choice',
-					youtubeId: '2LIstvYImSU',
-					channel: 'openuniversity'
+					youtubeId: 'Pq2KzBD5W7c',
+					channel: 'ourborisnemtsov'
 				},
 				{
 					id: 'elections2018_p1',
@@ -245,8 +288,38 @@ export default Route.extend({
 					id: 'slavyanskboy',
 					youtubeId: '_-SxR16JCCY',
 					channel: 'rtvi'
+				},{
+					id: 'houses_finland_1',
+					youtubeId: '5JXZapgIskg',
+					channel: 'varlamov'
+				},{
+					id: 'houses_finland_2',
+					youtubeId: 'WLjYhFlCxLw',
+					channel: 'varlamov'
+				},{
+					id: 'houses_nz',
+					youtubeId: '77vfr7abBk8',
+					channel: 'varlamov'
+				},{
+					id: 'publicspace_london',
+					youtubeId: 'O4MiAcrjCLs',
+					channel: 'varlamov'
+				},{
+					id: 'houses_sweden',
+					youtubeId: '6-tbOuWPPhs',
+					channel: 'varlamov'
 				}],
 			channels: [{
+					id: 'varlamov',
+					name: 'varlamov',
+					youtubeId: 'UC101o-vQ2iOj9vr00JUlyKw',
+					logoUrl: 'https://yt3.ggpht.com/-W5qNN8dXukc/AAAAAAAAAAI/AAAAAAAAAAA/e142ktDj7t8/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				},{
+					id: 'ourborisnemtsov',
+					name: 'Наш Борис Немцов',
+					youtubeId: 'UCWb3Xr8BtzMIJWE8UNnzMFg',
+					logoUrl: 'https://yt3.ggpht.com/-PTEtCBpY55g/AAAAAAAAAAI/AAAAAAAAAAA/WfWvmxCqyJI/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				},{
 					id: 'rtvi',
 					name: 'RTVI',
 					youtubeId: 'UCPU28A9z_ka_R5dQfecHJlA',
@@ -263,9 +336,9 @@ export default Route.extend({
 					logoUrl: 'https://yt3.ggpht.com/-TrSfpyquPAM/AAAAAAAAAAI/AAAAAAAAAAA/7GxVqYWCWtY/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'nparchive',
-					name: 'Архив newprezident.ru',
+					name: 'Архив сайта newprezident.ru',
 					youtubeId: 'UCwEN4wbUR0eM4uVSeBefPoA',
-					logoUrl: 'https://yt3.ggpht.com/-4p862zcrijI/AAAAAAAAAAI/AAAAAAAAAAA/a2-CRhE8IH0/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+					logoUrl: 'https://yt3.ggpht.com/-BlACVpeFi_A/AAAAAAAAAAI/AAAAAAAAAAg/Ha_Fchz3d3I/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'sotavision',
 					name: 'sotavision',
