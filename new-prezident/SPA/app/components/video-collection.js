@@ -2,15 +2,10 @@ import Component from '@ember/component';
 import Ember from 'ember';
 
 export default Component.extend({
-    videoNavigator: Ember.inject.service(),
-    videoHistory: Ember.inject.service(),
+    elementId: 'videoCollection',
     playlist: null,
     videoRangeIndex: 0,
     currentVideoRangeIndex: -1,
-    didReceiveAttrs(){
-        this._super(...arguments);
-        this.setNextPlayList();
-    },
 	didInsertElement(){
         this._super(...arguments);
         this.set('initPlayerPromise', this.initPlayer());
@@ -52,11 +47,13 @@ export default Component.extend({
             this.setVideoRange(currentVideoRangeIndex);
         }.bind(this));
     }),
-    setPlaylist(playlist){
-        this.set('playlist', playlist);
+    onPlaylistChanged: Ember.observer('playlist', function(){
+        this.stopPlaying();
+        // if(this.get('videoRange')){
+        //     this.set('videoRange.position', 0);
+        // }
         this.setVideoRange(0);
-        this.get('videoHistory').save(playlist.id);
-    },
+    }),
     setVideoRange(index){
         let videoRange = this.get('playlist.videoRanges').objectAt(index);
         this.set('videoRangeIndex', index);
@@ -168,17 +165,8 @@ export default Component.extend({
             this.set('player', player);
         }.bind(this));
     },
-    getNextPlaylist(){
-        return this.get('videoNavigator').getNextPlaylist(this.get('time'))
-    },
     onPlayerReady(event) {
-        this.hideLoader();
-    },
-    hideLoader(){
-        this.$('#loaderContainer').css('visibility','hidden');
-        setTimeout(function(){
-            this.$('#videoContainer').css('visibility','visible');
-        }.bind(this), 300);
+        this.get('onHideLoader')();
     },
     onPlayerStateChange(event) {
         let player = event.target;
@@ -235,18 +223,6 @@ export default Component.extend({
             this.set('timerId', null);
         }
     },
-    setNextPlayList(){
-        this.stopPlaying();
-        if(this.get('videoRange')){
-            this.set('videoRange.position', 0);
-        }
-        let nextPlaylist = this.getNextPlaylist();
-        if(nextPlaylist){
-            this.setPlaylist(nextPlaylist);
-        }else{
-            console.log('it was the last video.');
-        }
-    },
     setNextVideoRange(){
         this.stopPlaying();
         let videoRangesCount = this.get('playlist.videoRanges.length');
@@ -254,12 +230,7 @@ export default Component.extend({
         if(nextVideoRangeIndex<videoRangesCount){
             this.set('videoRangeIndex', nextVideoRangeIndex);
         }else{
-            this.setNextPlayList();
-        }
-    },
-    actions: {
-        nextPlaylist(){
-            this.setNextPlayList();    
+            this.get('onPlaylistFinished')();
         }
     }
 });

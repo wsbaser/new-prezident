@@ -1,1 +1,34 @@
-{{video-collection time=model playlists=playlists}}
+<div id="contentContainer">
+  <div id="videoContainer">
+    <div id="loaderContainer">
+      <div class="cssload-loader">
+        <div class="cssload-flipper">
+          <div class="cssload-front"></div>
+          <div class="cssload-back"></div>
+        </div>
+      </div>
+    </div>
+    <div id="videoDescription" class="container">
+        <div class="row header">
+            {{#bs-dropdown as |dd|}}
+              {{#dd.button}}{{fa-icon "bars"}}{{/dd.button}}
+              {{#dd.menu as |menu|}}
+                  {{#each playlists as |playlist|}}
+                    {{#link-to "time.playlist" model playlist class="dropdown-item"}}
+                      <i class="youtube-icon"></i><span>{{playlist.name}}</span>
+                    {{/link-to}}
+                  {{/each}}
+              {{/dd.menu}}
+            {{/bs-dropdown}}
+            <span class="name">{{playlist.name}}</span>
+            <span class="timetotal"><i class="far fa-clock"></i> {{minutes-string playlist.totalMinutes}}</span>
+        </div>
+    </div>
+    {{video-collection time=model playlist=playlist onHideLoader=(action "hideLoader") onPlaylistFinished=(action "nextPlaylist")}}
+  </div>
+  <div id="navigation">
+    {{#bs-button onClick=(action "nextPlaylist") type="primary"}}
+      {{fa-icon "step-forward"}} перейти к следующей теме
+    {{/bs-button}}
+  </div>
+</div>
