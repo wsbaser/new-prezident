@@ -61,10 +61,17 @@ export default Component.extend({
         this.updateCarouselArrows();
         this.preparePlaying(videoRange);
     },
+    stopPreviewAnimation(){
+        let animation = this.get('animation');
+        if(animation){
+            animation.pause();
+        }
+    },
     preparePlaying(videoRange){
         let initPlayerPromise = this.get('initPlayerPromise');
         if(videoRange && initPlayerPromise && !this.get('playingQueued')){
             this.set('playingQueued', true);
+            this.stopPreviewAnimation();
             console.log('prepare playing for ' + videoRange.id);
             initPlayerPromise.then(function(){
                 this.loadVideoToPlayer(videoRange);
@@ -90,48 +97,92 @@ export default Component.extend({
     },
     hidePreviewOverlay(){
         return new Promise(function(resolve, reject){
-            let $playerOverlay = this.$('#playerOverlay');
-            let $speaker = $playerOverlay.find('.speaker');
-            let $description = $playerOverlay.find('.description');
-            $speaker.css('opacity', 0);
-            $description.css('opacity', 0);
-            setTimeout(function(){
-                $playerOverlay.css('opacity', 0);
-                setTimeout(function(){
-                    $playerOverlay.hide();
+            let animationTimeline = anime.timeline()
+              .add({
+                targets: '#playerOverlay .speaker, #playerOverlay .description',
+                opacity: 0,
+                easing: 'linear',
+                duration: 300
+              })
+              .add({
+                targets: '#playerOverlay',
+                opacity: [1,0],
+                duration: 300,
+                delay: 700,
+                complete: function(){
+                    $('#playerOverlay').hide();
                     this.set('previewOverlayState', 0);
                     resolve();
-                }.bind(this), 300);
-            }.bind(this), 1000);
+                }.bind(this)
+              });
+            this.set('animation', animationTimeline);
         }.bind(this));
+
+        // return new Promise(function(resolve, reject){
+        //     let $playerOverlay = this.$('#playerOverlay');
+        //     let $speaker = $playerOverlay.find('.speaker');
+        //     let $description = $playerOverlay.find('.description');
+
+        //     $speaker.css('opacity', 0);
+        //     $description.css('opacity', 0);
+        //     setTimeout(function(){
+        //         $playerOverlay.css('opacity', 0);
+        //         setTimeout(function(){
+        //             $playerOverlay.hide();
+        //             this.set('previewOverlayState', 0);
+        //             resolve();
+        //         }.bind(this), 300);
+        //     }.bind(this), 1000);
+
+        // }.bind(this));
     },
     showPreviewOverlay(){
         this.set('previewOverlayState', 1);
+
         let $playerOverlay = this.$('#playerOverlay');
         let $speaker = $playerOverlay.find('.speaker');
         let $description = $playerOverlay.find('.description');
+        
         $playerOverlay.show();
-        $playerOverlay.css('opacity', 1);
-        let showDescription = function(){
-            $description.css('opacity', 1);
-            setTimeout(function(){
+        $speaker.show();
+        $description.show();
+
+        let description = this.get('videoRange.description');
+        $description.html(description.replace(/([^\x00-\x80]|\w|\.|,|-|")/g, "<span class='letter'>$&</span>"));
+
+        let animationTimeline = anime.timeline()
+          .add({
+            targets: '#playerOverlay',
+            opacity: 1,
+            easing: 'linear',
+            duration: 300,
+          })
+          .add({
+            targets: '#playerOverlay .speaker, #playerOverlay .description',
+            opacity: 1,
+            easing: 'linear',
+            duration: 300,
+            delay: 500,
+          })
+          .add({
+            targets: '#playerOverlay .description .letter',
+            translateX: [40,0],
+            translateZ: 0,
+            opacity: [0,1],
+            easing: "easeOutExpo",
+            duration: 1000,
+            delay: function(el, i) {
+              return 500 + 40 * i;
+            },
+            complete: function() {
                 this.set('previewOverlayState', 2);
                 if(this.get('readyToPlay')){
                     this.startPlaying();
                 }
-            }.bind(this), 3000);
-        }.bind(this);
-        let showSpeaker = function(){
-            if($speaker[0]){
-                $speaker.css('opacity', 1);
-                setTimeout(showDescription, 1000);
-            }else{
-                showDescription();
-            }
-        };
-        setTimeout(function(){
-            showSpeaker();
-        }, 300);
+            }.bind(this)
+          });
+
+          this.set('animation', animationTimeline);
     },
     loadVideoToPlayer(videoRange){
         console.log('loadVideo: '+ videoRange.id);
@@ -231,6 +282,11 @@ export default Component.extend({
             this.set('videoRangeIndex', nextVideoRangeIndex);
         }else{
             this.get('onPlaylistFinished')();
+        }
+    },
+    actions:{
+        onTextAnimationComplete(){
+
         }
     }
 });

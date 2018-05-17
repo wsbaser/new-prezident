@@ -8,6 +8,15 @@ body{
 	margin: 0;
 }
 
+button:focus{
+	outline: none;
+}
+
+
+.letter{
+	opacity: 0;
+}
+
 #previewContainer{
 	position:absolute;
 	top:0;
@@ -267,6 +276,10 @@ body{
 		font-family: Roboto, Arial, sans-serif;
 	}
 
+	.dropdown-item:last-child(){
+		border-bottom: none;
+	}
+
 	.dropdown-item{
 		cursor: pointer;
 		padding: 1px 15px;
@@ -289,6 +302,10 @@ body{
 
 	.dropdown-item:hover{
 		background-color: #f5f8fa;
+	}
+
+	.dropdown-item.active:hover{
+		background-color: #007bff;
 	}
 
 	>.header{
@@ -353,12 +370,12 @@ body{
 	top: 0;
 	width: 100%;
 	height: 100%;
-	transition: all 300ms linear;
 	padding: 50px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
+	// transition: all 300ms linear;
 }
 
 #playerOverlay>.back{
@@ -376,9 +393,8 @@ body{
 #playerOverlay>.content>.block{
 	font-family: Arial,'Times New Roman',serif;
 	color: #fff;
-	transition: all 300ms linear;
 	text-align: center;
-	opacity: 0;
+	// transition: all 300ms linear;
 }
 
 #playerOverlay>.content>.block.speaker{
@@ -390,7 +406,6 @@ body{
 #playerOverlay>.content>.block.description{
 	font-size: 16px;
 	margin: 15px;
-	opacity: 0;
 }
 
 #navigation{

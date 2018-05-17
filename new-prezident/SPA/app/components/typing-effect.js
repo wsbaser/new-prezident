@@ -22,7 +22,10 @@ export default Component.extend({
 		      return 500 + 40 * i;
 		    },
 		    complete: function() {
-				this.get('onComplete')();
+		    	let onComplete = this.get('onComplete');
+		    	if(onComplete){
+		    		onComplete();
+		    	}
 		    }.bind(this)
 		  });
 	},
