@@ -8,12 +8,22 @@ export default Service.extend({
 	getAllFor(route){
 		return this.get('store').peekAll('playlist').filterBy('route', route);
 	},
+	getAllExcept(route){
+		return this.get('store').peekAll('playlist').rejectBy('route', route);
+	},
 	getNextPlaylist(route){
+		return this.selectRandomFrom(this.getAllExcept(route));
+	},
+	getPlaylistFor(route){
+		return this.selectRandomFrom(this.getAllFor(route));
+	},
+	selectRandomFrom(allPlaylists){
 		let watched = this.get('videoHistory').get();
-		let notWatched = this.getAllFor(route).reject(function(item){
+		let notWatched = allPlaylists.reject(function(item){
 			return watched.includes(item.id);
 		});
-		return notWatched[Math.floor(Math.random() * notWatched.length)];
-		// return this.get('store').peekRecord('playlist','votsarenie');
+
+		let playlists = notWatched.length? notWatched: allPlaylists;
+		return playlists[Math.floor(Math.random() * playlists.length)];
 	}
 });

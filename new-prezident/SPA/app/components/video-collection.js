@@ -65,6 +65,7 @@ export default Component.extend({
         let animation = this.get('animation');
         if(animation){
             animation.pause();
+            this.$('#playerOverlay .speaker, #playerOverlay .description').hide().css('opacity', 0);
         }
     },
     preparePlaying(videoRange){
@@ -106,7 +107,7 @@ export default Component.extend({
               })
               .add({
                 targets: '#playerOverlay',
-                opacity: [1,0],
+                opacity: 0,
                 duration: 300,
                 delay: 700,
                 complete: function(){
@@ -282,11 +283,6 @@ export default Component.extend({
             this.set('videoRangeIndex', nextVideoRangeIndex);
         }else{
             this.get('onPlaylistFinished')();
-        }
-    },
-    actions:{
-        onTextAnimationComplete(){
-
         }
     }
 });

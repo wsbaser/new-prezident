@@ -12,14 +12,11 @@ export default Controller.extend({
         //     this.set('videoRange.position', 0);
         // }
         let nextPlaylist = this.getNextPlaylist();
-        if(nextPlaylist){
-            this.setPlaylist(nextPlaylist);
-        }else{
-            console.log('it was the last video.');
-        }
+        this.transitionToRoute('time.playlist', nextPlaylist.get('route'), nextPlaylist.id);
+        //this.setPlaylist(nextPlaylist);
     },
     getNextPlaylist(){
-        return this.get('videoNavigator').getNextPlaylist(this.get('model'))
+        return this.get('videoNavigator').getNextPlaylist(this.get('model'));
     },
     setPlaylist(playlist){
     	this.set('playlist', playlist);
@@ -27,7 +24,7 @@ export default Controller.extend({
     },
 	actions: {
         nextPlaylist(){
-            this.setNextPlayList();    
+            this.setNextPlayList();
         },
         hideLoader(){
 			$('#loaderContainer').css('visibility','hidden');
