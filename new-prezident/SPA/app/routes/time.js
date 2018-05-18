@@ -6,6 +6,7 @@ export default Route.extend({
 		return params.route_id.toLowerCase();
 	},
 	afterModel(model, transition){
+		$('title').html(this.getTitle(model));
 		switch(model){
 			case 'history':
 			case 'now':
@@ -23,8 +24,14 @@ export default Route.extend({
 				break;
 		}
 	},
-	// setupController(controller, model){
-	//    this._super(controller, model);
-	//    controller.setNextPlayList();
-	// }
+	getTitle(time){
+		switch(time){
+			case 'history':
+				return "NEW prezident: ИСТОРИЯ";
+			case 'now':
+				return "NEW prezident: 2018"
+			case 'future':
+				return "NEW prezident: БУДУЩЕЕ";
+		}
+	}
 });
