@@ -20,7 +20,9 @@
   <body >
     {{content-for "body"}}
 
-    <script>
+    <script>    
+      window.isMobile = return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+
       window.youTubeIframeAPIPromise = new Promise(function(resolve, reject) {
         // 2. This code loads the IFrame Player API code asynchronously.
         var tag = document.createElement('script');
