@@ -1,7 +1,7 @@
 <div id="headerContainer">
   <div id="landmark" >
-    {{#bs-navbar as |navbar|}}
-      <div id="arrow-left"></div>
+    {{#bs-navbar class="navbar-dark" as |navbar|}}
+      <div class="arrow-left"></div>
       <div class="navbar-header">
         {{navbar.toggle}}
         {{#link-to "index" class="navbar-brand"}}
@@ -15,7 +15,7 @@
           {{#nav.item}}{{#nav.link-to "time" "future"}}БУДУЩЕЕ{{/nav.link-to}}{{/nav.item}}
         {{/navbar.nav}}
       {{/navbar.content}}
-      <div id="arrow-right"></div>
+      <div class="arrow-right"></div>
     {{/bs-navbar}}
   </div>
 </div>

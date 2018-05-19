@@ -17,6 +17,12 @@ button:focus{
 	opacity: 0;
 }
 
+.cut-text { 
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 #previewContainer{
 	position:absolute;
 	top:0;
@@ -119,7 +125,11 @@ button:focus{
 	background: red !important;
 }
 
-#arrow-right{
+.navbar-collapse{
+	margin-left: 6rem;
+}
+
+nav .arrow-right{
 	display: inline-block;
 	width: 25px;
 	height: 50px;
@@ -129,7 +139,7 @@ button:focus{
 	background: #222;
 }
 
-#arrow-left{
+nav .arrow-left{
 	display: inline-block;
 	width:25px;
 	height:50px;
@@ -151,10 +161,6 @@ button:focus{
 
 #landmark .navbar-header{
 	margin-left: 1rem;
-}
-
-.navbar-collapse{
-	margin-left: 6rem;
 }
 
 #header{
@@ -623,5 +629,61 @@ button:focus{
 		-moz-transform: perspective(117px) rotateX(-180deg) rotateY(-179.9deg);
 	}
 }
+
+@media screen and (max-width: 768px) {
+	nav {
+		.arrow-right, .arrow-left{
+			display: none;
+		}
+	}
+
+	#landmark{
+		width: 100%;
+		min-width: 0;
+	}
+
+	#contentContainer{
+		width: 100%;
+		min-width: 0;
+		padding: 50px 0 0
+	}
+
+	.carousel{
+		border-left: none;
+		border-right: none;
+		margin: 10px 0;
+	}
+
+	#videoDescription{
+		.name{
+			padding: 3px 10px;
+			max-width: 230px;
+		}
+	}
+
+	.navbar-collapse{
+		.navbar-nav .nav-link{
+			padding-left: 20px;
+			padding-right: 20px;
+		}
+		margin-left: 0;
+	}
+
+	.navbar-header .navbar-toggler{
+		border: none;
+		padding: 0;
+		margin: 5px 10px 0 0;
+		vertical-align: top;
+	}
+
+	.navbar-light .navbar-toggler:focus{
+		outline: none;
+	}
+
+	.timetotal{
+		display: none;
+	}
+}
+
 
 @import "ember-bootstrap/bootstrap";
