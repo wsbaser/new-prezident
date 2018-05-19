@@ -227,6 +227,7 @@ export default Component.extend({
                     break
             }
         }else if(event.data==YT.PlayerState.ENDED || event.data==YT.PlayerState.PAUSED){
+            this.set('readyToPlay', true); // spike for mobiles
             if(event.data==YT.PlayerState.ENDED ){
                 console.log('video ENDED');
             }

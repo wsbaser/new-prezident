@@ -389,7 +389,6 @@ nav .arrow-left{
 	top: 0;
 	width: 100%;
 	height: 100%;
-	padding: 50px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -405,6 +404,8 @@ nav .arrow-left{
 
 	>.content{
 		z-index: 1000;
+		padding: 0 50px;
+
 		>.block{
 			font-family: Arial,'Times New Roman',serif;
 			color: #fff;
@@ -709,7 +710,9 @@ nav .arrow-left{
 	}
 
 	#playerOverlay{
-		padding: 10px;
+		>.content{
+			padding: 0 10px;
+		}
 	}
 }
 
