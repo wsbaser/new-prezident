@@ -118,24 +118,6 @@ export default Component.extend({
               });
             this.set('animation', animationTimeline);
         }.bind(this));
-
-        // return new Promise(function(resolve, reject){
-        //     let $playerOverlay = this.$('#playerOverlay');
-        //     let $speaker = $playerOverlay.find('.speaker');
-        //     let $description = $playerOverlay.find('.description');
-
-        //     $speaker.css('opacity', 0);
-        //     $description.css('opacity', 0);
-        //     setTimeout(function(){
-        //         $playerOverlay.css('opacity', 0);
-        //         setTimeout(function(){
-        //             $playerOverlay.hide();
-        //             this.set('previewOverlayState', 0);
-        //             resolve();
-        //         }.bind(this), 300);
-        //     }.bind(this), 1000);
-
-        // }.bind(this));
     },
     showPreviewOverlay(){
         this.set('previewOverlayState', 1);

@@ -126,7 +126,7 @@ button:focus{
 }
 
 .navbar-collapse{
-	margin-left: 6rem;
+	margin-left: 3rem;
 }
 
 nav .arrow-right{
@@ -160,7 +160,20 @@ nav .arrow-left{
 // }
 
 #landmark .navbar-header{
-	margin-left: 1rem;
+	margin-left: 1.25rem;
+
+	.redletter{
+		color:red;
+		font-weight:bold;
+	}
+
+	.whiteletter{
+		color:white;
+	}
+
+	.mobile{
+		display: none;
+	}
 }
 
 #header{
@@ -381,37 +394,32 @@ nav .arrow-left{
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
-	// transition: all 300ms linear;
-}
+	
+	>.back{
+		position: absolute;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		background-color: #222;
+	}
 
-#playerOverlay>.back{
-	position: absolute;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	background-color: #222;
-}
-
-#playerOverlay>.content{
-	z-index: 1000;
-}
-
-#playerOverlay>.content>.block{
-	font-family: Arial,'Times New Roman',serif;
-	color: #fff;
-	text-align: center;
-	// transition: all 300ms linear;
-}
-
-#playerOverlay>.content>.block.speaker{
-	font-size: 13px;
-	color: #ddd;
-	opacity: 0;
-}
-
-#playerOverlay>.content>.block.description{
-	font-size: 16px;
-	margin: 15px;
+	>.content{
+		z-index: 1000;
+		>.block{
+			font-family: Arial,'Times New Roman',serif;
+			color: #fff;
+			text-align: center;
+		}
+		>.block.speaker{
+			font-size: 13px;
+			color: #ddd;
+			opacity: 0;
+		}
+		>.block.description{
+			font-size: 16px;
+			margin: 15px;
+		}
+	}
 }
 
 #navigation{
@@ -637,15 +645,25 @@ nav .arrow-left{
 		}
 	}
 
+	#headerContainer{
+		position: static;
+	}
+
 	#landmark{
 		width: 100%;
 		min-width: 0;
+
+		.navbar-header{
+			.mobile{
+				display: inline;
+			}
+		}
 	}
 
 	#contentContainer{
 		width: 100%;
 		min-width: 0;
-		padding: 50px 0 0
+		padding: 10px 0 0 0;
 	}
 
 	.carousel{
@@ -688,6 +706,10 @@ nav .arrow-left{
 		#citeContainer{
 			width: 90%;
 		}
+	}
+
+	#playerOverlay{
+		padding: 10px;
 	}
 }
 
