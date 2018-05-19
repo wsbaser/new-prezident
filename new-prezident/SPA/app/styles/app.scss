@@ -162,17 +162,21 @@ nav .arrow-left{
 #landmark .navbar-header{
 	margin-left: 1.25rem;
 
-	.redletter{
-		color:red;
-		font-weight:bold;
-	}
+	.navbar-brand{
+		margin-left: 0.25rem;
 
-	.whiteletter{
-		color:white;
-	}
+		.redletter{
+			color:red;
+			font-weight:bold;
+		}
 
-	.mobile{
-		display: none;
+		.whiteletter{
+			color:white;
+		}
+
+		.mobile{
+			display: none;
+		}
 	}
 }
 
@@ -646,25 +650,28 @@ nav .arrow-left{
 		}
 	}
 
-	#headerContainer{
-		position: static;
-	}
-
 	#landmark{
 		width: 100%;
 		min-width: 0;
 
 		.navbar-header{
-			.mobile{
-				display: inline;
+			.navbar-brand{
+				margin-left: 1rem;
+				.mobile{
+					display: inline;
+				}
 			}
 		}
+	}
+	
+	#headerContainer{
+		position: absolute;
 	}
 
 	#contentContainer{
 		width: 100%;
 		min-width: 0;
-		padding: 10px 0 0 0;
+		padding: 50px 0 0 0;
 	}
 
 	.carousel{
@@ -691,7 +698,7 @@ nav .arrow-left{
 	.navbar-header .navbar-toggler{
 		border: none;
 		padding: 0;
-		margin: 5px 10px 0 0;
+		margin: 5px 0 0 0;
 		vertical-align: top;
 	}
 
