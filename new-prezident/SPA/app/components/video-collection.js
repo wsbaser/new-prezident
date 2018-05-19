@@ -159,9 +159,9 @@ export default Component.extend({
             },
             complete: function() {
                 this.set('previewOverlayState', 2);
-                if(this.get('readyToPlay')){
+                //if(this.get('readyToPlay')){
                     this.startPlaying();
-                }
+                //}
             }.bind(this)
           });
 
@@ -227,7 +227,6 @@ export default Component.extend({
                     break
             }
         }else if(event.data==YT.PlayerState.ENDED || event.data==YT.PlayerState.PAUSED){
-            this.set('readyToPlay', true); // spike for mobiles
             if(event.data==YT.PlayerState.ENDED ){
                 console.log('video ENDED');
             }

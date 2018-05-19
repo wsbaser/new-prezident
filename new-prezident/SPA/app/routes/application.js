@@ -66,7 +66,7 @@ export default Route.extend({
 					from: 12,
 					to: 88,
 					speaker: 'Анна Политковская',
-					description: 'как война в Чечне помогла Путину стать президентом',
+					description: 'как война в Чечне помогла поднять рейтинг Путина',
 					video: 'politkovskaya_putin_war'
 				},{
 					id: 'vts4',
