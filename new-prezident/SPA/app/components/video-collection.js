@@ -65,7 +65,8 @@ export default Component.extend({
         let animation = this.get('animation');
         if(animation){
             animation.pause();
-            this.$('#playerOverlay .speaker, #playerOverlay .description').hide().css('opacity', 0);
+            this.$('#playerOverlay .speaker, #playerOverlay .description, #playerOverlay .start-playing').hide().css('opacity', 0);
+            this.$('#playerOverlay .piechart-loader .wrapper').hide();
         }
     },
     preparePlaying(videoRange){
@@ -97,10 +98,11 @@ export default Component.extend({
         }
     },
     hidePreviewOverlay(){
+        this.set('previewOverlayState', 3);
         return new Promise(function(resolve, reject){
             let animationTimeline = anime.timeline()
               .add({
-                targets: '#playerOverlay .speaker, #playerOverlay .description',
+                targets: '#playerOverlay .speaker, #playerOverlay .description, #playerOverlay .start-playing',
                 opacity: 0,
                 easing: 'linear',
                 duration: 300
@@ -112,6 +114,7 @@ export default Component.extend({
                 delay: 700,
                 complete: function(){
                     $('#playerOverlay').hide();
+                    $('#playerOverlay .piechart-loader .wrapper').hide();
                     this.set('previewOverlayState', 0);
                     resolve();
                 }.bind(this)
@@ -125,10 +128,13 @@ export default Component.extend({
         let $playerOverlay = this.$('#playerOverlay');
         let $speaker = $playerOverlay.find('.speaker');
         let $description = $playerOverlay.find('.description');
+        let $startPlaying = $playerOverlay.find('.start-playing');
+        let $wrapper = $playerOverlay.find('.piechart-loader .wrapper');
         
         $playerOverlay.show();
         $speaker.show();
         $description.show();
+        $startPlaying.show();
 
         let description = this.get('videoRange.description');
         $description.html(description.replace(/([^\x00-\x80]|\w|\.|,|-|")/g, "<span class='letter'>$&</span>"));
@@ -156,12 +162,22 @@ export default Component.extend({
             duration: 1000,
             delay: function(el, i) {
               return 500 + 40 * i;
-            },
+            }
+          }).add({
+            targets: '#playerOverlay .start-playing',
+            opacity: 1,
+            easing: "linear",
+            duration: 300,
             complete: function() {
                 this.set('previewOverlayState', 2);
-                //if(this.get('readyToPlay')){
-                    this.startPlaying();
-                //}
+                $wrapper.css('display', 'inline-block');
+                setTimeout(function(){
+                    if(this.get('previewOverlayState')==2){
+                        // if(this.get('readyToPlay')){
+                            this.startPlaying();
+                        // }
+                    }
+                }.bind(this), 5000);
             }.bind(this)
           });
 
@@ -265,6 +281,11 @@ export default Component.extend({
             this.set('videoRangeIndex', nextVideoRangeIndex);
         }else{
             this.get('onPlaylistFinished')();
+        }
+    },
+    actions: {
+        onStartPlaying(){
+            this.startPlaying();
         }
     }
 });
