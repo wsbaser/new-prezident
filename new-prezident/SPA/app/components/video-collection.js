@@ -159,7 +159,7 @@ export default Component.extend({
             translateZ: 0,
             opacity: [0,1],
             easing: "easeOutExpo",
-            duration: 1000,
+            duration: 500,
             delay: function(el, i) {
               return 500 + 40 * i;
             }
@@ -167,7 +167,7 @@ export default Component.extend({
             targets: '#playerOverlay .start-playing',
             opacity: 1,
             easing: "linear",
-            duration: 300,
+            duration: 500,
             complete: function() {
                 this.set('previewOverlayState', 2);
                 $wrapper.css('display', 'inline-block');

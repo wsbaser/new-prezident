@@ -12,8 +12,10 @@ export default Controller.extend({
 	},
 	actions:{
 		onTextAnimationComplete(){
-			$('#citeContainer .author').css('opacity', 1);
-			setTimeout(this.showContinueButton.bind(this), 1500);
+			setTimeout(function(){
+				$('#citeContainer .author').css('opacity', 1);
+				setTimeout(this.showContinueButton.bind(this), 1000);
+			}.bind(this), 500);
 		},
 		goToVideos(){
 			var dividerElement = document.getElementById("divider");

@@ -17,7 +17,7 @@ export default Component.extend({
 		    translateZ: 0,
 		    opacity: [0,1],
 		    easing: "easeOutExpo",
-		    duration: 1500,
+		    duration: 500,
 		    delay: function(el, i) {
 		      return 500 + 40 * i;
 		    },
