@@ -40,11 +40,24 @@ export default Route.extend({
 					videoRanges: ['propaganda_1_range', 'propaganda_2_range', 'propaganda_3_range','tv_vs_streets_range', 'boingversions_range' ,'slavyanskboy_range','statisticslies_range'],
 				},
 				{
-					id: 'modern_houses',
+					id: 'modernhousing',
 					route: 'future',
 					name: 'Современное жильё',
 					description: 'Современное жилье - это не только просторные дома с качественной отделкой. Это благоустройство дворов и зон отдыха, детские площадки, доступный транспорт и много других мелочей, которые делают городскую среду безопасной и комфортной.',
 					videoRanges: ['houses_finland_1_range', 'houses_finland_2_range','houses_nz_range','houses_sweden_range','publicspace_london_range'],
+				},
+				{
+					id: 'mediacontrol',
+					route: 'history',
+					name: 'Уничтожение независимых СМИ',
+					description: '',
+					videoRanges: ['garantnesvobod_range','freedomdestruction_range','whoownsmedia_range'],
+				},{
+					id: 'oil',
+					route: 'now',
+					name: 'Нефтяная игла',
+					description: '',
+					videoRanges: ['oilfuture_range','electriconly_range','expensieveoil_range', 'shaleoil_range', 'oilextraction_range'],
 				}],
 			videoRanges:[{
 					id: 'vts1',
@@ -210,8 +223,91 @@ export default Route.extend({
 					speaker: 'Илья Варламов',
 					description: 'Современное жилье в Швеции',
 					video: 'houses_sweden'
+				},{
+					id: 'garantnesvobod_range',
+					from: 24,
+					to: 546.43,
+					description: 'Как происходило превращение независимых СМИ в подконтрольные Путину',
+					video: 'garantnesvobod'
+				},{
+					id: 'freedomdestruction_range',
+					from: 0,
+					to: 424.5,
+					description: 'Как Путин уничтожил свободу слова в России',
+					video: 'freedomdestruction'
+				},{
+					id: 'whoownsmedia_range',
+					from: 3,
+					to: 144,
+					description: 'Кому принадлежит телевидение в России?',
+					video: 'whoownsmedia'
+				},{
+					id: 'oilfuture_range',
+					from: 209.8,
+					to: 489.3,
+					speaker: 'Михаил Крутихин',
+					description: 'будущее российской нефтедобычи',
+					video: 'oilfuture'
+				},{
+					id: 'expensieveoil_range',
+					from: 882,
+					to: 977.5,
+					speaker: 'Михаил Крутихин',
+					description: 'сколько нефти осталось в России',
+					video: 'expensieveoil'
+				},{
+					id: 'oilextraction_range',
+					from: 171,
+					to: 291.3,
+					speaker: 'Михаил Крутихин',
+					description: 'о неэффективной добыче нефти на российских месторождениях',
+					video: 'oilextraction'
+				},{
+					id: 'shaleoil_range',
+					from: 14.2,
+					to: 426.5,
+					speaker: 'Михаил Крутихин',
+					description: 'о сланцевой революции и ее влиянии на рынок нефти',
+					video: 'shaleoil'
+				},{
+					id: 'electriconly_range',
+					from: 0.7,
+					to: 765.5,
+					description: 'Планы Европы, Китая и Индии по запрету автомобилей с ДВС',
+					video: 'electriconly'
+				},{
+					id: 'chinaenergy_range',
+					from: 0.7,
+					to: 765.5,
+					description: 'Перспективы развития энергетики Китая',
+					video: 'chinaenergy'
 				}],
 			videos: [{
+					id: 'chinaenergy',
+					youtubeId: '6mZ-_87MO1A',
+					channel: 'neftyanka'
+				},{
+					id: 'electriconly',
+					youtubeId: '1I8eaXNQiR0',
+					channel: 'ironcult'
+				},
+				{
+					id: 'shaleoil',
+					youtubeId: '62y5PHFEOMY',
+					channel: 'neftyanka'
+				},{
+					id: 'oilextraction',
+					youtubeId: 'n1-pF_1O3To',
+					channel: 'neftyanka'
+				},{
+					id: 'expensieveoil',
+					youtubeId: 'Zq10NJVDsok',
+					channel: 'neftyanka'
+				},{
+					id: 'oilfuture',
+					youtubeId: '50xI50RhLno',
+					channel: 'neftyanka'
+				},{
 					id: 'dorenkoputin',
 					youtubeId: 'J1SAtcBCL1o',
 					channel: 'nparchive'
@@ -308,57 +404,84 @@ export default Route.extend({
 					id: 'houses_sweden',
 					youtubeId: '6-tbOuWPPhs',
 					channel: 'varlamov'
+				},{
+					id: 'garantnesvobod',
+					youtubeId: 'TjLKq3wLGco',
+					channel: 'alternative'
+				},{
+					id: 'freedomdestruction',
+					youtubeId: 'aFdIgWs4CqU',
+					channel: 'putinregimelies'
+				},{
+					id: "whoownsmedia", 
+					youtubeId: '4TtgIHh5gvU',
+					channel: 'forbesrussia'
 				}],
 			channels: [{
+					id: 'ironcult',
+					name: 'Iron Cult',
+					youtubeId: 'channel/UCXJAF8FATr5KYf9CuymRlYg',
+					logoUrl: 'https://yt3.ggpht.com/-tVJ2R197r6o/AAAAAAAAAAI/AAAAAAAAAAA/9-D9yHS2SSU/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				},{
+					id: 'forbesrussia',
+					name: 'Forbes Russia',
+					youtubeId: 'user/ForbesRussia',
+					logoUrl: 'https://yt3.ggpht.com/-ohbXTKWpyFI/AAAAAAAAAAI/AAAAAAAAAAA/aMIdrnP1bq8/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				},{
+					id: 'neftyanka',
+					name: 'Нефтянка',
+					youtubeId: 'channel/UCMeuQzAnyBR3P9mHHXHcSvw',
+					logoUrl: 'https://yt3.ggpht.com/-vIkYMzlYMAU/AAAAAAAAAAI/AAAAAAAAAAA/wkJu5lbQx1E/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
+				},{
 					id: 'varlamov',
 					name: 'varlamov',
-					youtubeId: 'UC101o-vQ2iOj9vr00JUlyKw',
+					youtubeId: 'channel/UC101o-vQ2iOj9vr00JUlyKw',
 					logoUrl: 'https://yt3.ggpht.com/-W5qNN8dXukc/AAAAAAAAAAI/AAAAAAAAAAA/e142ktDj7t8/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'ourborisnemtsov',
 					name: 'Наш Борис Немцов',
-					youtubeId: 'UCWb3Xr8BtzMIJWE8UNnzMFg',
+					youtubeId: 'channel/UCWb3Xr8BtzMIJWE8UNnzMFg',
 					logoUrl: 'https://yt3.ggpht.com/-PTEtCBpY55g/AAAAAAAAAAI/AAAAAAAAAAA/WfWvmxCqyJI/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'rtvi',
 					name: 'RTVI',
-					youtubeId: 'UCPU28A9z_ka_R5dQfecHJlA',
+					youtubeId: 'channel/UCPU28A9z_ka_R5dQfecHJlA',
 					logoUrl: 'https://yt3.ggpht.com/-CnMwEbuTBrY/AAAAAAAAAAI/AAAAAAAAAAA/RHfN_cYaKEk/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'putinregimelies',
 					name: 'Ложь путинского режима',
-					youtubeId: 'UCBReV5bfLRI8pFtTrokH7mw',
+					youtubeId: 'channel/UCBReV5bfLRI8pFtTrokH7mw',
 					logoUrl: 'https://yt3.ggpht.com/-l0nxYVNJeWU/AAAAAAAAAAI/AAAAAAAAAAA/DRX_yR9aOb0/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'alternative',
 					name: 'ALTERNATIVE MEDIA',
-					youtubeId: 'UCS9DnIddkX6LhV8h4mCuW2Q',
+					youtubeId: 'channel/UCS9DnIddkX6LhV8h4mCuW2Q',
 					logoUrl: 'https://yt3.ggpht.com/-TrSfpyquPAM/AAAAAAAAAAI/AAAAAAAAAAA/7GxVqYWCWtY/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'nparchive',
 					name: 'Архив сайта newprezident.ru',
-					youtubeId: 'UCwEN4wbUR0eM4uVSeBefPoA',
+					youtubeId: 'channel/UCwEN4wbUR0eM4uVSeBefPoA',
 					logoUrl: 'https://yt3.ggpht.com/-BlACVpeFi_A/AAAAAAAAAAI/AAAAAAAAAAg/Ha_Fchz3d3I/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'sotavision',
 					name: 'sotavision',
-					youtubeId: 'UCk9F6pe9Z2IPxm1VO9lS6NA',
+					youtubeId: 'channel/UCk9F6pe9Z2IPxm1VO9lS6NA',
 					logoUrl: 'https://yt3.ggpht.com/-4p862zcrijI/AAAAAAAAAAI/AAAAAAAAAAA/a2-CRhE8IH0/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},
 				{
 					id: 'universeofhistory',
 					name: 'Вселенная Истории',
-					youtubeId: 'UC42ZrgA4ezCWVm8RHnS-xNA',
+					youtubeId: 'channel/UC42ZrgA4ezCWVm8RHnS-xNA',
 					logoUrl: 'https://yt3.ggpht.com/-7I0BUCNSPPA/AAAAAAAAAAI/AAAAAAAAAAA/jUT_5vtw6CY/s88-c-k-no-mo-rj-c0xffffff/photo.jpg'
 				},{
 					id: 'openuniversity',
 					name: 'Открытый университет',
-					youtubeId: 'UCG1i_bM5A4JMNjBszBOCasw',
+					youtubeId: 'channel/UCG1i_bM5A4JMNjBszBOCasw',
 					logoUrl: 'https://yt3.ggpht.com/-lutbsJAOAfY/AAAAAAAAAAI/AAAAAAAAAAA/JpMbFk20ls8/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				},{
 					id: 'gordon',
 					name: 'В гостях у Гордона',
-					youtubeId: 'UCCcprrrcbdaj14kYPjcbj9w',
+					youtubeId: 'channel/UCCcprrrcbdaj14kYPjcbj9w',
 					logoUrl: 'https://yt3.ggpht.com/-A8a8PrspQ2I/AAAAAAAAAAI/AAAAAAAAAAA/yqYE6zboWGc/s288-mo-c-c0xffffffff-rj-k-no/photo.jpg'
 				}]
 			});

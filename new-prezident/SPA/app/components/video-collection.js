@@ -128,13 +128,13 @@ export default Component.extend({
         let $playerOverlay = this.$('#playerOverlay');
         let $speaker = $playerOverlay.find('.speaker');
         let $description = $playerOverlay.find('.description');
-        let $startPlaying = $playerOverlay.find('.start-playing');
-        let $wrapper = $playerOverlay.find('.piechart-loader .wrapper');
+        //let $startPlaying = $playerOverlay.find('.start-playing');
+        //let $wrapper = $playerOverlay.find('.piechart-loader .wrapper');
         
         $playerOverlay.show();
         $speaker.show();
         $description.show();
-        $startPlaying.show();
+        //$startPlaying.show();
 
         let description = this.get('videoRange.description');
         $description.html(description.replace(/([^\x00-\x80]|\w|\.|,|-|")/g, "<span class='letter'>$&</span>"));
@@ -162,24 +162,31 @@ export default Component.extend({
             duration: 500,
             delay: function(el, i) {
               return 500 + 40 * i;
-            }
-          }).add({
-            targets: '#playerOverlay .start-playing',
-            opacity: 1,
-            easing: "linear",
-            duration: 500,
+            },
             complete: function() {
                 this.set('previewOverlayState', 2);
-                $wrapper.css('display', 'inline-block');
-                setTimeout(function(){
-                    if(this.get('previewOverlayState')==2){
-                        // if(this.get('readyToPlay')){
-                            this.startPlaying();
-                        // }
-                    }
-                }.bind(this), 5000);
+                // if(this.get('readyToPlay')){
+                    this.startPlaying();
+                // }
             }.bind(this)
           });
+          // .add({
+          //   targets: '#playerOverlay .start-playing',
+          //   opacity: 1,
+          //   easing: "linear",
+          //   duration: 500,
+          //   complete: function() {
+          //       this.set('previewOverlayState', 2);
+          //       $wrapper.css('display', 'inline-block');
+          //       setTimeout(function(){
+          //           if(this.get('previewOverlayState')==2){
+          //               // if(this.get('readyToPlay')){
+          //                   this.startPlaying();
+          //               // }
+          //           }
+          //       }.bind(this), 10000);
+          //   }.bind(this)
+          // });
 
           this.set('animation', animationTimeline);
     },

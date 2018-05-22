@@ -17,7 +17,7 @@
           {{#each playlist.videoRanges as |videoRange|}}
             {{#car.slide}}
               <div class="car-item">
-                <a href="https://www.youtube.com/channel/{{videoRange.video.channel.youtubeId}}" target="_blank">
+                <a href="https://www.youtube.com/{{videoRange.video.channel.youtubeId}}" target="_blank">
                   <img src={{videoRange.video.channel.logoUrl}} width="30" title={{videoRange.video.channel.name}}>
                 </a>
                 <div class="range-length"> {{minutes-string videoRange.minutes}}</div>
@@ -47,7 +47,7 @@
           </div>
         {{/if}}
         <div class="block description"></div>
-        <div class="block start-playing" {{action 'onStartPlaying'}}>
+<!--        <div class="block start-playing" {{action 'onStartPlaying'}}>
           <div class="arrow-left"></div><div class="button-body">
             СМОТРЕТЬ
             <div class="piechart-loader">
@@ -58,7 +58,7 @@
               </div>
             </div>
           </div><div class="arrow-right"></div>
-        </div>
+        </div>-->
       </div>
     </div>
   </div>
