@@ -113,10 +113,10 @@ export default Component.extend({
                 duration: 300,
                 delay: 700,
                 complete: function(){
-                    $('#playerOverlay').hide();
-                    $('#playerOverlay .piechart-loader .wrapper').hide();
-                    this.set('previewOverlayState', 0);
                     resolve();
+                    $('#playerOverlay').hide();
+                    $('#playerOverlay .piechart-loader .wrapper').hide(); // need to restart animation
+                    this.set('previewOverlayState', 0);
                 }.bind(this)
               });
             this.set('animation', animationTimeline);
@@ -137,7 +137,7 @@ export default Component.extend({
         $startPlaying.show();
 
         let description = this.get('videoRange.description');
-        $description.html(description.replace(/([^\x00-\x80]|\w|\.|,|-|")/g, "<span class='letter'>$&</span>"));
+        $description.html(description.replace(/([^\x00-\x80]|\w|\.|,|-|"|\?)/g, "<span class='letter'>$&</span>"));
 
         let animationTimeline = anime.timeline()
           .add({

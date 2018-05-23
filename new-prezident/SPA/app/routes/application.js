@@ -227,7 +227,7 @@ export default Route.extend({
 					id: 'garantnesvobod_range',
 					from: 24,
 					to: 546.43,
-					description: 'Как происходило превращение независимых СМИ в подконтрольные Путину',
+					description: 'Превращение независимых СМИ в подконтрольные Путину',
 					video: 'garantnesvobod'
 				},{
 					id: 'freedomdestruction_range',
@@ -239,7 +239,7 @@ export default Route.extend({
 					id: 'whoownsmedia_range',
 					from: 3,
 					to: 144,
-					description: 'Кому принадлежит телевидение в России?',
+					description: 'Кому принадлежит телевидение в России',
 					video: 'whoownsmedia'
 				},{
 					id: 'oilfuture_range',
