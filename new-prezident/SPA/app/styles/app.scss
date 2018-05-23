@@ -424,42 +424,42 @@ nav .arrow-left{
 			font-size: 16px;
 			margin: 15px;
 		}
-		// >.start-playing{
-		// 	opacity: 0;
+		>.start-playing{
+			opacity: 0;
 
-		// 	>div{
-		// 		cursor: pointer;
-		// 		display: inline-block;
-		// 		height: 20px;
-		// 	}
+			>div{
+				cursor: pointer;
+				display: inline-block;
+				height: 20px;
+			}
 
-		// 	.arrow-left{
-		// 		width: 10px;
-		// 		border-top: 10px solid red;
-		// 		border-bottom: 10px solid red;
-		// 		border-left: 10px solid #222;
-		// 	}
-		// 	.arrow-right{
-		// 		border-top: 10px solid #222;
-		// 		border-bottom: 10px solid #222;
-		// 		border-left: 10px solid red;
-		// 		background: red;
-		// 	}
+			.arrow-left{
+				width: 10px;
+				border-top: 10px solid red;
+				border-bottom: 10px solid red;
+				border-left: 10px solid #222;
+			}
+			.arrow-right{
+				border-top: 10px solid #222;
+				border-bottom: 10px solid #222;
+				border-left: 10px solid red;
+				background: red;
+			}
 
-		// 	.button-body{
-		// 		background-color: red;
-		// 		vertical-align: top;
-		// 		width: 120px;
-		// 		line-height: 20px;
-		// 		font-size: 12px;
+			.button-body{
+				background-color: red;
+				vertical-align: top;
+				width: 120px;
+				line-height: 20px;
+				font-size: 12px;
 
-		// 		.piechart-loader{
-		// 			display: inline-block;
-		// 			width: 20px;
-		// 			text-align: right;
-		// 		}
-		// 	}
-		// }
+				.piechart-loader{
+					display: inline-block;
+					width: 20px;
+					text-align: right;
+				}
+			}
+		}
 	}
 }
 
@@ -761,81 +761,81 @@ nav .arrow-left{
 
 // @import "compass/css3";
 
-// @mixin box-sizing($box-model) {
-//   -webkit-box-sizing: $box-model; // Safari <= 5
-//      -moz-box-sizing: $box-model; // Firefox <= 19
-//           box-sizing: $box-model;
-// }
+@mixin box-sizing($box-model) {
+  -webkit-box-sizing: $box-model; // Safari <= 5
+     -moz-box-sizing: $box-model; // Firefox <= 19
+          box-sizing: $box-model;
+}
 
-// .wrapper {
-// 	display: inline-block;
-// 	position: relative;
-//   	// margin: 40px auto;
-// 	background: red;
-// 	display: none;
-// }
+.wrapper {
+	display: inline-block;
+	position: relative;
+  	// margin: 40px auto;
+	background: red;
+	display: none;
+}
 
-// @mixin timer($item, $duration, $size, $color, $border, $hover: running) {
-//   #{$item}, #{$item} * { @include box-sizing(border-box); }
+@mixin timer($item, $duration, $size, $color, $border, $hover: running) {
+  #{$item}, #{$item} * { @include box-sizing(border-box); }
 
-//   #{$item} { 
-//     width: $size;
-//     height: $size;
-//   }
+  #{$item} { 
+    width: $size;
+    height: $size;
+  }
 
-//   #{$item} .pie {
-//     width: 50%;
-//     height: 100%;
-//     transform-origin: 100% 50%;
-//     position: absolute;
-//     background: $color;
-//     border: #{$border};
-//   }
+  #{$item} .pie {
+    width: 50%;
+    height: 100%;
+    transform-origin: 100% 50%;
+    position: absolute;
+    background: $color;
+    border: #{$border};
+  }
 
-//   #{$item} .spinner {
-//     border-radius: 100% 0 0 100% / 50% 0 0 50%;
-//     z-index: 200;
-//     border-right: none;
-//     animation: rota $duration + s linear 1;
-//   }
+  #{$item} .spinner {
+    border-radius: 100% 0 0 100% / 50% 0 0 50%;
+    z-index: 200;
+    border-right: none;
+    animation: rota $duration + s linear 1;
+  }
 
-//   #{$item}:hover .spinner,
-//   #{$item}:hover .filler, 
-//   #{$item}:hover .mask {
-//     animation-play-state: $hover;    
-//   }
+  #{$item}:hover .spinner,
+  #{$item}:hover .filler, 
+  #{$item}:hover .mask {
+    animation-play-state: $hover;    
+  }
 
-//   #{$item} .filler {
-//     border-radius: 0 100% 100% 0 / 0 50% 50% 0; 
-//     left: 50%;
-//     opacity: 0;
-//     z-index: 100;
-//     animation: opa $duration + s steps(1,end) 1 reverse;
-//     border-left: none;
-//   }
+  #{$item} .filler {
+    border-radius: 0 100% 100% 0 / 0 50% 50% 0; 
+    left: 50%;
+    opacity: 0;
+    z-index: 100;
+    animation: opa $duration + s steps(1,end) 1 reverse;
+    border-left: none;
+  }
 
-//   #{$item} .mask {
-//     width: 50%;
-//     height: 100%;
-//     position: absolute;
-//     background: inherit;
-//     opacity: 1;
-//     z-index: 300;
-//     animation: opa $duration + s steps(1,end) 1;
-//   }
+  #{$item} .mask {
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    background: inherit;
+    opacity: 1;
+    z-index: 300;
+    animation: opa $duration + s steps(1,end) 1;
+  }
 
-//   @keyframes rota {
-//     0% { transform: rotate(0deg); }
-//     100% { transform: rotate(360deg); }
-//   }
+  @keyframes rota {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 
-//   @keyframes opa {
-//     0% { opacity: 1; }
-//     50%, 100% { opacity: 0; }
-//   }
-// }
+  @keyframes opa {
+    0% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+}
 
-// @include timer('.wrapper', 10, 10px, #fff, 'none');
+@include timer('.wrapper', 10, 10px, #fff, 'none');
 
 
 @import "ember-bootstrap/bootstrap";

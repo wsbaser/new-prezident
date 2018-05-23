@@ -50,13 +50,13 @@ export default Route.extend({
 					id: 'mediacontrol',
 					route: 'history',
 					name: 'Уничтожение независимых СМИ',
-					description: '',
+					description: 'Независимые СМИ - это демократический инититут, который позволяет оценивать качество работы властей и вынуждает их действовать в интересах граждан. Если в стране отсутствуют независимые СМИ - этого не происходит.',
 					videoRanges: ['garantnesvobod_range','freedomdestruction_range','whoownsmedia_range'],
 				},{
 					id: 'oil',
 					route: 'now',
 					name: 'Нефтяная игла',
-					description: '',
+					description: 'Россия долгие годы жила на доходы от экспорта нефти, зарабатывая более 200 млрд долларов в год. Сегодня нефтедоллары составляют 40% федерального бюджета и 50% экспорта, однако в следующие 10 лет ситуация может резко измениться.',
 					videoRanges: ['oilfuture_range','electriconly_range','expensieveoil_range', 'shaleoil_range', 'oilextraction_range'],
 				}],
 			videoRanges:[{
