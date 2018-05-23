@@ -113,10 +113,11 @@ export default Component.extend({
                 duration: 300,
                 delay: 700,
                 complete: function(){
-                    resolve();
+                    console.log('preview overlay is hidden');
                     $('#playerOverlay').hide();
                     $('#playerOverlay .piechart-loader .wrapper').hide(); // need to restart animation
                     this.set('previewOverlayState', 0);
+                    resolve();
                 }.bind(this)
               });
             this.set('animation', animationTimeline);
@@ -173,7 +174,9 @@ export default Component.extend({
                 this.set('previewOverlayState', 2);
                 $wrapper.css('display', 'inline-block');
                 setTimeout(function(){
+                    console.log('autoplay timeout');
                     if(this.get('previewOverlayState')==2){
+                        console.log('start autoplaying by timeout');
                         // if(this.get('readyToPlay')){
                             this.startPlaying();
                         // }
