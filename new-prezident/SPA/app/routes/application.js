@@ -56,8 +56,8 @@ export default Route.extend({
 					id: 'oil',
 					route: 'now',
 					name: 'Нефтяная игла',
-					description: 'Россия долгие годы жила на доходы от экспорта нефти, зарабатывая более 200 млрд долларов в год. Сегодня нефтедоллары составляют 40% федерального бюджета и 50% экспорта, однако в следующие 10 лет ситуация может резко измениться.',
-					videoRanges: ['oilfuture_range','electriconly_range','expensieveoil_range', 'shaleoil_range', 'oilextraction_range'],
+					description: 'Россия долгие годы жила на доходы от экспорта нефти, зарабатывая более 200 млрд долларов в год. Сегодня нефтедоллары составляют более 40% федерального бюджета и 50% экспорта, однако в следующие 10 лет ситуация может резко измениться.',
+					videoRanges: ['oilfuture_range','electriconly_range','electriconly_range2','expensieveoil_range', 'shaleoil_range', 'oilextraction_range'],
 				}],
 			videoRanges:[{
 					id: 'vts1',
@@ -271,9 +271,15 @@ export default Route.extend({
 					video: 'shaleoil'
 				},{
 					id: 'electriconly_range',
-					from: 0.7,
-					to: 765.5,
-					description: 'Планы Европы, Китая и Индии по запрету автомобилей с ДВС',
+					from: 81,
+					to: 169.7,
+					description: 'Планы автопроизводителей по расширению линейки электромобилей',
+					video: 'electriconly'
+				},{
+					id: 'electriconly_range2',
+					from: 172,
+					to: 765.4,
+					description: 'Планы Европы и Китая по субсидированию рынка электромобилей и запрету автомобилей с ДВС',
 					video: 'electriconly'
 				},{
 					id: 'chinaenergy_range',
