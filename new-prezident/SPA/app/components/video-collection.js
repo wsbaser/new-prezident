@@ -245,16 +245,17 @@ export default Component.extend({
                     console.log('video PLAYING');
                     break;
                 case 1:
+                case 2:
                     // . video loading completed before preview is ready
                     // . pause playing and set readyToPlay to true
                     player.pauseVideo();
                     this.set('readyToPlay', true);
                     break
-                case 2:
+
                     // . preview was ready before video loading completer
                     // . start playing
-                    this.startPlaying();
-                    break
+                    // this.startPlaying();
+                    // break
             }
         }else if(event.data==YT.PlayerState.ENDED || event.data==YT.PlayerState.PAUSED){
             if(event.data==YT.PlayerState.ENDED ){
