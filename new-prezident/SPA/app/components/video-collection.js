@@ -84,6 +84,7 @@ export default Component.extend({
         }
     },
     startPlaying(){
+        window.autoplayAllowed = true;
         this.hidePreviewOverlay().then(function(){
             this.get('player').unMute();
             this.get('player').playVideo();
@@ -131,11 +132,15 @@ export default Component.extend({
         let $description = $playerOverlay.find('.description');
         let $startPlaying = $playerOverlay.find('.start-playing');
         let $wrapper = $playerOverlay.find('.piechart-loader .wrapper');
+        let $piechartLoader = $playerOverlay.find('.piechart-loader');
         
         $playerOverlay.show();
         $speaker.show();
         $description.show();
         $startPlaying.show();
+        if(window.autoplayAllowed){
+            $piechartLoader.css('display', 'inline-block');
+        }
 
         let description = this.get('videoRange.description');
         $description.html(description.replace(/([^\x00-\x80]|\w|\.|,|-|"|\?)/g, "<span class='letter'>$&</span>"));
@@ -172,16 +177,21 @@ export default Component.extend({
             duration: 500,
             complete: function() {
                 this.set('previewOverlayState', 2);
-                $wrapper.css('display', 'inline-block');
-                setTimeout(function(){
-                    console.log('autoplay timeout');
-                    if(this.get('previewOverlayState')==2){
-                        console.log('start autoplaying by timeout');
-                        // if(this.get('readyToPlay')){
-                            this.startPlaying();
-                        // }
-                    }
-                }.bind(this), 10000);
+                if(window.autoplayAllowed){
+                    $wrapper.css('display', 'inline-block');
+                    setTimeout(function(){
+                        console.log('autoplay timeout');
+                        if(this.get('previewOverlayState')==2){
+                            console.log('start autoplaying by timeout');
+                            // if(this.get('readyToPlay')){
+                                this.startPlaying();
+                            // }
+                        }
+                    }.bind(this), 10000);            
+                }else{
+                    // wait for user interaction
+                }
+
             }.bind(this)
           });
 
