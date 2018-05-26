@@ -44,20 +44,20 @@ export default Route.extend({
 					route: 'future',
 					name: 'Современное жильё',
 					description: 'Современное жилье - это не только просторные дома с качественной отделкой. Это благоустройство дворов и зон отдыха, детские площадки, доступный транспорт и много других мелочей, которые делают городскую среду безопасной и комфортной.',
-					videoRanges: ['houses_finland_1_range', 'houses_finland_2_range','houses_nz_range','houses_sweden_range','publicspace_london_range'],
+					videoRanges: ['houses_nz_range','houses_sweden_range','houses_finland_1_range', 'houses_finland_2_range','publicspace_london_range'],
 				},
 				{
 					id: 'mediacontrol',
 					route: 'history',
 					name: 'Уничтожение независимых СМИ',
 					description: 'Независимые СМИ - это демократический инититут, который позволяет оценивать качество работы властей и вынуждает их действовать в интересах граждан. Если в стране отсутствуют независимые СМИ - этого не происходит.',
-					videoRanges: ['garantnesvobod_range','freedomdestruction_range','whoownsmedia_range'],
+					videoRanges: ['whoownsmedia_range', 'garantnesvobod_range','freedomdestruction_range'],
 				},{
 					id: 'oil',
 					route: 'now',
 					name: 'Нефтяная игла',
 					description: 'Россия долгие годы жила на доходы от экспорта нефти, зарабатывая более 200 млрд долларов в год. Сегодня нефтедоллары составляют более 40% федерального бюджета и 60% экспорта, однако в следующие 10 лет ситуация может резко измениться.',
-					videoRanges: ['oilfuture_range','electriconly_range','electriconly_range2','expensieveoil_range', 'shaleoil_range', 'oilextraction_range'],
+					videoRanges: ['electriconly_range','electriconly_range2','oilfuture_range','expensieveoil_range', 'shaleoil_range', 'solarwind_range', 'newoil_range', 'oilextraction_range'],
 				}],
 			videoRanges:[{
 					id: 'vts1',
@@ -277,9 +277,9 @@ export default Route.extend({
 					video: 'electriconly'
 				},{
 					id: 'electriconly_range2',
-					from: 172,
-					to: 765.4,
-					description: 'Планы Европы и Китая по субсидированию рынка электромобилей и запрету автомобилей с ДВС',
+					from: 437,
+					to: 599.85,
+					description: 'Планы Европы по субсидированию рынка электромобилей и запрету автомобилей с ДВС',
 					video: 'electriconly'
 				},{
 					id: 'chinaenergy_range',
@@ -287,8 +287,30 @@ export default Route.extend({
 					to: 765.5,
 					description: 'Перспективы развития энергетики Китая',
 					video: 'chinaenergy'
+				},{
+					id: 'solarwind_range',
+					from: 287,
+					to: 561,
+					speaker: 'Владимир Сидорович',
+					description: 'о том почему растет доля возобновляемых источников в производстве электоэнергии',
+					video: 'solarwind'
+				},{
+					id: 'newoil_range',
+					from: 1582,
+					to: 1794.9,
+					speaker: 'Михаил Крутихин',
+					description: 'о перспективах добычи нефти на новых месторождениях',
+					video: 'newoil'
 				}],
 			videos: [{
+					id: 'newoil',
+					youtubeId: 'xyYZlR_Ibmc',
+					channel: 'neftyanka'
+				},{
+					id: 'solarwind',
+					youtubeId: '50dwsixfX9U',
+					channel: 'neftyanka'
+				},{
 					id: 'chinaenergy',
 					youtubeId: '6mZ-_87MO1A',
 					channel: 'neftyanka'

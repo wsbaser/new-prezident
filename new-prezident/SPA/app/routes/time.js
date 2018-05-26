@@ -27,11 +27,11 @@ export default Route.extend({
 	getTitle(time){
 		switch(time){
 			case 'history':
-				return "Np - ИСТОРИЯ";
+				return "ИСТОРИЯ - newprezident.ru";
 			case 'now':
-				return "Np - 2018"
+				return "2018 - newprezident.ru"
 			case 'future':
-				return "Np - БУДУЩЕЕ";
+				return "БУДУЩЕЕ - newprezident.ru";
 		}
 	}
 });
